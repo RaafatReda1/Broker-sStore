@@ -1,0 +1,38 @@
+.card{
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+    margin: 10px;
+    border: solid rgb(194, 194, 194) 2px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2); /* شفاف شوية عشان تظهر الخلفية */
+    backdrop-filter: blur(80px); /* هنا الضبابية */
+    transition: 1s;
+    width: 400px;
+    height: 580px;
+}
+.card:hover{
+    transform: scale(1.001);
+    box-shadow: 0 0 10px 1px orange;
+}
+.card:has(button:hover) {
+    background: #787878; /* لما تحوم على الزر، الكارد يتغير */
+    transition: all 1s ease;
+  }
+
+  .card img{
+    min-width: 100px;
+    max-width: 250px;
+    border-radius: 5px;
+    margin: 10px;
+    height: 250px;
+    cursor: pointer;
+
+  }
+  .price{
+    color: gold;
+    font-weight: bolder;
+    font-size: large;
+  }
