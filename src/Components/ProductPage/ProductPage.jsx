@@ -14,9 +14,9 @@ const ProductPage = () => {
   const [quantity, setQuantity] = useState(1);
 
   // Add to cart logic using currentProduct and quantity
-  const handleAddToCart = () => {
+  const handleAddToCart = (product, qty = 1) => {
     const existingProductIndex = cart.findIndex(
-      (item) => item.id === currentProduct.id
+      (item) => item.id === product.id
     );
 
     let updatedCart;
@@ -24,11 +24,11 @@ const ProductPage = () => {
     if (existingProductIndex !== -1) {
       updatedCart = cart.map((item, index) =>
         index === existingProductIndex
-          ? { ...item, quantity: item.quantity + quantity }
+          ? { ...item, quantity: item.quantity + qty }
           : item
       );
     } else {
-      updatedCart = [...cart, { ...currentProduct, quantity }];
+      updatedCart = [...cart, { ...product, quantity: qty }];
     }
 
     setCart(updatedCart);
@@ -107,7 +107,10 @@ const ProductPage = () => {
             </div>
           ) : (
             <div className="buttons">
-              <button className="btn add-to-cart" onClick={handleAddToCart}>
+              <button
+                className="btn add-to-cart"
+                onClick={() => handleAddToCart(currentProduct, quantity)}
+              >
                 Add to Cart
               </button>
               <button className="btn checkout">Go to Checkout</button>

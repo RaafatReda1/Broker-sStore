@@ -56,7 +56,7 @@ function App() {
           setOrders(orders);
           // for now we'll consider that we fetched user's data in case of the 1st user signed in and then we'll
           // modify the condition according to correct way so let's suppose that the first person signed in
-          setUser(users[1]);
+          setUser(users[0]);
         } catch (err) {
           console.log(err);
           setServerResponded(false);
