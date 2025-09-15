@@ -1,13 +1,13 @@
 import { useState, useContext } from "react";
 import "./ProductPage.css";
-import { currentProductContext, userContext, cartContext } from "../../App";
+import { currentProductContext, userContext, cartContext, currentPageContext } from "../../App";
 import PDF from "../PDF/PDF";
 
 const ProductPage = () => {
   const { currentProduct } = useContext(currentProductContext);
   const { user } = useContext(userContext);
   const { cart, setCart } = useContext(cartContext);
-
+  const { setcurrentPage } = useContext(currentPageContext);
   const [currentImage, setCurrentImage] = useState(
     currentProduct.images?.[0] || currentProduct.image
   );
@@ -70,15 +70,19 @@ const ProductPage = () => {
             <p>Profit: {currentProduct.profit}$</p>
           )}
 
-          {user.authority !== "broker" &&<div className="quantity">
-            <label>Quantity:</label>
-            <input
-              type="number"
-              value={quantity}
-              min="1"
-              onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-            />
-          </div>}
+          {user.authority !== "broker" && (
+            <div className="quantity">
+              <label>Quantity:</label>
+              <input
+                type="number"
+                value={quantity}
+                min="1"
+                onChange={(e) =>
+                  setQuantity(Math.max(1, Number(e.target.value)))
+                }
+              />
+            </div>
+          )}
 
           {user.authority === "broker" ? (
             <div className="buttons">
@@ -113,7 +117,11 @@ const ProductPage = () => {
               >
                 Add to Cart
               </button>
-              <button className="btn checkout">Go to Checkout</button>
+              <button className="btn checkout" onClick={(()=>{
+                setcurrentPage("cart")
+                handleAddToCart(currentProduct, 1)
+              })
+              }>Go to Checkout</button>
             </div>
           )}
         </div>
