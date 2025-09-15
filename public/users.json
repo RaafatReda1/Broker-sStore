@@ -1,0 +1,40 @@
+[
+    {
+        "id": 1,
+        "FullName": "أحمد علي محمد عبد الخالق",
+        "NickName": "Ahmed",
+        "image": "/vite.svg",
+        "phone": "01022779263",
+        "address": "Cairo desret road, Helwan",
+        "IdCardImgFront": "/vite.svg",
+        "IdCardImgBack": "/vite.svg",
+        "authority": "admin",
+        "approval": false
+    },
+    {
+        "id": 2,
+        "FullName": "صالح مسعد مفتوح",
+        "NickName": "saleh",
+        "image": "/react.svg",
+        "phone": "01022779263",
+        "address": "Cairo desret road, Giza",
+        "IdCardImgFront": "/vite.svg",
+        "IdCardImgBack": "/vite.svg",
+        "authority": "broker",
+        "approval": false
+    },   
+    {
+        "id": 3,
+        "FullName": "شعبان عبد الرحيم",
+        "NickName": "Shaaban",
+        "image": "/react.svg",
+        "phone": "01022779263",
+        "address": "Alex, Sidi Gaber",
+        "IdCardImgFront": "/vite.svg",
+        "IdCardImgBack": "/vite.svg",
+        "authority": "moderator",
+        "approval": true,
+        "RealBalance": "100$",
+        "OutStandingBalance": "50$"
+    }
+]

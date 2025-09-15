@@ -1,0 +1,50 @@
+[
+    {
+        "id": 1,
+        "productName": "Book",
+        "productId": 1,
+        "placingDate": "9/9/2025",
+        "estimatedArrival": "12/9/2025",
+        "cusName": "ahmed khaled abdo",
+        "cusAddresse": "NewGiza, Sharabia first Block",
+        "cusPhone": "01007427340",
+        "brokerId": 1,
+        "arrived": false
+    },
+    {
+        "id": 2,
+        "productName": "Laptop",
+        "productId": 2,
+        "placingDate": "10/9/2025",
+        "estimatedArrival": "15/9/2025",
+        "cusName": "mohamed ali",
+        "cusAddresse": "Nasr City, El-Moshir Tantawy St.",
+        "cusPhone": "01234567890",
+        "brokerId": 2,
+        "arrived": false
+    },
+    {
+        "id": 3,
+        "productName": "Smartphone",
+        "productId": 3,
+        "placingDate": "11/9/2025",
+        "estimatedArrival": "14/9/2025",
+        "cusName": "sara mohamed",
+        "cusAddresse": "Heliopolis, El-Masaken St.",
+        "cusPhone": "01122334455",
+        "brokerId": 1,
+        "arrived": true
+    },
+    {
+        "id": 4,
+        "productName": "Headphones",
+        "productId": 4,
+        "placingDate": "12/9/2025",
+        "estimatedArrival": "18/9/2025",
+        "cusName": "ali hassan",
+        "cusAddresse": "6th of October, El-Wahat St.",
+        "cusPhone": "01566778899",
+        "brokerId": 3,
+        "arrived": false
+    }
+]

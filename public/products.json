@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Book",
+    "description": "A useful Book to Read",
+    "fullDescription": "هذا كتاب رائع للغاية يمكن استخدامه في العديدمن مناحي الحياه واللي انا بقوله ده اي عبط انا بس بجرب اعمل نص طويل عشان اشوفه جوا ال pdf هيبقي عامل ازتاي عشان انا لسه عامل كومبوننت جديد لل بي دي اف ده ومش عارف هيشتغل عدل ولا لأ بس هوا مش شغال كويس مع الانجليزي معرفش لي يمكن عشان مش ظابط احداثيات الاس والواي",
+    "price": 200,
+    "images": ["https://placehold.co/600x400@2x.png", "https://placehold.co/600x400@2x.png", "https://placehold.co/600x400@2x.png"],
+    "profit": 100
+  },
+  {
+    "id": 2,
+    "name": "Laptop",
+    "description": "512Gb and 16 Gb of Ram",
+    "fullDescription": " لابتوب مفيد جدا للعمل والدراسة والبرمجة والتصميم والالعاب ايضا مع امكانيات عالية جدا وسعر مناسب للجميع",
+    "price": 1000,
+    "images": ["/vite.svg", "/react.svg", "/vite.svg"],
+    "profit": 100
+  },
+  {
+    "id": 3,
+    "name": "Bike",
+    "description": "Fast bike for a fast trip",
+    "fullDescription": "A useful Bike to ride with and go on trips and enjoy the nature and the fresh air and the beautiful views",
+    "price": 20000,
+    "images": ["https://placehold.co/600x400@2x.png", "https://placehold.co/600x400@2x.png", "https://placehold.co/600x400@2x.png"],
+    "profit": 100
+  },
+  {
+    "id": 4,
+    "name": "Phone",
+    "description": "65mp camera with 690 snapDragon CPU",
+    "fullDescription": "A useful Phone to communicate with your friends and family and do all your tasks with high performance and speed",
+    "price": 8000,
+    "images": ["/vite.svg", "/react.svg", "/vite.svg"],
+    "profit": 100
+  }
+]
