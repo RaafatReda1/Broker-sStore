@@ -86,7 +86,7 @@
   margin-bottom: 28px;
   font-weight: 500;
   color: #444;
-  font-size: .9rem;
+  font-size: 0.9rem;
   letter-spacing: 0.2px;
 }
 
@@ -96,12 +96,10 @@
   top: 14px;
   background: transparent;
   color: #888;
-  font-size: .8rem;
+  font-size: 0.8rem;
   pointer-events: none;
-  transition: 
-    top 0.3s cubic-bezier(.4,2,.3,1),
-    font-size 0.3s cubic-bezier(.4,2,.3,1),
-    color 0.3s;
+  transition: top 0.3s cubic-bezier(0.4, 2, 0.3, 1),
+    font-size 0.3s cubic-bezier(0.4, 2, 0.3, 1), color 0.3s;
   padding: 0 4px;
 }
 
@@ -153,7 +151,7 @@
   margin-top: 18px;
   cursor: pointer;
   box-shadow: 0 2px 12px rgba(60, 60, 120, 0.1);
-  transition: .5s;
+  transition: 0.5s;
   letter-spacing: 0.5px;
 }
 
@@ -166,4 +164,69 @@
 .checkout-label:not(:last-child) {
   border-bottom: 1px solid #ececec;
   padding-bottom: 8px;
+}
+
+.signup-label {
+  position: relative;
+  display: block;
+  margin-bottom: 28px;
+  font-weight: 500;
+  color: #444;
+  font-size: 0.9rem;
+  letter-spacing: 0.2px;
+}
+
+.signup-label .floating-label {
+  position: absolute;
+  left: 0;
+  top: 14px;
+  background: transparent;
+  color: #888;
+  font-size: 0.8rem;
+  pointer-events: none;
+  transition: top 0.3s cubic-bezier(0.4, 2, 0.3, 1),
+    font-size 0.3s cubic-bezier(0.4, 2, 0.3, 1), color 0.3s;
+  padding: 0 4px;
+}
+
+.signup-input:focus + .floating-label,
+.signup-input:not(:placeholder-shown) + .floating-label {
+  top: -5px;
+  font-size: 0.85rem;
+  color: #6a82fb;
+  background: #1f1f1f;
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+.signup-input {
+  width: 90%;
+  padding: 12px 14px;
+  margin-top: 7px;
+  border-radius: 8px;
+  border: 1px solid #646464;
+  font-size: 0.8rem;
+  background: #555555;
+  transition: border 0.2s, background 0.2s;
+  box-shadow: 0 1px 4px rgba(60, 60, 120, 0.04);
+}
+
+.signup-input:focus {
+  border-color: #6a82fb;
+  outline: none;
+  background: #656565;
+}
+
+.checkout-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 28px;
+  color: #43cea2;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-top:0;
 }

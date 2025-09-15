@@ -6,7 +6,7 @@ import Profile from "./Components/Profile/Profile";
 import Balance from "./Components/Balance/Balance";
 import Cart from "./Components/Cart/Cart";
 import ProductPage from "./Components/ProductPage/ProductPage";
-import PDF from "./Components/PDF/PDF";
+import SignUp from "./Components/SignUp/SignUp";
 
 export const currentPageContext = createContext();
 export const userContext = createContext();
@@ -14,12 +14,14 @@ export const productsContext = createContext();
 export const isLoadingContext = createContext();
 export const cartContext = createContext();
 export const currentProductContext = createContext();
+export const userSignedUpContext = createContext();
 
 function App() {
   const isFetched = useRef(false); // to control mounting times (prevent doubling the fetching code)
   const [products, setProducts] = useState([]);
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
+  const [userSignedUp, setUserSignedUp] = useState(false);
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState(
     JSON.parse(localStorage.getItem("cart") || "[]")
@@ -79,14 +81,19 @@ function App() {
               <currentProductContext.Provider
                 value={{ currentProduct, setCurrentProduct }}
               >
-                <>
-                  <Header></Header>
-                  {currentPage === "products" && <Products></Products>}
-                  {currentPage === "profile" && <Profile></Profile>}
-                  {currentPage === "balance" && <Balance></Balance>}
-                  {currentPage === "cart" && <Cart></Cart>}
-                  {currentPage === "productPage" && <ProductPage></ProductPage>}
-                </>
+                <userSignedUpContext.Provider
+                  value={{ userSignedUp, setUserSignedUp }}
+                >
+                  <>
+                    <Header></Header>
+                    {currentPage === "products" && <Products></Products>}
+                    {currentPage === "profile" && <Profile></Profile>}
+                    {currentPage === "balance" && <Balance></Balance>}
+                    {currentPage === "cart" && <Cart></Cart>}
+                    {currentPage === "productPage" && (<ProductPage></ProductPage>)}
+                    {currentPage === "signUp" && <SignUp></SignUp>}
+                  </>
+                </userSignedUpContext.Provider>
               </currentProductContext.Provider>
             </cartContext.Provider>
           </isLoadingContext.Provider>

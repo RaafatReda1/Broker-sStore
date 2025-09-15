@@ -45,6 +45,7 @@ const CheckOut = () => {
       </button>
       <div className={`checkout-parent ${visible ? "show" : ""}`}>
         <form className={`checkout-form${visible ? "" : " hide"}`}>
+        <h2 className="checkout-title">Checkout</h2>
           <label className="checkout-label">
             <input
               className="checkout-input"
