@@ -7,6 +7,7 @@ import Balance from "./Components/Balance/Balance";
 import Cart from "./Components/Cart/Cart";
 import ProductPage from "./Components/ProductPage/ProductPage";
 import SignUp from "./Components/SignUp/SignUp";
+import SignIn from "./Components/SignIn/SignIn";
 
 export const currentPageContext = createContext();
 export const userContext = createContext();
@@ -90,8 +91,11 @@ function App() {
                     {currentPage === "profile" && <Profile></Profile>}
                     {currentPage === "balance" && <Balance></Balance>}
                     {currentPage === "cart" && <Cart></Cart>}
-                    {currentPage === "productPage" && (<ProductPage></ProductPage>)}
+                    {currentPage === "productPage" && (
+                      <ProductPage></ProductPage>
+                    )}
                     {currentPage === "signUp" && <SignUp></SignUp>}
+                    {currentPage === "signIn" && <SignIn></SignIn>}
                   </>
                 </userSignedUpContext.Provider>
               </currentProductContext.Provider>

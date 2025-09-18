@@ -1,8 +1,10 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useContext } from "react";
 import "./DropMenu.css";
+import { currentPageContext } from "../../App";
 
 const DropMenu = ({ isOpen, onClose }) => {
   const dropdownRef = useRef(null);
+  const {setcurrentPage} = useContext(currentPageContext);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -28,6 +30,7 @@ const DropMenu = ({ isOpen, onClose }) => {
 
   const handleSignIn = () => {
     console.log("Sign In clicked");
+    setcurrentPage("signIn");
     onClose();
   };
 
