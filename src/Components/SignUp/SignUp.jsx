@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import "./Signup.css";
+import "./SignUp.css";
 
 const SignUp = () => {
   const [signUpForm, setSignUpForm] = useState({
     fullName: "",
     nickname: "",
+    email: "",
+    password: "",
     phone: "",
     idFront: null,
     idBack: null,
@@ -29,29 +31,57 @@ const SignUp = () => {
     <div className="signup-parent">
       <form className="signup-form" onSubmit={handleSubmit}>
         <h1 className="signup-title">Sign Up</h1>
+        <div className="names">
+          <label className="signup-label name-field">
+            <input
+              className="signup-input"
+              type="text"
+              name="fullName"
+              value={signUpForm.fullName}
+              onChange={handleChange}
+              required
+              placeholder=" "
+            />
+            <span className="floating-label">Full Name</span>
+          </label>
+          <label className="signup-label name-field nickname-field">
+            <input
+              className="signup-input"
+              type="text"
+              name="nickname"
+              value={signUpForm.nickname}
+              onChange={handleChange}
+              required
+              placeholder=" "
+            />
+            <span className="floating-label">Nickname</span>
+          </label>
+        </div>
+
         <label className="signup-label">
           <input
             className="signup-input"
-            type="text"
-            name="fullName"
-            value={signUpForm.fullName}
+            type="email"
+            name="email"
+            value={signUpForm.email}
             onChange={handleChange}
             required
             placeholder=" "
           />
-          <span className="floating-label">Full Name</span>
+          <span className="floating-label">Email</span>
         </label>
+
         <label className="signup-label">
           <input
             className="signup-input"
-            type="text"
-            name="nickname"
-            value={signUpForm.nickname}
+            type="password"
+            name="password"
+            value={signUpForm.password}
             onChange={handleChange}
             required
             placeholder=" "
           />
-          <span className="floating-label">Nickname</span>
+          <span className="floating-label">Password</span>
         </label>
         <label className="signup-label">
           <input

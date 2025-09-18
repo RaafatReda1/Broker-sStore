@@ -8,7 +8,20 @@
   box-shadow: 0 10px 40px rgba(60, 60, 120, 0.13);
   position: relative;
 }
+.names {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
 
+
+}
+
+.name-field {
+  width: 40%;
+}
+.nickname-field{
+  margin-right: 30px;
+}
 .signup-form {
   opacity: 1;
   max-height: 800px;
@@ -136,10 +149,56 @@
 }
 
 /* Add subtle divider between fields */
-.signup-label:not(:last-child) {
+.signup-label:not(:last-child):not(.name-field) {
   border-bottom: 1px solid #ececec;
   padding-bottom: 8px;
 }
-#idCardLabel{
-    color: #6a82fb;
+#idCardLabel {
+  color: #6a82fb;
+}
+.name-field {
+  border-bottom: none;
+}
+
+.name-field .signup-input {
+  width: 100%;
+  margin-bottom: 0;
+  margin-top: 7px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #646464;
+  font-size: 0.8rem;
+  background: #555555;
+  transition: border 0.2s, background 0.2s;
+  box-shadow: 0 1px 4px rgba(60, 60, 120, 0.04);
+  color: #fff;
+}
+
+.name-field .signup-input:focus {
+  border-color: #6a82fb;
+  outline: none;
+  background: #656565;
+}
+
+.name-field .floating-label {
+  position: absolute;
+  left: 0;
+  top: 14px;
+  background: transparent;
+  color: #888;
+  font-size: 0.8rem;
+  pointer-events: none;
+  transition: top 0.3s cubic-bezier(0.4, 2, 0.3, 1),
+    font-size 0.3s cubic-bezier(0.4, 2, 0.3, 1), color 0.3s;
+  padding: 0 4px;
+}
+
+.name-field .signup-input:focus + .floating-label,
+.name-field .signup-input:not(:placeholder-shown) + .floating-label {
+  top: -5px;
+  font-size: 0.85rem;
+  color: #6a82fb;
+  background: #1f1f1f;
+  border-radius: 4px;
+  padding: 0 4px;
 }

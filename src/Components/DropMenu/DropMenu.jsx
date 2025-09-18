@@ -4,7 +4,7 @@ import { currentPageContext } from "../../App";
 
 const DropMenu = ({ isOpen, onClose }) => {
   const dropdownRef = useRef(null);
-  const {setcurrentPage} = useContext(currentPageContext);
+  const { setcurrentPage } = useContext(currentPageContext);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -25,6 +25,8 @@ const DropMenu = ({ isOpen, onClose }) => {
 
   const handleSignUp = () => {
     console.log("Sign Up clicked");
+    setcurrentPage("signUp");
+
     onClose();
   };
 
@@ -36,6 +38,8 @@ const DropMenu = ({ isOpen, onClose }) => {
 
   const handleProfile = () => {
     console.log("Profile clicked");
+    setcurrentPage("profile");
+
     onClose();
   };
 
