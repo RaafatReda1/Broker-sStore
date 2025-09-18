@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./SignUp.css";
-
+import supabase from "../../SupabaseClient";
 const SignUp = () => {
   const [signUpForm, setSignUpForm] = useState({
     fullName: "",
@@ -21,12 +21,19 @@ const SignUp = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    alert("Sign up submitted!");
+    try{
+      await supabase.auth.signUp({
+        email: signUpForm.email,
+        password: signUpForm.password});
+      alert("Sign up successful! Please check your email to confirm your account.");
+    }catch(error){
+      console.error("Error during sign up:", error);
+      alert("Sign up failed. Please try again.");
+    }
   };
-
+  
   return (
     <div className="signup-parent">
       <form className="signup-form" onSubmit={handleSubmit}>

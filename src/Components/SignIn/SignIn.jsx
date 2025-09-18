@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./SignIn.css";
-
+import supabase from "../../SupabaseClient";
 const SignIn = () => {
   const [signInForm, setSignInForm] = useState({
     email: "",
@@ -12,11 +12,14 @@ const SignIn = () => {
     setSignInForm({ ...signInForm, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    // Handle sign in logic here
-    console.log("Sign in data:", signInForm);
-    alert("Sign in submitted!");
+    try{
+      await supabase.auth.signInWithPassword({email: signInForm.email, password: signInForm.password});
+      alert("signed in successfully")
+    }catch(err){
+      console.log(err)
+    }
   };
 
   return (

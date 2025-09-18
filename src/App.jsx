@@ -8,6 +8,7 @@ import Cart from "./Components/Cart/Cart";
 import ProductPage from "./Components/ProductPage/ProductPage";
 import SignUp from "./Components/SignUp/SignUp";
 import SignIn from "./Components/SignIn/SignIn";
+import supabase from "./SupabaseClient.js";
 
 export const currentPageContext = createContext();
 export const userContext = createContext();
@@ -16,6 +17,7 @@ export const isLoadingContext = createContext();
 export const cartContext = createContext();
 export const currentProductContext = createContext();
 export const userSignedUpContext = createContext();
+export const sessionContext = createContext();
 
 function App() {
   const isFetched = useRef(false); // to control mounting times (prevent doubling the fetching code)
@@ -29,17 +31,35 @@ function App() {
   );
   const [currentPage, setcurrentPage] = useState("products");
   const [currentProduct, setCurrentProduct] = useState({});
-  const [IsLoading, setIsLoading] = useState(true);
+  const [session, setSession] = useState(null);
 
+  const [IsLoading, setIsLoading] = useState(true);
   const [serverResponded, setServerResponded] = useState(true);
 
   const params = new URLSearchParams(window.location.search);
   const brokerId = params.get("brokerId");
-
+  const getSession = async () => {
+    try {
+      const res = await supabase.auth.getSession();
+      setSession(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   if (brokerId) {
     localStorage.setItem("brokerId", JSON.stringify(brokerId));
   }
+  //detecting the auth state change (e.g., sign-in, sign-out)
   useEffect(() => {
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      console.log("Auth state changed: ", _event);
+    });
+  }, []);
+
+  useEffect(() => {
+    getSession();
+
     const getData = async () => {
       const RandomTime = Math.random() * 3000;
 
@@ -73,6 +93,12 @@ function App() {
       isFetched.current = true;
     }
   }, [products]);
+  if (session && (currentPage === "signIn" || currentPage === "signUp")) {
+    setcurrentPage("products");
+    console.log("redirecting to products page");
+  }
+
+  console.log(session);
   return (
     <currentPageContext.Provider value={{ currentPage, setcurrentPage }}>
       <userContext.Provider value={{ user, setUser }}>
@@ -85,18 +111,20 @@ function App() {
                 <userSignedUpContext.Provider
                   value={{ userSignedUp, setUserSignedUp }}
                 >
-                  <>
-                    <Header></Header>
-                    {currentPage === "products" && <Products></Products>}
-                    {currentPage === "profile" && <Profile></Profile>}
-                    {currentPage === "balance" && <Balance></Balance>}
-                    {currentPage === "cart" && <Cart></Cart>}
-                    {currentPage === "productPage" && (
-                      <ProductPage></ProductPage>
-                    )}
-                    {currentPage === "signUp" && <SignUp></SignUp>}
-                    {currentPage === "signIn" && <SignIn></SignIn>}
-                  </>
+                  <sessionContext.Provider value={{ session, setSession }}>
+                    <>
+                      <Header></Header>
+                      {currentPage === "products" && <Products></Products>}
+                      {currentPage === "profile" && <Profile></Profile>}
+                      {currentPage === "balance" && <Balance></Balance>}
+                      {currentPage === "cart" && <Cart></Cart>}
+                      {currentPage === "productPage" && (
+                        <ProductPage></ProductPage>
+                      )}
+                      {currentPage === "signUp" && <SignUp></SignUp>}
+                      {currentPage === "signIn" && <SignIn></SignIn>}
+                    </>
+                  </sessionContext.Provider>
                 </userSignedUpContext.Provider>
               </currentProductContext.Provider>
             </cartContext.Provider>

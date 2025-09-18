@@ -1,10 +1,12 @@
 import React, { useRef, useEffect, useContext } from "react";
 import "./DropMenu.css";
-import { currentPageContext } from "../../App";
+import { currentPageContext, sessionContext } from "../../App";
+import supabase from "../../SupabaseClient";
 
 const DropMenu = ({ isOpen, onClose }) => {
   const dropdownRef = useRef(null);
-  const { setcurrentPage } = useContext(currentPageContext);
+  const { currentPage,setcurrentPage } = useContext(currentPageContext);
+  const { session } = useContext(sessionContext);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -43,8 +45,13 @@ const DropMenu = ({ isOpen, onClose }) => {
     onClose();
   };
 
-  const handleLogOut = () => {
+  const handleLogOut = async () => {
     console.log("Log Out clicked");
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.log("LoggingOut Err:   " + err.message);
+    }
     onClose();
   };
 
@@ -52,12 +59,16 @@ const DropMenu = ({ isOpen, onClose }) => {
 
   return (
     <div className="dropdown-menu" ref={dropdownRef}>
-      <button className="dropdown-btn" onClick={handleSignUp}>
-        Sign Up
-      </button>
-      <button className="dropdown-btn" onClick={handleSignIn}>
-        Sign In
-      </button>
+      {!session && (
+        <>
+          <button className="dropdown-btn" onClick={handleSignUp}>
+            Sign Up
+          </button>
+          <button className="dropdown-btn" onClick={handleSignIn}>
+            Sign In
+          </button>
+        </>
+      )}
       <button className="dropdown-btn" onClick={handleProfile}>
         Profile
       </button>
