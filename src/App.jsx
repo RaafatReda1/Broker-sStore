@@ -40,8 +40,8 @@ function App() {
   const brokerId = params.get("brokerId");
   const getSession = async () => {
     try {
-      const res = await supabase.auth.getSession();
-      setSession(res.data);
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
     } catch (err) {
       console.log(err);
     }
@@ -50,12 +50,14 @@ function App() {
     localStorage.setItem("brokerId", JSON.stringify(brokerId));
   }
   //detecting the auth state change (e.g., sign-in, sign-out)
-  useEffect(() => {
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      console.log("Auth state changed: ", _event);
-    });
-  }, []);
+useEffect(() => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    setSession(session); // ✅ هيبقى عندك نفس الشكل
+    console.log("Auth state changed: ", _event, session);
+  });
+
+  return () => subscription.unsubscribe(); // عشان ما يحصلش memory leak
+}, []);
 
   useEffect(() => {
     getSession();
@@ -98,7 +100,6 @@ function App() {
     console.log("redirecting to products page");
   }
 
-  console.log(session);
   return (
     <currentPageContext.Provider value={{ currentPage, setcurrentPage }}>
       <userContext.Provider value={{ user, setUser }}>

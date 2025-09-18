@@ -8,37 +8,16 @@
   box-shadow: 0 10px 40px rgba(60, 60, 120, 0.13);
   position: relative;
 }
-.names {
-  display: flex;
-  gap: 20px;
-  justify-content: space-between;
 
-
-}
-
-.name-field {
-  width: 40%;
-}
-.nickname-field{
-  margin-right: 30px;
-}
 .signup-form {
   opacity: 1;
-  max-height: 800px;
-  overflow: hidden;
+  max-height: 500px;
+  overflow-x: hidden;
   transition: opacity 0.5s cubic-bezier(0.4, 2, 0.3, 1),
     max-height 0.6s cubic-bezier(0.4, 2, 0.3, 1);
   animation: fadeInSignup 0.7s cubic-bezier(0.4, 2, 0.3, 1) both;
   padding-top: 8px;
   display: block;
-}
-
-.signup-form.hide {
-  opacity: 0;
-  max-height: 0;
-  pointer-events: none;
-  transition: opacity 0.5s cubic-bezier(0.4, 2, 0.3, 1),
-    max-height 0.6s cubic-bezier(0.4, 2, 0.3, 1);
 }
 
 @keyframes fadeInSignup {
@@ -85,9 +64,7 @@
 }
 
 .signup-input:focus + .floating-label,
-.signup-input:not(:placeholder-shown) + .floating-label,
-.signup-notes:focus + .floating-label,
-.signup-notes:not(:placeholder-shown) + .floating-label {
+.signup-input:not(:placeholder-shown) + .floating-label {
   top: -5px;
   font-size: 0.85rem;
   color: #6a82fb;
@@ -97,7 +74,7 @@
 }
 
 .signup-input {
-  width: 90%;
+  width: 80%;
   padding: 12px 14px;
   margin-top: 7px;
   border-radius: 8px;
@@ -106,25 +83,13 @@
   background: #555555;
   transition: border 0.2s, background 0.2s;
   box-shadow: 0 1px 4px rgba(60, 60, 120, 0.04);
+  color: #fff;
 }
 
 .signup-input:focus {
   border-color: #6a82fb;
   outline: none;
   background: #656565;
-}
-
-.signup-file {
-  padding: 8px 0;
-  background: #fff;
-  border: none;
-  box-shadow: none;
-  width: 90%;
-  margin-top: 7px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  background: #555555;
-  color: #fff;
 }
 
 .signup-submit-btn {
@@ -137,6 +102,8 @@
   border: none;
   font-size: 1.13rem;
   margin-top: 18px;
+
+  margin-bottom: 50px;
   cursor: pointer;
   box-shadow: 0 2px 12px rgba(60, 60, 120, 0.1);
   transition: 0.5s;
@@ -148,57 +115,82 @@
   box-shadow: 0 4px 16px rgba(60, 60, 120, 0.15);
 }
 
-/* Add subtle divider between fields */
-.signup-label:not(:last-child):not(.name-field) {
-  border-bottom: 1px solid #ececec;
+/* Password Field Styles */
+.password-field {
+  position: relative;
+}
+
+.password-toggle-container {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+    font-size: 15px;
+
+}
+
+.password-checkbox {
+  display: none;
+}
+
+.password-checkbox-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  background: #555555;
+  border: 2px solid #646464;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 2, 0.3, 1);
+  position: relative;
+}
+
+.password-checkbox-label:hover {
+  background: #656565;
+  border-color: #6a82fb;
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(106, 130, 251, 0.3);
+}
+
+.password-checkbox:checked + .password-checkbox-label {
+  background: #6a82fb;
+  border-color: #6a82fb;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(106, 130, 251, 0.4);
+
+}
+
+.checkmark {
+  width: 5px;
+  height: 7px;
+  border: solid white;
+  border-radius:2px;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 2, 0.3, 1);
+}
+
+.password-checkbox:checked + .password-checkbox-label .checkmark {
+  opacity: 1;
+  transform: rotate(45deg) scale(1.2);
+}
+
+.password-field .signup-input {
+  padding-right: 60px;
+}
+
+/* Subtle divider between fields */
+.signup-label:not(:last-child) {
+  border-bottom: 1px solid rgba(236, 236, 236, 0.1);
   padding-bottom: 8px;
 }
-#idCardLabel {
-  color: #6a82fb;
-}
-.name-field {
-  border-bottom: none;
-}
 
-.name-field .signup-input {
-  width: 100%;
-  margin-bottom: 0;
-  margin-top: 7px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  border: 1px solid #646464;
-  font-size: 0.8rem;
-  background: #555555;
-  transition: border 0.2s, background 0.2s;
-  box-shadow: 0 1px 4px rgba(60, 60, 120, 0.04);
-  color: #fff;
-}
+/* Ensure all inputs have consistent styling */
+.email-field{
+    padding-right: 60px;
 
-.name-field .signup-input:focus {
-  border-color: #6a82fb;
-  outline: none;
-  background: #656565;
-}
-
-.name-field .floating-label {
-  position: absolute;
-  left: 0;
-  top: 14px;
-  background: transparent;
-  color: #888;
-  font-size: 0.8rem;
-  pointer-events: none;
-  transition: top 0.3s cubic-bezier(0.4, 2, 0.3, 1),
-    font-size 0.3s cubic-bezier(0.4, 2, 0.3, 1), color 0.3s;
-  padding: 0 4px;
-}
-
-.name-field .signup-input:focus + .floating-label,
-.name-field .signup-input:not(:placeholder-shown) + .floating-label {
-  top: -5px;
-  font-size: 0.85rem;
-  color: #6a82fb;
-  background: #1f1f1f;
-  border-radius: 4px;
-  padding: 0 4px;
 }

@@ -3,71 +3,57 @@ import "./SignUp.css";
 import supabase from "../../SupabaseClient";
 const SignUp = () => {
   const [signUpForm, setSignUpForm] = useState({
-    fullName: "",
-    nickname: "",
     email: "",
     password: "",
-    phone: "",
-    idFront: null,
-    idBack: null,
+    confirmPassword: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (files) {
-      setSignUpForm({ ...signUpForm, [name]: files[0] });
-    } else {
-      setSignUpForm({ ...signUpForm, [name]: value });
-    }
+    const { name, value } = e.target;
+    setSignUpForm({ ...signUpForm, [name]: value });
   };
 
-  const handleSubmit = async(e) => {
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
+
+    if (signUpForm.password !== signUpForm.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    try {
       await supabase.auth.signUp({
         email: signUpForm.email,
-        password: signUpForm.password});
-      alert("Sign up successful! Please check your email to confirm your account.");
-    }catch(error){
+        password: signUpForm.password,
+      });
+      alert(
+        "Sign up successful! Please check your email to confirm your account."
+      );
+    } catch (error) {
       console.error("Error during sign up:", error);
       alert("Sign up failed. Please try again.");
     }
   };
-  
+
   return (
     <div className="signup-parent">
       <form className="signup-form" onSubmit={handleSubmit}>
         <h1 className="signup-title">Sign Up</h1>
-        <div className="names">
-          <label className="signup-label name-field">
-            <input
-              className="signup-input"
-              type="text"
-              name="fullName"
-              value={signUpForm.fullName}
-              onChange={handleChange}
-              required
-              placeholder=" "
-            />
-            <span className="floating-label">Full Name</span>
-          </label>
-          <label className="signup-label name-field nickname-field">
-            <input
-              className="signup-input"
-              type="text"
-              name="nickname"
-              value={signUpForm.nickname}
-              onChange={handleChange}
-              required
-              placeholder=" "
-            />
-            <span className="floating-label">Nickname</span>
-          </label>
-        </div>
 
         <label className="signup-label">
           <input
-            className="signup-input"
+            className="signup-input email-field"
             type="email"
             name="email"
             value={signUpForm.email}
@@ -78,10 +64,10 @@ const SignUp = () => {
           <span className="floating-label">Email</span>
         </label>
 
-        <label className="signup-label">
+        <label className="signup-label password-field">
           <input
             className="signup-input"
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             value={signUpForm.password}
             onChange={handleChange}
@@ -89,44 +75,53 @@ const SignUp = () => {
             placeholder=" "
           />
           <span className="floating-label">Password</span>
+          <div className="password-toggle-container">
+            <input
+              type="checkbox"
+              id="password-toggle"
+              className="password-checkbox"
+              checked={showPassword}
+              onChange={togglePasswordVisibility}
+            />
+            <label
+              htmlFor="password-toggle"
+              className="password-checkbox-label"
+            >
+              <span className="checkmark"></span>
+            </label>
+          </div>
         </label>
-        <label className="signup-label">
+
+        <label className="signup-label password-field">
           <input
             className="signup-input"
-            type="tel"
-            name="phone"
-            value={signUpForm.phone}
+            type={showConfirmPassword ? "text" : "password"}
+            name="confirmPassword"
+            value={signUpForm.confirmPassword}
             onChange={handleChange}
             required
             placeholder=" "
-            pattern="[0-9]{10,15}"
           />
-          <span className="floating-label">Phone Number</span>
+          <span className="floating-label">Confirm Password</span>
+          <div className="password-toggle-container">
+            <input
+              type="checkbox"
+              id="confirm-password-toggle"
+              className="password-checkbox"
+              checked={showConfirmPassword}
+              onChange={toggleConfirmPasswordVisibility}
+            />
+            <label
+              htmlFor="confirm-password-toggle"
+              className="password-checkbox-label"
+            >
+              <span className="checkmark"></span>
+            </label>
+          </div>
         </label>
-        <label className="signup-label" id="idCardLabel">
-          ID Card Front Photo
-          <input
-            className="signup-input signup-file"
-            type="file"
-            name="idFront"
-            accept="image/*"
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label className="signup-label" id="idCardLabel">
-          ID Card Back Photo
-          <input
-            className="signup-input signup-file"
-            type="file"
-            name="idBack"
-            accept="image/*"
-            onChange={handleChange}
-            required
-          />
-        </label>
+
         <button className="signup-submit-btn" type="submit">
-          Submit
+          Sign Up
         </button>
       </form>
     </div>
