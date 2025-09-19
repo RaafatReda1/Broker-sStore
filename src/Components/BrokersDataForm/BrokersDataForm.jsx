@@ -1,8 +1,8 @@
 import React, { useState, useContext } from "react";
 import "./BrokersDataForm.css";
-import supabase from "../../../SupabaseClient";
-import { userContext, sessionContext } from "../../../AppContexts";
-// id_card_back
+import supabase from "../../SupabaseClient";
+import { userContext, sessionContext } from "../../App";
+
 const BrokersDataForm = () => {
   const { user } = useContext(userContext);
   const { session } = useContext(sessionContext);
@@ -31,7 +31,7 @@ const BrokersDataForm = () => {
   const uploadImageToStorage = async (file, fileName) => {
     try {
       const { data, error } = await supabase.storage
-        .from("BrokersCards")
+        .from("Brokers'Cards")
         .upload(fileName, file, {
           cacheControl: "3600",
           upsert: false,
@@ -44,7 +44,7 @@ const BrokersDataForm = () => {
       // Get public URL
       const {
         data: { publicUrl },
-      } = supabase.storage.from("BrokersCards").getPublicUrl(fileName);
+      } = supabase.storage.from("Brokers'Cards").getPublicUrl(fileName);
 
       return publicUrl;
     } catch (error) {
@@ -56,7 +56,7 @@ const BrokersDataForm = () => {
   const uploadWithProgress = async (file, fileName, type) => {
     return new Promise((resolve, reject) => {
       const uploadTask = supabase.storage
-        .from("BrokersCards")
+        .from("Brokers'Cards")
         .upload(fileName, file, {
           cacheControl: "3600",
           upsert: false,
@@ -83,7 +83,7 @@ const BrokersDataForm = () => {
           // Get public URL
           const {
             data: { publicUrl },
-          } = supabase.storage.from("BrokersCards").getPublicUrl(fileName);
+          } = supabase.storage.from("Brokers'Cards").getPublicUrl(fileName);
 
           resolve(publicUrl);
         })
@@ -126,8 +126,8 @@ const BrokersDataForm = () => {
         phone: brokerData.phone,
         email: brokerData.email,
         auth_id: user.id,
-        idCardFront: frontUrl,
-        idCardBack: backUrl,
+        id_card_front_url: frontUrl,
+        id_card_back_url: backUrl,
       });
 
       if (error) {
