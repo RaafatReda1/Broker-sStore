@@ -30,9 +30,6 @@ function App() {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState({ id: "", email: "" });
 
-  const params = new URLSearchParams(window.location.search);
-  const brokerId = params.get("brokerId");
-
   // Fetch the current session
   const getSession = async () => {
     try {
@@ -45,9 +42,14 @@ function App() {
     }
   };
   // Storing brokerId in localStorage if exists in URL
-  if (brokerId) {
-    localStorage.setItem("brokerId", JSON.stringify(brokerId));
-  }
+  const setbrokerId = (() => {
+    const params = new URLSearchParams(window.location.search);
+    const brokerId = params.get("brokerId");
+
+    if (brokerId) {
+      localStorage.setItem("brokerId", JSON.stringify(brokerId));
+    }
+  })();
   //detecting the auth state change (e.g., sign-in, sign-out)
   useEffect(() => {
     const {
