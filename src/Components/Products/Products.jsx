@@ -2,14 +2,13 @@ import React, { useContext } from "react";
 import Product from "./Product";
 import "./Products.css";
 
-import { productsContext, isLoadingContext } from "./../../App";
+import { productsContext} from "./../../App";
 const Products = () => {
-  const { products, setProducts } = useContext(productsContext);
-  const isLoading = useContext(isLoadingContext);
+  const { products } = useContext(productsContext);
   return (
     <div className="productsContainer">
-      {!isLoading &&
-        products.map((item) => {
+      
+        {products.map((item) => {
           return (
             <Product
               key={item.id}
@@ -26,6 +25,6 @@ const Products = () => {
         })}
     </div>
   );
-};
+}
 
 export default Products;
