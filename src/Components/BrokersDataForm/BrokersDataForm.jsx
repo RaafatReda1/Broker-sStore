@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./BrokersDataForm.css";
+import { sessionContext, userContext } from "../../App";
+import supabase from "../../SupabaseClient";
 
 const BrokersDataForm = () => {
   const [brokerForm, setBrokerForm] = useState({
@@ -9,7 +11,9 @@ const BrokersDataForm = () => {
     idFront: null,
     idBack: null,
   });
+  const { session } = useContext(sessionContext);
 
+  const { user } = useContext(userContext);
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
@@ -19,11 +23,24 @@ const BrokersDataForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("Broker data submitted:", brokerForm);
-    alert("Broker data submitted!");
+    if (session) {
+      const { data, err } = await supabase.from("Brokers").insert({
+        fullName: brokerForm.fullName,
+        nickName: brokerForm.nickname,
+        phone: brokerForm.phone,
+        email: user.email,
+        auth_id: user.id,
+      });
+      if (err) {
+        console.log(err);
+        alert("Error submitting broker data. Please try again.");
+        return;
+      } else if (data) {
+        alert("Broker data submitted successfully!");
+      }
+    }
   };
 
   return (

@@ -11,7 +11,7 @@ const Profile = () => {
       try {
         const { data } = await supabase
           .from("Brokers")
-          .select("email")
+          .select("*")
           .eq("email", session.user.email);
         if (data.length > 0) {
           setBrokerExists(true);
@@ -25,6 +25,8 @@ const Profile = () => {
   };
   useEffect(() => {
     checkIfBrokerExists();
+    console.log(brokerExists);
+    console.log(session.user.email)
   });
   return (
     <>

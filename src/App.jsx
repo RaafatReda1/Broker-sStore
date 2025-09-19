@@ -23,7 +23,6 @@ function App() {
   const isFetched = useRef(false); // to control mounting times (prevent doubling the fetching code)
   const [products, setProducts] = useState([]);
   const [users, setUsers] = useState([]);
-  const [user, setUser] = useState({});
   const [userSignedUp, setUserSignedUp] = useState(false);
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState(
@@ -32,7 +31,7 @@ function App() {
   const [currentPage, setcurrentPage] = useState("products");
   const [currentProduct, setCurrentProduct] = useState({});
   const [session, setSession] = useState(null);
-
+  const [user, setUser] = useState({ id: "", email: "" });
   const [IsLoading, setIsLoading] = useState(true);
   const [serverResponded, setServerResponded] = useState(true);
 
@@ -40,7 +39,9 @@ function App() {
   const brokerId = params.get("brokerId");
   const getSession = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setSession(session);
     } catch (err) {
       console.log(err);
@@ -50,14 +51,16 @@ function App() {
     localStorage.setItem("brokerId", JSON.stringify(brokerId));
   }
   //detecting the auth state change (e.g., sign-in, sign-out)
-useEffect(() => {
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-    setSession(session); // ✅ هيبقى عندك نفس الشكل
-    console.log("Auth state changed: ", _event, session);
-  });
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session); // ✅ هيبقى عندك نفس الشكل
+      console.log("Auth state changed: ", _event, session);
+    });
 
-  return () => subscription.unsubscribe(); // عشان ما يحصلش memory leak
-}, []);
+    return () => subscription.unsubscribe(); // عشان ما يحصلش memory leak
+  }, []);
 
   useEffect(() => {
     getSession();
@@ -81,7 +84,6 @@ useEffect(() => {
           setOrders(orders);
           // for now we'll consider that we fetched user's data in case of the 1st user signed in and then we'll
           // modify the condition according to correct way so let's suppose that the first person signed in
-          setUser(users[0]);
         } catch (err) {
           console.log(err);
           setServerResponded(false);
@@ -99,6 +101,16 @@ useEffect(() => {
     setcurrentPage("products");
     console.log("redirecting to products page");
   }
+  useEffect(() => {
+    if (session) {
+      setUser({
+        id: session.user.id,
+        email: session.user.email,
+      });
+        console.log(user);
+
+    }
+  }, [session]);
 
   return (
     <currentPageContext.Provider value={{ currentPage, setcurrentPage }}>
@@ -113,18 +125,20 @@ useEffect(() => {
                   value={{ userSignedUp, setUserSignedUp }}
                 >
                   <sessionContext.Provider value={{ session, setSession }}>
-                    <>
-                      <Header></Header>
-                      {currentPage === "products" && <Products></Products>}
-                      {currentPage === "profile" && <Profile></Profile>}
-                      {currentPage === "balance" && <Balance></Balance>}
-                      {currentPage === "cart" && <Cart></Cart>}
-                      {currentPage === "productPage" && (
-                        <ProductPage></ProductPage>
-                      )}
-                      {currentPage === "signUp" && <SignUp></SignUp>}
-                      {currentPage === "signIn" && <SignIn></SignIn>}
-                    </>
+                    <userContext.Provider value={{ user, setUser }}>
+                      <>
+                        <Header></Header>
+                        {currentPage === "products" && <Products></Products>}
+                        {currentPage === "profile" && <Profile></Profile>}
+                        {currentPage === "balance" && <Balance></Balance>}
+                        {currentPage === "cart" && <Cart></Cart>}
+                        {currentPage === "productPage" && (
+                          <ProductPage></ProductPage>
+                        )}
+                        {currentPage === "signUp" && <SignUp></SignUp>}
+                        {currentPage === "signIn" && <SignIn></SignIn>}
+                      </>
+                    </userContext.Provider>
                   </sessionContext.Provider>
                 </userSignedUpContext.Provider>
               </currentProductContext.Provider>
