@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useContext } from "react";
 import "./BrokersDataForm.css";
 import supabase from "../../../SupabaseClient";
@@ -124,7 +125,7 @@ const BrokersDataForm = () => {
         fullName: brokerData.fullName,
         nickName: brokerData.nickName,
         phone: brokerData.phone,
-        email: brokerData.email,
+        email: user.email,
         auth_id: user.id,
         idCardFront: frontUrl,
         idCardBack: backUrl,
@@ -160,8 +161,8 @@ const BrokersDataForm = () => {
       <form className="broker-form" onSubmit={handleSubmit}>
         <h1 className="broker-title">Broker Information</h1>
 
-        <div className="broker-names">
-          <label className="broker-label broker-name-field">
+        <div className="names">
+          <label className="broker-label name-field">
             <input
               className="broker-input"
               type="text"
@@ -171,10 +172,10 @@ const BrokersDataForm = () => {
               required
               placeholder=" "
             />
-            <span className="broker-floating-label">Full Name</span>
+            <span className="floating-label">Full Name</span>
           </label>
 
-          <label className="broker-label broker-name-field broker-nickname-field">
+          <label className="broker-label name-field nickname-field">
             <input
               className="broker-input"
               type="text"
@@ -184,7 +185,7 @@ const BrokersDataForm = () => {
               required
               placeholder=" "
             />
-            <span className="broker-floating-label">Nickname</span>
+            <span className="floating-label">Nickname</span>
           </label>
         </div>
 
@@ -199,21 +200,9 @@ const BrokersDataForm = () => {
             placeholder=" "
             pattern="[0-9]{10,15}"
           />
-          <span className="broker-floating-label">Phone Number</span>
+          <span className="floating-label">Phone Number</span>
         </label>
 
-        <label className="broker-label">
-          <input
-            className="broker-input"
-            type="email"
-            name="email"
-            value={brokerData.email}
-            onChange={handleChange}
-            required
-            placeholder=" "
-          />
-          <span className="broker-floating-label">Email</span>
-        </label>
 
         <div className="id-card-upload-section">
           <h3 className="upload-section-title">ID Card Photos</h3>
