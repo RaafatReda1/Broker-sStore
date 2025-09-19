@@ -1,10 +1,9 @@
-import { useState, useRef, useContext, createContext, useEffect } from "react";
+import { useContext } from "react";
 import "./Balance.css";
-import { currentPageContext, userContext } from "../../App";
+import { currentPageContext} from "../../AppContexts";
 
 const Balance = () => {
-    const { currentPage, setcurrentPage } = useContext(currentPageContext);
-    const { user, setUser } = useContext(userContext);
+    const {  setcurrentPage } = useContext(currentPageContext);
   return (
     <div className="popup-overlay">
       <div className="popup">

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import BrokersDataForm from "../BrokersDataForm/BrokersDataForm";
 import supabase from "../../SupabaseClient";
-import { sessionContext } from "../../App";
+import { sessionContext } from "../../AppContexts";
 
 const Profile = () => {
   const [brokerExists, setBrokerExists] = useState(null);
@@ -25,9 +25,7 @@ const Profile = () => {
   };
   useEffect(() => {
     checkIfBrokerExists();
-    console.log(brokerExists);
-    console.log(session.user.email)
-  });
+  },[]);
   return (
     <>
       <div>Profile</div>

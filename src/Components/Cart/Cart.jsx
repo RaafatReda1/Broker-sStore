@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import "./Cart.css";
-import { cartContext, currentPageContext, currentProductContext } from "../../App";
+import { cartContext, currentPageContext, currentProductContext } from "../../AppContexts";
 import CheckOut from "../CheckOut/CheckOut";
 
 export default function Cart() {

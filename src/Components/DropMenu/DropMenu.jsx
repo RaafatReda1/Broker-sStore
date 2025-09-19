@@ -1,11 +1,11 @@
 import React, { useRef, useEffect, useContext } from "react";
 import "./DropMenu.css";
-import { currentPageContext, sessionContext } from "../../App";
+import { currentPageContext, sessionContext } from "../../AppContexts";
 import supabase from "../../SupabaseClient";
 
 const DropMenu = ({ isOpen, onClose }) => {
   const dropdownRef = useRef(null);
-  const { currentPage,setcurrentPage } = useContext(currentPageContext);
+  const { setcurrentPage } = useContext(currentPageContext);
   const { session } = useContext(sessionContext);
 
   // Close dropdown when clicking outside

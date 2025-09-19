@@ -1,4 +1,5 @@
-import { useState, useRef, createContext, useEffect } from "react";
+/* eslint-disable no-unused-vars */
+import { useState, useEffect } from "react";
 import "./App.css";
 import Header from "./Components/Header/Header";
 import Products from "./Components/Products/Products";
@@ -10,17 +11,17 @@ import SignUp from "./Components/SignUp/SignUp";
 import SignIn from "./Components/SignIn/SignIn";
 import supabase from "./SupabaseClient.js";
 
-export const currentPageContext = createContext();
-export const userContext = createContext();
-export const productsContext = createContext();
-export const cartContext = createContext();
-export const currentProductContext = createContext();
-export const userSignedUpContext = createContext();
-export const sessionContext = createContext();
+import {
+  currentPageContext,
+  userContext,
+  productsContext,
+  cartContext,
+  currentProductContext,
+  sessionContext,
+} from "./AppContexts";
 
 function App() {
   const [products, setProducts] = useState([]);
-  const [userSignedUp, setUserSignedUp] = useState(false);
   const [cart, setCart] = useState(
     JSON.parse(localStorage.getItem("cart") || "[]")
   );
@@ -31,6 +32,8 @@ function App() {
 
   const params = new URLSearchParams(window.location.search);
   const brokerId = params.get("brokerId");
+
+  // Fetch the current session
   const getSession = async () => {
     try {
       const {
@@ -41,6 +44,7 @@ function App() {
       console.log(err);
     }
   };
+  // Storing brokerId in localStorage if exists in URL
   if (brokerId) {
     localStorage.setItem("brokerId", JSON.stringify(brokerId));
   }
@@ -55,7 +59,7 @@ function App() {
 
     return () => subscription.unsubscribe(); // عشان ما يحصلش memory leak
   }, []);
-
+  // Fetch products data with a random delay to simulate loading time
   useEffect(() => {
     getSession();
 
@@ -74,11 +78,11 @@ function App() {
     };
     getData();
   }, [products]);
-
+  // Redirecting to products page if user is authenticated and trying to access signIn or signUp page
   if (session && (currentPage === "signIn" || currentPage === "signUp")) {
     setcurrentPage("products");
   }
-
+  // Setting user data when session changes
   useEffect(() => {
     if (session) {
       setUser({
@@ -90,34 +94,28 @@ function App() {
 
   return (
     <currentPageContext.Provider value={{ currentPage, setcurrentPage }}>
-        <productsContext.Provider value={{ products, setProducts }}>
-            <cartContext.Provider value={{ cart, setCart }}>
-              <currentProductContext.Provider
-                value={{ currentProduct, setCurrentProduct }}
-              >
-                <userSignedUpContext.Provider
-                  value={{ userSignedUp, setUserSignedUp }}
-                >
-                  <sessionContext.Provider value={{ session, setSession }}>
-                    <userContext.Provider value={{ user, setUser }}>
-                      <>
-                        <Header></Header>
-                        {currentPage === "products" && <Products></Products>}
-                        {currentPage === "profile" && <Profile></Profile>}
-                        {currentPage === "balance" && <Balance></Balance>}
-                        {currentPage === "cart" && <Cart></Cart>}
-                        {currentPage === "productPage" && (
-                          <ProductPage></ProductPage>
-                        )}
-                        {currentPage === "signUp" && <SignUp></SignUp>}
-                        {currentPage === "signIn" && <SignIn></SignIn>}
-                      </>
-                    </userContext.Provider>
-                  </sessionContext.Provider>
-                </userSignedUpContext.Provider>
-              </currentProductContext.Provider>
-            </cartContext.Provider>
-        </productsContext.Provider>
+      <productsContext.Provider value={{ products, setProducts }}>
+        <cartContext.Provider value={{ cart, setCart }}>
+          <currentProductContext.Provider
+            value={{ currentProduct, setCurrentProduct }}
+          >
+            <sessionContext.Provider value={{ session, setSession }}>
+              <userContext.Provider value={{ user, setUser }}>
+                <>
+                  <Header></Header>
+                  {currentPage === "products" && <Products></Products>}
+                  {currentPage === "profile" && <Profile></Profile>}
+                  {currentPage === "balance" && <Balance></Balance>}
+                  {currentPage === "cart" && <Cart></Cart>}
+                  {currentPage === "productPage" && <ProductPage></ProductPage>}
+                  {currentPage === "signUp" && <SignUp></SignUp>}
+                  {currentPage === "signIn" && <SignIn></SignIn>}
+                </>
+              </userContext.Provider>
+            </sessionContext.Provider>
+          </currentProductContext.Provider>
+        </cartContext.Provider>
+      </productsContext.Provider>
     </currentPageContext.Provider>
   );
 }

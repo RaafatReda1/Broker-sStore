@@ -5,7 +5,7 @@ import {
   cartContext,
   currentProductContext,
   userContext,
-} from "../../App";
+} from "../../AppContexts";
 
 const Product = ({
   id,
@@ -19,10 +19,10 @@ const Product = ({
 }) => {
   const { setcurrentPage } = useContext(currentPageContext);
   const { cart, setCart } = useContext(cartContext);
-  const { currentProduct, setCurrentProduct } = useContext(
+  const { setCurrentProduct } = useContext(
     currentProductContext
   );
-  const { user, setUser } = useContext(userContext);
+  const { user } = useContext(userContext);
 
   const handleAddToCart = () => {
     const existingProductIndex = cart.findIndex((item) => item.id === id);

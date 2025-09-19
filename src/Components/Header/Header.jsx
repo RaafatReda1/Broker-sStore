@@ -1,15 +1,10 @@
-import { useState, useRef, useContext, createContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import "./Header.css";
 import DropMenu from "../DropMenu/DropMenu";
-import {
-  currentPageContext,
-  userContext,
-  userSignedUpContext,
-} from "../../App";
+import { currentPageContext, userContext } from "../../AppContexts";
 const Header = () => {
-  const { currentPage, setcurrentPage } = useContext(currentPageContext);
-  const { user, setUser } = useContext(userContext);
-  const { userSignedUp, setUserSignedUp } = useContext(userSignedUpContext);
+  const { setcurrentPage } = useContext(currentPageContext);
+  const { user } = useContext(userContext);
 
   // State for dropdown menu visibility
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -31,11 +26,12 @@ const Header = () => {
         )}
         <h4 onClick={() => setcurrentPage("products")}>Products</h4>
 
-        <div
-          className="profile-container"
-          
-        >
-          <img src="/vite.svg" alt="Profile Photo" onClick={() => setIsDropdownOpen(!isDropdownOpen)}/>
+        <div className="profile-container">
+          <img
+            src="/vite.svg"
+            alt="Profile Photo"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          />
           <DropMenu
             isOpen={isDropdownOpen}
             onClose={() => setIsDropdownOpen(false)}

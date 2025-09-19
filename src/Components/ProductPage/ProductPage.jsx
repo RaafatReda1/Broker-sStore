@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import "./ProductPage.css";
-import { currentProductContext, userContext, cartContext, currentPageContext } from "../../App";
+import { currentProductContext, userContext, cartContext, currentPageContext } from "../../AppContexts";
 import PDF from "../PDF/PDF";
 
 const ProductPage = () => {
