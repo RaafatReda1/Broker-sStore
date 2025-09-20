@@ -1,0 +1,159 @@
+.dataContainer {
+  width: 80%;
+  max-width: 900px;
+  margin: 48px auto;
+  padding: 28px 24px 24px 24px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #1f1f1f 60%, #2b2b2b 100%);
+  box-shadow: 0 10px 40px rgba(60, 60, 120, 0.13);
+}
+
+.dataContainer h1 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #6a82fb;
+  letter-spacing: 1px;
+}
+
+.profileContent {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 28px;
+  align-items: center;
+  animation: contentIn 0.6s cubic-bezier(0.4, 2, 0.3, 1) both;
+}
+
+.profileLeft {
+  position: sticky;
+  top: 24px;
+}
+
+.avatarCard {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(106, 130, 251, 0.06);
+  border: 1px solid rgba(106, 130, 251, 0.18);
+  box-shadow: 0 8px 30px rgba(106, 130, 251, 0.15);
+  transform: translateY(8px);
+  animation: floatIn 0.7s cubic-bezier(0.4, 2, 0.3, 1) 0.1s both;
+}
+
+.avatarCard img {
+  display: block;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(106, 130, 251, 0.25);
+  background: #2a2a2a;
+}
+
+.profileRight {
+  animation: slideInRight 0.7s cubic-bezier(0.4, 2, 0.3, 1) 0.05s both;
+}
+
+.profileForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.profileForm label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #a6a6a6;
+  margin-bottom: -6px;
+}
+
+.profileForm input {
+  width: 70%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #646464;
+  background: #555555;
+  color: #ffffff;
+  font-size: 0.95rem;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(60, 60, 120, 0.08);
+}
+
+.profileForm input:focus {
+  outline: none;
+  border-color: #6a82fb;
+  background: #656565;
+  box-shadow: 0 2px 12px rgba(106, 130, 251, 0.15);
+}
+
+/* Keep disabled inputs readable but consistent with theme */
+.profileForm input:disabled {
+  opacity: 1;
+  color: #eaeaea;
+  cursor: default;
+}
+
+/* Subtle separators between fields */
+.profileForm > div,
+.profileForm > label:not(:last-of-type) {
+  border-bottom: 1px solid rgba(236, 236, 236, 0.08);
+  padding-bottom: 8px;
+}
+
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes contentIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .dataContainer {
+    margin: 24px auto;
+    padding: 20px 16px;
+  }
+
+  .dataContainer h1 {
+    font-size: 1.6rem;
+    margin-bottom: 14px;
+  }
+
+  .profileContent {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .avatarCard img {
+    width: 100px;
+    height: 100px;
+  }
+}

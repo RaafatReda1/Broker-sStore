@@ -7,7 +7,6 @@ import { userContext, sessionContext } from "../../../AppContexts";
 const BrokersDataForm = () => {
   const { user } = useContext(userContext);
   const { session } = useContext(sessionContext);
-
   const [brokerData, setBrokerData] = useState({
     fullName: "",
     nickName: "",

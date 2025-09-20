@@ -18,6 +18,7 @@ import {
   cartContext,
   currentProductContext,
   sessionContext,
+  userDataContext,
 } from "./AppContexts";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
   const [currentProduct, setCurrentProduct] = useState({});
   const [session, setSession] = useState(null);
   const [user, setUser] = useState({ id: "", email: "" });
+  const [userData, setUserData] = useState(null);
 
   // Fetch the current session
   const getSession = async () => {
@@ -79,7 +81,7 @@ function App() {
       }, RandomTime);
     };
     getData();
-  }, [products]);
+  }, []);
   // Redirecting to products page if user is authenticated and trying to access signIn or signUp page
   if (session && (currentPage === "signIn" || currentPage === "signUp")) {
     setcurrentPage("products");
@@ -98,21 +100,21 @@ function App() {
     <currentPageContext.Provider value={{ currentPage, setcurrentPage }}>
       <productsContext.Provider value={{ products, setProducts }}>
         <cartContext.Provider value={{ cart, setCart }}>
-          <currentProductContext.Provider
-            value={{ currentProduct, setCurrentProduct }}
-          >
+          <currentProductContext.Provider value={{ currentProduct, setCurrentProduct }}>
             <sessionContext.Provider value={{ session, setSession }}>
               <userContext.Provider value={{ user, setUser }}>
-                <>
-                  <Header></Header>
-                  {currentPage === "products" && <Products></Products>}
-                  {currentPage === "profile" && <Profile></Profile>}
-                  {currentPage === "balance" && <Balance></Balance>}
-                  {currentPage === "cart" && <Cart></Cart>}
-                  {currentPage === "productPage" && <ProductPage></ProductPage>}
-                  {currentPage === "signUp" && <SignUp></SignUp>}
-                  {currentPage === "signIn" && <SignIn></SignIn>}
-                </>
+                <userDataContext.Provider value={{userData, setUserData}}>
+                  <>
+                    <Header></Header>
+                    {currentPage === "products" && <Products></Products>}
+                    {currentPage === "profile" && <Profile></Profile>}
+                    {currentPage === "balance" && <Balance></Balance>}
+                    {currentPage === "cart" && <Cart></Cart>}
+                    {currentPage === "productPage" && <ProductPage></ProductPage>}
+                    {currentPage === "signUp" && <SignUp></SignUp>}
+                    {currentPage === "signIn" && <SignIn></SignIn>}
+                  </>
+                </userDataContext.Provider>
               </userContext.Provider>
             </sessionContext.Provider>
           </currentProductContext.Provider>
