@@ -65,7 +65,7 @@
 
 .signin-input:focus + .floating-label,
 .signin-input:not(:placeholder-shown) + .floating-label {
-  top: -5px;
+  top: -10px;
   font-size: 0.85rem;
   color: #6a82fb;
   background: #1f1f1f;
@@ -111,4 +111,8 @@
 .signin-submit-btn:hover {
   background: linear-gradient(90deg, #185a9d 0%, #43cea2 100%);
   box-shadow: 0 4px 16px rgba(60, 60, 120, 0.15);
+}
+.signin-input{
+  display: flex;
+  align-items: center;
 }

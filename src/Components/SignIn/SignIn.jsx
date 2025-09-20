@@ -6,19 +6,27 @@ const SignIn = () => {
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSignInForm({ ...signInForm, [name]: value });
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-      await supabase.auth.signInWithPassword({email: signInForm.email, password: signInForm.password});
-      alert("signed in successfully")
-    }catch(err){
-      console.log(err)
+    try {
+      await supabase.auth.signInWithPassword({
+        email: signInForm.email,
+        password: signInForm.password,
+      });
+      alert("signed in successfully");
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -38,10 +46,10 @@ const SignIn = () => {
           />
           <span className="floating-label">Email</span>
         </label>
-        <label className="signin-label">
+        <label className="signin-label password-field">
           <input
             className="signin-input"
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             value={signInForm.password}
             onChange={handleChange}
@@ -49,6 +57,21 @@ const SignIn = () => {
             placeholder=" "
           />
           <span className="floating-label">Password</span>
+          <div className="password-toggle-container">
+            <input
+              type="checkbox"
+              id="password-toggle"
+              className="password-checkbox"
+              checked={showPassword}
+              onChange={togglePasswordVisibility}
+            />
+            <label
+              htmlFor="password-toggle"
+              className="password-checkbox-label"
+            >
+              <span className="checkmark"></span>
+            </label>
+          </div>
         </label>
         <button className="signin-submit-btn" type="submit">
           Sign In
