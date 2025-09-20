@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./PreviewData.css";
 import { sessionContext, userDataContext } from "../../../AppContexts";
 import supabase from "../../../SupabaseClient";
@@ -6,6 +6,8 @@ import supabase from "../../../SupabaseClient";
 const PreviewData = () => {
   const { userData, setUserData } = useContext(userDataContext);
   const { session } = useContext(sessionContext);
+  const [isEditing, setIsEditing] = useState(false);
+
   //getting the user's data from the brokers table
   const getUserData = async () => {
     if (!session?.user?.email) return; // لو مفيش session متعملش حاجة
@@ -40,24 +42,50 @@ const PreviewData = () => {
 
         <div className="profileContent">
           <div className="profileLeft">
-            <div className="avatarCard">
-              <img src="./vite.svg" alt="Profile avatar" />
+            <div className={`avatarCard ${isEditing && "avatarCard2"}`}>
+              <img
+                src="./vite.svg"
+                alt="Profile avatar"
+                className="avatarImage"
+              />
             </div>
           </div>
 
           <div className="profileRight">
             <form className="profileForm">
               <label htmlFor="fullName">Full Name</label>
-              <input defaultValue={userData?.fullName} disabled id="fullName" />
+              <input
+                defaultValue={userData?.fullName}
+                {...(isEditing ? {} : { disabled: true })}
+                id="fullName"
+              />
 
               <label htmlFor="nickName">Nickname</label>
-              <input defaultValue={userData?.nickName} disabled id="nickName" />
+              <input
+                defaultValue={userData?.nickName}
+                {...(isEditing ? {} : { disabled: true })}
+                id="nickName"
+              />
 
               <label htmlFor="phone">Phone</label>
-              <input defaultValue={userData?.phone} disabled id="phone" />
+              <input
+                defaultValue={userData?.phone}
+                {...(isEditing ? {} : { disabled: true })}
+                id="phone"
+              />
             </form>
           </div>
         </div>
+      </div>
+      <div className="btns">
+        <button className="savingBtn" onClick={() => setIsEditing(true)}>
+          {isEditing ? "Save Changes" : "Edit Data"}
+        </button>
+        {isEditing && (
+          <button className="cancelBtn" onClick={() => setIsEditing(false)}>
+            Cancel
+          </button>
+        )}
       </div>
     </>
   );

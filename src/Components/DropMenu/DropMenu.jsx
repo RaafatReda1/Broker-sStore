@@ -69,12 +69,16 @@ const DropMenu = ({ isOpen, onClose }) => {
           </button>
         </>
       )}
-      <button className="dropdown-btn" onClick={handleProfile}>
-        Profile
-      </button>
-      <button className="dropdown-btn logout-btn" onClick={handleLogOut}>
-        Log Out
-      </button>
+      {session && (
+        <>
+          <button className="dropdown-btn" onClick={handleProfile}>
+            Profile
+          </button>
+          <button className="dropdown-btn logout-btn" onClick={handleLogOut}>
+            Log Out
+          </button>
+        </>
+      )}
     </div>
   );
 };
