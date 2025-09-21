@@ -116,6 +116,7 @@ const PreviewData = () => {
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file)); // يعمل preview
   };
+  //handle updating the profile pic with removing the older one in the DB
   const handleUploadingAvatar = async () => {
     if (!selectedFile) return; // لو مفيش فايل محدد مفيش داعي نكمل
 
@@ -136,6 +137,7 @@ const PreviewData = () => {
 
       // 2️⃣ رفع الصورة الجديدة
       const newFileName = `${userData.id}_${Date.now()}`;
+      // eslint-disable-next-line no-unused-vars
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("BrokersProfilePic")
         .upload(newFileName, selectedFile);
@@ -158,6 +160,7 @@ const PreviewData = () => {
       const avatarUrl = publicUrlData.publicUrl;
 
       // 4️⃣ تحديث الـ avatar_url في جدول الـ DB
+      // eslint-disable-next-line no-unused-vars
       const { data: updateData, error: updateError } = await supabase
         .from("Brokers")
         .update({ avatar_url: avatarUrl })

@@ -95,7 +95,35 @@ function App() {
       });
     }
   }, [session]);
+  // fetch data from DB
+  const getUserData = (async () => {
+    if (!session?.user?.email) return;
 
+    const { data, error } = await supabase
+      .from("Brokers")
+      .select("*")
+      .eq("email", session.user.email);
+
+    if (error) {
+      console.error("Fetching user data error:", error.message);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      setUserData(data[0]);
+      console.log("Fetched user data:", data[0]);
+    } else {
+      setUserData(null);
+      console.log("No user data found for this email");
+    }
+  })
+  useEffect(()=>{
+     if (session) {
+    getUserData();
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[session])
+  console.log(userData)
   return (
     <currentPageContext.Provider value={{ currentPage, setcurrentPage }}>
       <productsContext.Provider value={{ products, setProducts }}>

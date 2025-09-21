@@ -1,12 +1,19 @@
 import { useState, useContext } from "react";
 import "./Header.css";
 import DropMenu from "../DropMenu/DropMenu";
-import { currentPageContext, userContext } from "../../AppContexts";
+import {
+  currentPageContext,
+  userContext,
+  userDataContext,
+} from "../../AppContexts";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUserTie } from "@fortawesome/free-solid-svg-icons";
+
 const Header = () => {
   const { setcurrentPage } = useContext(currentPageContext);
   const { user } = useContext(userContext);
+  const { userData } = useContext(userDataContext);
 
-  // State for dropdown menu visibility
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
@@ -27,11 +34,31 @@ const Header = () => {
         <h4 onClick={() => setcurrentPage("products")}>Products</h4>
 
         <div className="profile-container">
-          <img
-            src="/vite.svg"
-            alt="Profile Photo"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          />
+          {/* Avatar / Icon as dropdown toggle */}
+          <div
+            className="profile-trigger"
+            onClick={() => setIsDropdownOpen((prev) => !prev)}
+          >
+            {userData?.avatar_url ? (
+              <img
+                src={userData.avatar_url}
+                alt="Profile"
+                style={{
+                  width: "30px",
+                  height: "30px",
+                  borderRadius: "50%", // make it circular
+                  cursor: "pointer",
+                }}
+              />
+            ) : (
+              <FontAwesomeIcon
+                icon={faUserTie}
+                style={{ width: "30px", height: "30px", cursor: "pointer" }}
+              />
+            )}
+          </div>
+
+          {/* Dropdown */}
           <DropMenu
             isOpen={isDropdownOpen}
             onClose={() => setIsDropdownOpen(false)}
