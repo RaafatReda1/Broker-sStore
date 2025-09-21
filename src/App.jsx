@@ -26,24 +26,6 @@ function App() {
   const [cart, setCart] = useState(
     JSON.parse(localStorage.getItem("cart") || "[]")
   );
-
-  // ✅ Sync cart changes to localStorage
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
-
-  // ✅ Listen for localStorage changes from other tabs
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === "cart") {
-        const newCart = JSON.parse(e.newValue || "[]");
-        setCart(newCart);
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
   const [currentPage, setcurrentPage] = useState("products");
   const [currentProduct, setCurrentProduct] = useState({});
   const [session, setSession] = useState(null);
@@ -141,6 +123,23 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
+    // ✅ Sync cart changes to localStorage
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  // ✅ Listen for localStorage changes from other tabs
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === "cart") {
+        const newCart = JSON.parse(e.newValue || "[]");
+        setCart(newCart);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
   return (
     <currentPageContext.Provider value={{ currentPage, setcurrentPage }}>
       <productsContext.Provider value={{ products, setProducts }}>
