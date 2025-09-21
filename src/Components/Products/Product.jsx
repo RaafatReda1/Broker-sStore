@@ -19,9 +19,7 @@ const Product = ({
 }) => {
   const { setcurrentPage } = useContext(currentPageContext);
   const { cart, setCart } = useContext(cartContext);
-  const { setCurrentProduct } = useContext(
-    currentProductContext
-  );
+  const { setCurrentProduct } = useContext(currentProductContext);
   const { user } = useContext(userContext);
 
   const handleAddToCart = () => {
@@ -51,7 +49,7 @@ const Product = ({
     }
 
     setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    // localStorage is now handled in App.jsx
   };
 
   return (

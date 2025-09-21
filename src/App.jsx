@@ -26,6 +26,24 @@ function App() {
   const [cart, setCart] = useState(
     JSON.parse(localStorage.getItem("cart") || "[]")
   );
+
+  // ✅ Sync cart changes to localStorage
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  // ✅ Listen for localStorage changes from other tabs
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === "cart") {
+        const newCart = JSON.parse(e.newValue || "[]");
+        setCart(newCart);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
   const [currentPage, setcurrentPage] = useState("products");
   const [currentProduct, setCurrentProduct] = useState({});
   const [session, setSession] = useState(null);
@@ -96,7 +114,7 @@ function App() {
     }
   }, [session]);
   // fetch Broker's data from DB
-  const getUserData = (async () => {
+  const getUserData = async () => {
     if (!session?.user?.email) return;
 
     const { data, error } = await supabase
@@ -116,28 +134,32 @@ function App() {
       setUserData(null);
       console.log("No user data found for this email");
     }
-  })
-  useEffect(()=>{
-     if (session) {
-    getUserData();
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[session])
+  };
+  useEffect(() => {
+    if (session) {
+      getUserData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
   return (
     <currentPageContext.Provider value={{ currentPage, setcurrentPage }}>
       <productsContext.Provider value={{ products, setProducts }}>
         <cartContext.Provider value={{ cart, setCart }}>
-          <currentProductContext.Provider value={{ currentProduct, setCurrentProduct }}>
+          <currentProductContext.Provider
+            value={{ currentProduct, setCurrentProduct }}
+          >
             <sessionContext.Provider value={{ session, setSession }}>
               <userContext.Provider value={{ user, setUser }}>
-                <userDataContext.Provider value={{userData, setUserData}}>
+                <userDataContext.Provider value={{ userData, setUserData }}>
                   <>
                     <Header></Header>
                     {currentPage === "products" && <Products></Products>}
                     {currentPage === "profile" && <Profile></Profile>}
                     {currentPage === "balance" && <Balance></Balance>}
                     {currentPage === "cart" && <Cart></Cart>}
-                    {currentPage === "productPage" && <ProductPage></ProductPage>}
+                    {currentPage === "productPage" && (
+                      <ProductPage></ProductPage>
+                    )}
                     {currentPage === "signUp" && <SignUp></SignUp>}
                     {currentPage === "signIn" && <SignIn></SignIn>}
                   </>

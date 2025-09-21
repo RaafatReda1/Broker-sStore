@@ -1,6 +1,11 @@
 import { useState, useContext } from "react";
 import "./ProductPage.css";
-import { currentProductContext, userContext, cartContext, currentPageContext } from "../../AppContexts";
+import {
+  currentProductContext,
+  userContext,
+  cartContext,
+  currentPageContext,
+} from "../../AppContexts";
 import PDF from "../PDF/PDF";
 
 const ProductPage = () => {
@@ -32,7 +37,7 @@ const ProductPage = () => {
     }
 
     setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    // localStorage is now handled in App.jsx
     alert("Added to cart!");
   };
 
@@ -117,11 +122,15 @@ const ProductPage = () => {
               >
                 Add to Cart
               </button>
-              <button className="btn checkout" onClick={(()=>{
-                setcurrentPage("cart")
-                handleAddToCart(currentProduct, 1)
-              })
-              }>Go to Checkout</button>
+              <button
+                className="btn checkout"
+                onClick={() => {
+                  setcurrentPage("cart");
+                  handleAddToCart(currentProduct, 1);
+                }}
+              >
+                Go to Checkout
+              </button>
             </div>
           )}
         </div>
