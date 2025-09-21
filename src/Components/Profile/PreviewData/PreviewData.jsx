@@ -79,7 +79,7 @@ const PreviewData = () => {
     // فلترة القيم اللي المستخدم غيرها فقط
     const updatedFields = {};
     Object.keys(userDataForm).forEach((key) => {
-      if (userDataForm[key] !== (userData[key] || "")) {
+      if (userDataForm[key] !== userData[key] && userDataForm[key] !== "") {
         updatedFields[key] = userDataForm[key];
       }
     });
@@ -150,6 +150,18 @@ const PreviewData = () => {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 onChange={handleChange}
+                onKeyDown={(e) => {
+                  // لو المفتاح مش رقم ومش Backspace/Arrow → منع الكتابة
+                  if (
+                    !/[0-9]/.test(e.key) &&
+                    e.key !== "Backspace" &&
+                    e.key !== "ArrowLeft" &&
+                    e.key !== "ArrowRight"
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                maxLength={11}
                 disabled={!isEditing}
                 id="phone"
               />
@@ -164,6 +176,7 @@ const PreviewData = () => {
           onClick={() => {
             if (isEditing) {
               handleUpdate();
+              setRefresh((prev) => !prev);
             } else {
               setIsEditing(true);
             }
