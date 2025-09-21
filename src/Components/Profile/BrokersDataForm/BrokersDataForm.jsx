@@ -4,7 +4,7 @@ import "./BrokersDataForm.css";
 import supabase from "../../../SupabaseClient";
 import { userContext, sessionContext } from "../../../AppContexts";
 // id_card_back
-const BrokersDataForm = () => {
+const BrokersDataForm = ({setRefresh}) => {
   const { user } = useContext(userContext);
   const { session } = useContext(sessionContext);
   const [brokerData, setBrokerData] = useState({
@@ -197,11 +197,23 @@ const BrokersDataForm = () => {
             onChange={handleChange}
             required
             placeholder=" "
-            pattern="[0-9]{10,15}"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            onKeyDown={(e) => {
+              // لو المفتاح مش رقم ومش Backspace/Arrow → منع الكتابة
+              if (
+                !/[0-9]/.test(e.key) &&
+                e.key !== "Backspace" &&
+                e.key !== "ArrowLeft" &&
+                e.key !== "ArrowRight"
+              ) {
+                e.preventDefault();
+              }
+            }}
+            maxLength={11}
           />
           <span className="floating-label">Phone Number</span>
         </label>
-
 
         <div className="id-card-upload-section">
           <h3 className="upload-section-title">ID Card Photos</h3>
@@ -311,6 +323,11 @@ const BrokersDataForm = () => {
           className="broker-submit-btn"
           type="submit"
           disabled={isUploading}
+          onClick={()=>{
+            setTimeout(()=>{
+              setRefresh((prev)=>!prev);
+            },3000)
+          }}
         >
           {isUploading ? "Uploading..." : "Submit Broker Data"}
         </button>

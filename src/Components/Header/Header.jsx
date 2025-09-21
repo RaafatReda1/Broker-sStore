@@ -53,7 +53,14 @@ const Header = () => {
             ) : (
               <FontAwesomeIcon
                 icon={faUserTie}
-                style={{ width: "30px", height: "30px", cursor: "pointer" }}
+                style={{
+                  width: "30px",
+                  height: "30px",
+                  borderRadius: "50%", // make it circular
+                  border: "solid 2px white",
+                  padding: "5px",
+                  cursor: "pointer",
+                }}
               />
             )}
           </div>

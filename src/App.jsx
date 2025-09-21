@@ -95,7 +95,7 @@ function App() {
       });
     }
   }, [session]);
-  // fetch data from DB
+  // fetch Broker's data from DB
   const getUserData = (async () => {
     if (!session?.user?.email) return;
 
@@ -123,7 +123,6 @@ function App() {
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[session])
-  console.log(userData)
   return (
     <currentPageContext.Provider value={{ currentPage, setcurrentPage }}>
       <productsContext.Provider value={{ products, setProducts }}>
