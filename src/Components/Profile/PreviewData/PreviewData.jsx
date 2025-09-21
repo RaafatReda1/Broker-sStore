@@ -192,7 +192,7 @@ const PreviewData = () => {
                 }
               }}
             >
-              {previewUrl ? (
+              {previewUrl && isEditing ? (
                 <img
                   src={previewUrl}
                   alt="Preview"
