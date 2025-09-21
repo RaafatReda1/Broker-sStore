@@ -18,6 +18,9 @@ const PreviewData = () => {
     phone: "",
   });
 
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+
   // sync form with fetched userData
   useEffect(() => {
     if (userData) {
@@ -57,19 +60,19 @@ const PreviewData = () => {
       console.log("No user data found for this email");
     }
   };
-
+  //rendering the data according to the refresh state
   useEffect(() => {
     getUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh]);
-
+  //setting the userFormData to the input values
   const handleChange = (e) => {
     setUserDataForm({
       ...userDataForm,
       [e.target.name]: e.target.value,
     });
   };
-
+  //sending the new form to the DB
   const handleUpdate = async () => {
     if (!userData) {
       alert("No user data found");
@@ -106,6 +109,73 @@ const PreviewData = () => {
       alert("No data was updated");
     }
   };
+  //handling the profile img temporary storage
+  const handleFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return; // لو مفيش فايل يخرج على طول
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file)); // يعمل preview
+  };
+  const handleUploadingAvatar = async () => {
+    if (!selectedFile) return; // لو مفيش فايل محدد مفيش داعي نكمل
+
+    try {
+      // 1️⃣ حذف الصورة القديمة لو موجودة
+      if (userData.avatar_url) {
+        const oldFileName = userData.avatar_url.split("/").pop(); // الاسم بس
+        const { data: deleteData, error: deleteError } = await supabase.storage
+          .from("BrokersProfilePic")
+          .remove([oldFileName]);
+
+        if (deleteError) {
+          console.error("Deleting Old Img Error:", deleteError.message);
+        } else {
+          console.log("Previous image deleted successfully:", deleteData);
+        }
+      }
+
+      // 2️⃣ رفع الصورة الجديدة
+      const newFileName = `${userData.id}_${Date.now()}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("BrokersProfilePic")
+        .upload(newFileName, selectedFile);
+
+      if (uploadError) {
+        alert("Uploading Img Error: " + uploadError.message);
+        return;
+      }
+
+      // 3️⃣ الحصول على public URL للصورة الجديدة
+      const { data: publicUrlData, error: publicUrlError } = supabase.storage
+        .from("BrokersProfilePic")
+        .getPublicUrl(newFileName);
+
+      if (publicUrlError) {
+        alert("Error getting public URL: " + publicUrlError.message);
+        return;
+      }
+
+      const avatarUrl = publicUrlData.publicUrl;
+
+      // 4️⃣ تحديث الـ avatar_url في جدول الـ DB
+      const { data: updateData, error: updateError } = await supabase
+        .from("Brokers")
+        .update({ avatar_url: avatarUrl })
+        .eq("id", userData.id)
+        .select();
+
+      if (updateError) {
+        alert("Error updating avatar URL: " + updateError.message);
+        return;
+      }
+
+      alert("Profile picture updated successfully!");
+      setUserData((prev) => ({ ...prev, avatar_url: avatarUrl })); // تحديث الواجهة فورًا
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      alert("Something went wrong!");
+    }
+  };
 
   return (
     <>
@@ -114,10 +184,39 @@ const PreviewData = () => {
 
         <div className="profileContent">
           <div className="profileLeft">
-            <div className={`avatarCard ${isEditing && "avatarCard2"}`}>
-              <FontAwesomeIcon
-                icon={faUserTie}
-                style={{ width: "150px", height: "150px" }}
+            <div
+              className={`avatarCard ${isEditing && "avatarCard2"}`}
+              onClick={() => {
+                {
+                  isEditing && document.getElementById("fileInput").click();
+                }
+              }}
+            >
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  style={{ width: "150px", height: "150px" }}
+                />
+              ) : userData?.avatar_url ? (
+                <img
+                  src={userData.avatar_url}
+                  alt="Profile"
+                  style={{ width: "150px", height: "150px" }}
+                />
+              ) : (
+                <FontAwesomeIcon
+                  icon={faUserTie}
+                  style={{ width: "150px", height: "150px" }}
+                />
+              )}
+
+              <input
+                type="file"
+                accept="image/*"
+                id="fileInput"
+                style={{ display: "none" }}
+                onChange={handleFile}
               />
             </div>
           </div>
@@ -176,6 +275,7 @@ const PreviewData = () => {
           onClick={() => {
             if (isEditing) {
               handleUpdate();
+              handleUploadingAvatar();
               setRefresh((prev) => !prev);
             } else {
               setIsEditing(true);
