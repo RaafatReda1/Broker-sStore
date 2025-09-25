@@ -3,7 +3,6 @@ import "./Header.css";
 import DropMenu from "../DropMenu/DropMenu";
 import {
   currentPageContext,
-  userContext,
   userDataContext,
 } from "../../AppContexts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,7 +10,6 @@ import { faUserTie } from "@fortawesome/free-solid-svg-icons";
 
 const Header = () => {
   const { setcurrentPage } = useContext(currentPageContext);
-  const { user } = useContext(userContext);
   const { userData } = useContext(userDataContext);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -25,10 +23,10 @@ const Header = () => {
       </div>
 
       <nav>
-        {user.authority !== "broker" && (
+        {!userData && (
           <h4 onClick={() => setcurrentPage("cart")}>Cart</h4>
         )}
-        {user.authority === "broker" && (
+        {userData && (
           <h4 onClick={() => setcurrentPage("balance")}>Balance</h4>
         )}
         <h4 onClick={() => setcurrentPage("products")}>Products</h4>

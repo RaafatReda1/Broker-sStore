@@ -2,17 +2,17 @@ import { useState, useContext } from "react";
 import "./ProductPage.css";
 import {
   currentProductContext,
-  userContext,
   cartContext,
   currentPageContext,
+  userDataContext,
 } from "../../AppContexts";
 import PDF from "../PDF/PDF";
 
 const ProductPage = () => {
   const { currentProduct } = useContext(currentProductContext);
-  const { user } = useContext(userContext);
   const { cart, setCart } = useContext(cartContext);
   const { setcurrentPage } = useContext(currentPageContext);
+  const {userData} = useContext(userDataContext)
   const [currentImage, setCurrentImage] = useState(
     currentProduct.images?.[0] || currentProduct.image
   );
@@ -70,12 +70,11 @@ const ProductPage = () => {
           <h2>{currentProduct.name}</h2>
           <p className="description">{currentProduct.description}</p>
           <p className="price">{currentProduct.price}$</p>
-
-          {user.authority === "broker" && (
+          {userData && (
             <p>Profit: {currentProduct.profit}$</p>
           )}
 
-          {user.authority !== "broker" && (
+          {!userData && (
             <div className="quantity">
               <label>Quantity:</label>
               <input
@@ -89,7 +88,7 @@ const ProductPage = () => {
             </div>
           )}
 
-          {user.authority === "broker" ? (
+          {userData ? (
             <div className="buttons">
               <PDF
                 name={currentProduct.name}
@@ -103,7 +102,7 @@ const ProductPage = () => {
                 onClick={async () => {
                   try {
                     await navigator.clipboard.writeText(
-                      window.location.href + "?brokerId=" + user.id
+                      window.location.href + "?brokerId=" + userData.id
                     );
                     alert("Copied to clipboard!");
                   } catch (err) {

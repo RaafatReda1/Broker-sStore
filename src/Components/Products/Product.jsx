@@ -4,7 +4,7 @@ import {
   currentPageContext,
   cartContext,
   currentProductContext,
-  userContext,
+  userDataContext,
 } from "../../AppContexts";
 
 const Product = ({
@@ -20,8 +20,7 @@ const Product = ({
   const { setcurrentPage } = useContext(currentPageContext);
   const { cart, setCart } = useContext(cartContext);
   const { setCurrentProduct } = useContext(currentProductContext);
-  const { user } = useContext(userContext);
-
+  const {userData} = useContext(userDataContext);
   const handleAddToCart = () => {
     const existingProductIndex = cart.findIndex((item) => item.id === id);
 
@@ -77,20 +76,21 @@ const Product = ({
       <h5 className="price">{price}$</h5>
 
       <div className="productBtns">
-        {user.authority !== "broker" && (
+        {!userData && (
           <button type="button" onClick={handleAddToCart}>
             Add to cart
           </button>
         )}
-        {user.authority === "broker" && (
+        {userData && (
           <button
             type="button"
             onClick={async () => {
               try {
-                await navigator.clipboard.writeText(
-                  window.location.href + "?brokerId=" + user.id
+                const copiedTxt = await navigator.clipboard.writeText(
+                  window.location.href + "?brokerId=" + userData.id
                 );
-                alert("Copied to clipboard!");
+                console.log(userData);
+                alert("Copied to clipboard!", copiedTxt);
               } catch (err) {
                 console.error("Failed to copy: ", err);
               }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import "./CheckOut.css";
 import { cartContext } from "../../AppContexts";
+import supabase from "../../SupabaseClient";
 
 const CheckOut = () => {
   const [visible, setVisible] = useState(false);
@@ -48,9 +49,15 @@ const CheckOut = () => {
   };
 
   // ✅ handle form submit
-  const handleSubmit = () => {
-    alert("Order submitted!");
-    console.log("Order Data:", form);
+  const handleSubmit = async () => {
+    const { data, error } = await supabase.from("Orders").insert([form]);
+    if (error) {
+      alert("Error sending the Order");
+    } else if (data) {
+      alert("OrderPlaced!!");
+    } else {
+      alert("OrderPlaced!!");
+    }
   };
 
   return (
