@@ -1,24 +1,21 @@
 import { useContext } from "react";
 import "./Balance.css";
-import { currentPageContext} from "../../AppContexts";
+import { userDataContext } from "../../AppContexts";
 
 const Balance = () => {
-    const {  setcurrentPage } = useContext(currentPageContext);
+  const { userData } = useContext(userDataContext);
+
   return (
-    <div className="popup-overlay">
-      <div className="popup">
-        <h2>Your Balances</h2>
-        <p>
-          <strong>Real Balance:</strong> $100
-        </p>
-        <p>
-          <strong>Suspended Balance:</strong> $200
-        </p>
-        <button className="close-btn" onClick={()=> setcurrentPage('products')}>
-          Close
-        </button>
-      </div>
-    </div>
+    <>
+      <h3>
+        Suspended Balance:{" "}
+        <p>{userData ? userData.suspendedBalance ?? 0 : "Loading..."}</p>
+      </h3>
+      <h3>
+        Actual Balance:{" "}
+        <p>{userData ? userData.actualBalance ?? 0 : "Loading..."}</p>
+      </h3>
+    </>
   );
 };
 
