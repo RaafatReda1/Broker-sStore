@@ -19,6 +19,10 @@ const CheckOut = () => {
     date: "",
     cart: cart,
     total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    //adding the net profit logic
+    netProfit: cart.reduce((sum, product) => {
+      return sum + product.profit * product.quantity;
+    }, 0),
   });
 
   // ✅ Update form when cart changes from context
@@ -27,6 +31,9 @@ const CheckOut = () => {
       ...prev,
       cart: cart,
       total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+      netProfit: cart.reduce((sum, product) => {
+        return sum + product.profit * product.quantity;
+      }, 0),
     }));
   }, [cart]);
 
