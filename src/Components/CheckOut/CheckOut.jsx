@@ -16,7 +16,7 @@ const CheckOut = () => {
     address: "",
     phone: "",
     notes: "",
-    date: "",
+    // date: "", this feild is deleted at the DB for now
     cart: cart,
     total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
     //adding the net profit logic

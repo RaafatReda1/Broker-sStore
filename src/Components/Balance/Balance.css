@@ -1,60 +1,299 @@
 .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Balance Stats */
+.balance-container {
+  width: 100%;
+  background: #0f1115;
+  padding: 8px;
+}
+
+.loading {
+  padding: 24px;
+  text-align: center;
+  color: #666;
+}
+
+.balance-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.dashboard-section {
+  width: 100%;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e8ecf2;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title i {
+  color: #5c8dff;
+}
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.stat-card {
+  background: #12151c;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-title {
+  font-size: 14px;
+  color: #b5bdc9;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #f3f5f7;
+  letter-spacing: 0.2px;
+}
+
+.stat-subtitle {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #8c95a3;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stat-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 8px;
+  flex-grow: 1;
+}
+
+.chart-container {
+  margin-top: 12px;
+  height: 60px;
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
+
+.linear-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #b5bdc9;
+}
+
+.stat-chip.success {
+  background: rgba(0, 176, 116, 0.22);
+  color: #2be49f;
+}
+
+.stat-chip.warning {
+  background: rgba(245, 166, 35, 0.22);
+  color: #ffb74d;
+}
+
+.accent-primary {
+  border-color: rgba(66, 133, 244, 0.35);
+  box-shadow: 0 8px 28px rgba(66, 133, 244, 0.18);
+}
+
+.accent-warning {
+  border-color: rgba(245, 166, 35, 0.35);
+  box-shadow: 0 8px 28px rgba(245, 166, 35, 0.18);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .section-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   }
-  
-  .popup {
-    background: #fff;
-    padding: 20px 30px;
-    border-radius: 15px;
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    width: 300px;
-    animation: fadeIn 0.3s ease-in-out;
+}
+
+@media (min-width: 1024px) {
+  .section-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   }
-  
-  .popup h2 {
-    margin-bottom: 15px;
-    color: #333;
+
+  .dashboard-section:nth-child(1) .section-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  .popup p {
-    margin: 10px 0;
-    font-size: 16px;
-    color: #444;
+
+  .dashboard-section:nth-child(2) .section-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
-  
-  .close-btn {
-    margin-top: 15px;
-    padding: 8px 15px;
-    border: none;
-    background: #ff5c5c;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
+
+  .dashboard-section:nth-child(3) .section-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
-  
-  .close-btn:hover {
-    background: #e04343;
+
+  .dashboard-section:nth-child(4) .section-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* Removed old grid span helpers - now using flexbox layout */
+
+/* Progress ring */
+.ring {
+  display: block;
+}
+.ring-bg {
+  fill: none;
+  stroke: #1b2029;
+}
+.ring-fg {
+  fill: none;
+  stroke: #5c8dff;
+  stroke-linecap: round;
+}
+.ring-text {
+  font-weight: 700;
+  font-size: 14px;
+  fill: #e8ecf2;
+}
+
+/* Donut chart */
+.donut {
+  display: block;
+}
+.donut-pending {
+  fill: none;
+  stroke: #1b2029;
+}
+.donut-completed {
+  fill: none;
+  stroke: #2be49f;
+  stroke-linecap: round;
+}
+.donut-text {
+  font-weight: 700;
+  font-size: 14px;
+  fill: #e8ecf2;
+}
+
+/* Bar compare */
+.bar-compare .bar {
+  height: 12px;
+  border-radius: 999px;
+  background: #1b2029;
+  overflow: hidden;
+  display: flex;
+}
+.bar-compare .bar-a {
+  background: #5c8dff;
+}
+.bar-compare .bar-b {
+  background: #ffb74d;
+}
+.bar-compare .bar-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-top: 8px;
+  color: #8c95a3;
+}
+
+/* Title icons */
+.stat-title i {
+  margin-right: 8px;
+  color: #8c95a3;
+}
+
+.popup {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 15px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 300px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.popup h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.popup p {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #444;
+}
+
+.close-btn {
+  margin-top: 15px;
+  padding: 8px 15px;
+  border: none;
+  background: #ff5c5c;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.close-btn:hover {
+  background: #e04343;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
   }
-  
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
