@@ -1,5 +1,5 @@
-/* eslint-disable no-unused-vars */
-import { useState, useEffect } from "react";
+import { useState, useEffect, React } from "react";
+
 import "./App.css";
 import Header from "./Components/Header/Header";
 import Products from "./Components/Products/Products";
@@ -10,9 +10,9 @@ import ProductPage from "./Components/ProductPage/ProductPage";
 import SignUp from "./Components/SignUp/SignUp";
 import SignIn from "./Components/SignIn/SignIn";
 import supabase from "./SupabaseClient.js";
+import { Routes, Route, Link } from "react-router-dom";
 
 import {
-  currentPageContext,
   userContext,
   productsContext,
   cartContext,
@@ -44,6 +44,7 @@ function App() {
     }
   };
   // Storing brokerId in localStorage if exists in URL
+  // eslint-disable-next-line no-unused-vars
   const setbrokerId = (() => {
     const params = new URLSearchParams(window.location.search);
     const brokerId = params.get("brokerId");

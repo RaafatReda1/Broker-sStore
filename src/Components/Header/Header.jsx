@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { useState, useContext } from "react";
 import "./Header.css";
 import DropMenu from "../DropMenu/DropMenu";

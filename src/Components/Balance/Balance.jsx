@@ -1,4 +1,6 @@
 import { useContext, useMemo } from "react";
+import React from "react";
+
 import "./Balance.css";
 import { userDataContext } from "../../AppContexts";
 import BrokersArrangement from "./BrokersArrangement/BrokersArrangement";

@@ -1,4 +1,6 @@
 import { useState, useContext } from "react";
+import React from "react";
+
 import "./BrokersArrangement.css";
 import { userDataContext, sessionContext } from "../../../AppContexts";
 import supabase from "../../../SupabaseClient";

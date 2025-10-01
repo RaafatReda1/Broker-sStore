@@ -36,7 +36,6 @@ const Profile = () => {
   };
   useEffect(() => {
     checkIfBrokerExists();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh]);
   //getting the userdata to preview just after uploading the form
     const getUserData = (async () => {
