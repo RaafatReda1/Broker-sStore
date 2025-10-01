@@ -9,6 +9,7 @@ import Cart from "./Components/Cart/Cart";
 import ProductPage from "./Components/ProductPage/ProductPage";
 import SignUp from "./Components/SignUp/SignUp";
 import SignIn from "./Components/SignIn/SignIn";
+import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute";
 import supabase from "./SupabaseClient.js";
 import { Routes, Route, Link } from "react-router-dom";
 
@@ -117,7 +118,6 @@ function App() {
     if (session) {
       getUserData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
   // ✅ Sync cart changes to localStorage
   useEffect(() => {
@@ -147,8 +147,22 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Products></Products>}></Route>
                   <Route path="/profile" element={<Profile></Profile>}></Route>
-                  <Route path="/balance" element={<Balance></Balance>}></Route>
-                  <Route path="/cart" element={<Cart></Cart>}></Route>
+                  <Route
+                    path="/balance"
+                    element={
+                      <ProtectedRoute requireSession={true}>
+                        <Balance></Balance>
+                      </ProtectedRoute>
+                    }
+                  ></Route>
+                  <Route
+                    path="/cart"
+                    element={
+                      <ProtectedRoute blockBroker={true}>
+                        <Cart></Cart>
+                      </ProtectedRoute>
+                    }
+                  ></Route>
                   <Route
                     path={`/productPage/*`}
                     element={<ProductPage></ProductPage>}
