@@ -35,7 +35,7 @@ export default function Cart() {
           <>
             <ul className="cart-list">
               {cart.map((item, index) => (
-                <Link key={index} to="/productPage">
+                <Link key={index} to= {`/productPage/productId:${item.id}`}>
                   <li
                     key={index}
                     className="cart-item"

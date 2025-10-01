@@ -161,7 +161,7 @@ function App() {
                     ></Route>
                     <Route path="/cart" element={<Cart></Cart>}></Route>
                     <Route
-                      path= {`/productPage/ProductId:${currentProduct.id}`}
+                      path= {`/productPage/*`}
                       element={<ProductPage></ProductPage>}
                     ></Route>
                     <Route path="/signup" element={<SignUp></SignUp>}></Route>

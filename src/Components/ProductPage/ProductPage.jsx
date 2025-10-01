@@ -1,21 +1,43 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import "./ProductPage.css";
-import {
-  currentProductContext,
-  userContext,
-  cartContext,
-} from "../../AppContexts";
+import { userContext, cartContext, productsContext } from "../../AppContexts";
 import PDF from "../PDF/PDF";
 import { Link } from "react-router-dom";
 
 const ProductPage = () => {
-  const { currentProduct } = useContext(currentProductContext);
+  const { products } = useContext(productsContext);
   const { user } = useContext(userContext);
   const { cart, setCart } = useContext(cartContext);
-  const [currentImage, setCurrentImage] = useState(
-    currentProduct.images?.[0] || currentProduct.image
-  );
+
+  // Extract product ID from URL path
+  const path = window.location.pathname;
+  const productIdMatch = path.match(/productId:(\d+)/);
+  const productId = productIdMatch ? parseInt(productIdMatch[1]) : null;
+
+  // Find the product from products array
+  const currentProduct = products.find((product) => product.id === productId);
+
+  const [currentImage, setCurrentImage] = useState(null);
   const [quantity, setQuantity] = useState(1);
+
+  // Update currentImage when currentProduct is found
+  useEffect(() => {
+    if (currentProduct) {
+      setCurrentImage(currentProduct.images?.[0] || currentProduct.image);
+    }
+  }, [currentProduct]);
+
+  // Show loading or error if product is not found
+  if (!currentProduct) {
+    return (
+      <div className="product-page">
+        <div className="product-card">
+          {products.length === 0 && <h2>Loading product...</h2>}
+          {products.length > 0 && <p>Product not found</p>}
+        </div>
+      </div>
+    );
+  }
 
   // Add to cart logic using currentProduct and quantity
   const handleAddToCart = (product, qty = 1) => {
