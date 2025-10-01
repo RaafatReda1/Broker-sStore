@@ -67,7 +67,7 @@ const Product = ({
             onClick={async () => {
               try {
                 const copiedTxt = await navigator.clipboard.writeText(
-                  window.location.href + "?brokerId=" + userData.id
+                  window.location.href + "productPage/productId:" + id +"?brokerId=" + userData.id
                 );
                 console.log(userData);
                 alert("Copied to clipboard!", copiedTxt);

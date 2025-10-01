@@ -1,6 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
 import "./ProductPage.css";
-import { userContext, cartContext, productsContext } from "../../AppContexts";
+import {
+  userContext,
+  cartContext,
+  productsContext,
+  userDataContext,
+} from "../../AppContexts";
 import PDF from "../PDF/PDF";
 import { Link } from "react-router-dom";
 
@@ -8,7 +13,7 @@ const ProductPage = () => {
   const { products } = useContext(productsContext);
   const { user } = useContext(userContext);
   const { cart, setCart } = useContext(cartContext);
-
+  const { userData } = useContext(userDataContext);
   // Extract product ID from URL path
   const path = window.location.pathname;
   const productIdMatch = path.match(/productId:(\d+)/);
@@ -91,12 +96,9 @@ const ProductPage = () => {
           <h2>{currentProduct.name}</h2>
           <p className="description">{currentProduct.description}</p>
           <p className="price">{currentProduct.price}$</p>
+          {userData && <p>Profit: {currentProduct.profit}$</p>}
 
-          {user.authority === "broker" && (
-            <p>Profit: {currentProduct.profit}$</p>
-          )}
-
-          {user.authority !== "broker" && (
+          {!userData && (
             <div className="quantity">
               <label>Quantity:</label>
               <input
@@ -110,7 +112,7 @@ const ProductPage = () => {
             </div>
           )}
 
-          {user.authority === "broker" ? (
+          {userData ? (
             <div className="buttons">
               <PDF
                 name={currentProduct.name}
@@ -124,7 +126,7 @@ const ProductPage = () => {
                 onClick={async () => {
                   try {
                     await navigator.clipboard.writeText(
-                      window.location.href + "?brokerId=" + user.id
+                      window.location.href + "?brokerId=" + userData.id
                     );
                     alert("Copied to clipboard!");
                   } catch (err) {
@@ -143,13 +145,8 @@ const ProductPage = () => {
               >
                 Add to Cart
               </button>
-              <Link to="/cart">
-                <button
-                  className="btn checkout"
-                  onClick={() => {
-                    handleAddToCart(currentProduct, 1);
-                  }}
-                >
+              <Link to = "/cart">
+                <button className="btn checkout" onClick={() => {}}>
                   Go to Checkout
                 </button>
               </Link>
