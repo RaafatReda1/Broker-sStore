@@ -1,13 +1,17 @@
-import { useState, useContext } from "react";
+import React, { useState, useContext } from "react";
 import "./ProductPage.css";
-import { currentProductContext, userContext, cartContext, currentPageContext } from "../../AppContexts";
+import {
+  currentProductContext,
+  userContext,
+  cartContext,
+} from "../../AppContexts";
 import PDF from "../PDF/PDF";
+import { Link } from "react-router-dom";
 
 const ProductPage = () => {
   const { currentProduct } = useContext(currentProductContext);
   const { user } = useContext(userContext);
   const { cart, setCart } = useContext(cartContext);
-  const { setcurrentPage } = useContext(currentPageContext);
   const [currentImage, setCurrentImage] = useState(
     currentProduct.images?.[0] || currentProduct.image
   );
@@ -117,11 +121,16 @@ const ProductPage = () => {
               >
                 Add to Cart
               </button>
-              <button className="btn checkout" onClick={(()=>{
-                setcurrentPage("cart")
-                handleAddToCart(currentProduct, 1)
-              })
-              }>Go to Checkout</button>
+              <Link to="/cart">
+                <button
+                  className="btn checkout"
+                  onClick={() => {
+                    handleAddToCart(currentProduct, 1);
+                  }}
+                >
+                  Go to Checkout
+                </button>
+              </Link>
             </div>
           )}
         </div>

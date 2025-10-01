@@ -19,8 +19,10 @@ const Product = ({
   profit,
 }) => {
   const { cart, setCart } = useContext(cartContext);
-  const { setCurrentProduct } = useContext(currentProductContext);
-  const {userData} = useContext(userDataContext);
+  const { currentProduct, setCurrentProduct } = useContext(
+    currentProductContext
+  );
+  const { userData } = useContext(userDataContext);
   const handleAddToCart = () => {
     const existingProductIndex = cart.findIndex((item) => item.id === id);
 
@@ -53,24 +55,25 @@ const Product = ({
 
   return (
     <div className="card">
-      <Link to = "productPage">
-              <img
-        src={src}
-        alt=""
-        onClick={() => {
-          setCurrentProduct({
-            id,
-            name,
-            description,
-            price,
-            image: src,
-            images,
-            fullDescription,
-            profit,
-            quantity: 1,
-          });
-        }}
-      />
+      <Link to={`/productPage/productId:${id}`}>
+        <img
+          src={src}
+          alt=""
+          onClick={() => {
+            setCurrentProduct({
+              id,
+              name,
+              description,
+              price,
+              image: src,
+              images,
+              fullDescription,
+              profit,
+              quantity: 1,
+            });
+            console.log(id);
+          }}
+        />
       </Link>
       <h3>{name}</h3>
       <h5>{description}</h5>
