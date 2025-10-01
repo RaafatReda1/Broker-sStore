@@ -1,17 +1,13 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import "./ProductPage.css";
-import {
-  currentProductContext,
-  cartContext,
-  userDataContext,
-} from "../../AppContexts";
+import { currentProductContext, userContext, cartContext, currentPageContext } from "../../AppContexts";
 import PDF from "../PDF/PDF";
-import { Link } from "react-router-dom";
 
 const ProductPage = () => {
   const { currentProduct } = useContext(currentProductContext);
+  const { user } = useContext(userContext);
   const { cart, setCart } = useContext(cartContext);
-  const { userData } = useContext(userDataContext);
+  const { setcurrentPage } = useContext(currentPageContext);
   const [currentImage, setCurrentImage] = useState(
     currentProduct.images?.[0] || currentProduct.image
   );
@@ -36,7 +32,7 @@ const ProductPage = () => {
     }
 
     setCart(updatedCart);
-    // localStorage is now handled in App.jsx
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
     alert("Added to cart!");
   };
 
@@ -69,9 +65,12 @@ const ProductPage = () => {
           <h2>{currentProduct.name}</h2>
           <p className="description">{currentProduct.description}</p>
           <p className="price">{currentProduct.price}$</p>
-          {userData && <p>Profit: {currentProduct.profit}$</p>}
 
-          {!userData && (
+          {user.authority === "broker" && (
+            <p>Profit: {currentProduct.profit}$</p>
+          )}
+
+          {user.authority !== "broker" && (
             <div className="quantity">
               <label>Quantity:</label>
               <input
@@ -85,7 +84,7 @@ const ProductPage = () => {
             </div>
           )}
 
-          {userData ? (
+          {user.authority === "broker" ? (
             <div className="buttons">
               <PDF
                 name={currentProduct.name}
@@ -99,7 +98,7 @@ const ProductPage = () => {
                 onClick={async () => {
                   try {
                     await navigator.clipboard.writeText(
-                      window.location.href + "?brokerId=" + userData.id
+                      window.location.href + "?brokerId=" + user.id
                     );
                     alert("Copied to clipboard!");
                   } catch (err) {
@@ -118,16 +117,11 @@ const ProductPage = () => {
               >
                 Add to Cart
               </button>
-              <Link to="/cart">
-                <button
-                  className="btn checkout"
-                  onClick={() => {
-                    handleAddToCart(currentProduct, 1);
-                  }}
-                >
-                  Go to Checkout
-                </button>
-              </Link>
+              <button className="btn checkout" onClick={(()=>{
+                setcurrentPage("cart")
+                handleAddToCart(currentProduct, 1)
+              })
+              }>Go to Checkout</button>
             </div>
           )}
         </div>
