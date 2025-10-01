@@ -3,16 +3,15 @@ import "./ProductPage.css";
 import {
   currentProductContext,
   cartContext,
-  currentPageContext,
   userDataContext,
 } from "../../AppContexts";
 import PDF from "../PDF/PDF";
+import { Link } from "react-router-dom";
 
 const ProductPage = () => {
   const { currentProduct } = useContext(currentProductContext);
   const { cart, setCart } = useContext(cartContext);
-  const { setcurrentPage } = useContext(currentPageContext);
-  const {userData} = useContext(userDataContext)
+  const { userData } = useContext(userDataContext);
   const [currentImage, setCurrentImage] = useState(
     currentProduct.images?.[0] || currentProduct.image
   );
@@ -70,9 +69,7 @@ const ProductPage = () => {
           <h2>{currentProduct.name}</h2>
           <p className="description">{currentProduct.description}</p>
           <p className="price">{currentProduct.price}$</p>
-          {userData && (
-            <p>Profit: {currentProduct.profit}$</p>
-          )}
+          {userData && <p>Profit: {currentProduct.profit}$</p>}
 
           {!userData && (
             <div className="quantity">
@@ -121,15 +118,16 @@ const ProductPage = () => {
               >
                 Add to Cart
               </button>
-              <button
-                className="btn checkout"
-                onClick={() => {
-                  setcurrentPage("cart");
-                  handleAddToCart(currentProduct, 1);
-                }}
-              >
-                Go to Checkout
-              </button>
+              <Link to="/cart">
+                <button
+                  className="btn checkout"
+                  onClick={() => {
+                    handleAddToCart(currentProduct, 1);
+                  }}
+                >
+                  Go to Checkout
+                </button>
+              </Link>
             </div>
           )}
         </div>

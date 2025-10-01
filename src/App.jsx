@@ -26,7 +26,6 @@ function App() {
   const [cart, setCart] = useState(
     JSON.parse(localStorage.getItem("cart") || "[]")
   );
-  const [currentPage, setcurrentPage] = useState("products");
   const [currentProduct, setCurrentProduct] = useState({});
   const [session, setSession] = useState(null);
   const [user, setUser] = useState({ id: "", email: "" });
@@ -84,9 +83,7 @@ function App() {
     getData();
   }, []);
   // Redirecting to products page if user is authenticated and trying to access signIn or signUp page
-  if (session && (currentPage === "signIn" || currentPage === "signUp")) {
-    setcurrentPage("products");
-  }
+
   // Setting user data when session changes
   useEffect(() => {
     if (session) {
@@ -124,7 +121,7 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
-    // ✅ Sync cart changes to localStorage
+  // ✅ Sync cart changes to localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
@@ -142,34 +139,41 @@ function App() {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
   return (
-    <currentPageContext.Provider value={{ currentPage, setcurrentPage }}>
-      <productsContext.Provider value={{ products, setProducts }}>
-        <cartContext.Provider value={{ cart, setCart }}>
-          <currentProductContext.Provider
-            value={{ currentProduct, setCurrentProduct }}
-          >
-            <sessionContext.Provider value={{ session, setSession }}>
-              <userContext.Provider value={{ user, setUser }}>
-                <userDataContext.Provider value={{ userData, setUserData }}>
-                  <>
-                    <Header></Header>
-                    {currentPage === "products" && <Products></Products>}
-                    {currentPage === "profile" && <Profile></Profile>}
-                    {currentPage === "balance" && <Balance></Balance>}
-                    {currentPage === "cart" && <Cart></Cart>}
-                    {currentPage === "productPage" && (
-                      <ProductPage></ProductPage>
-                    )}
-                    {currentPage === "signUp" && <SignUp></SignUp>}
-                    {currentPage === "signIn" && <SignIn></SignIn>}
-                  </>
-                </userDataContext.Provider>
-              </userContext.Provider>
-            </sessionContext.Provider>
-          </currentProductContext.Provider>
-        </cartContext.Provider>
-      </productsContext.Provider>
-    </currentPageContext.Provider>
+    <productsContext.Provider value={{ products, setProducts }}>
+      <cartContext.Provider value={{ cart, setCart }}>
+        <currentProductContext.Provider
+          value={{ currentProduct, setCurrentProduct }}
+        >
+          <sessionContext.Provider value={{ session, setSession }}>
+            <userContext.Provider value={{ user, setUser }}>
+              <userDataContext.Provider value={{ userData, setUserData }}>
+                <>
+                  <Header></Header>
+                  <Routes>
+                    <Route path="/" element={<Products></Products>}></Route>
+                    <Route
+                      path="/profile"
+                      element={<Profile></Profile>}
+                    ></Route>
+                    <Route
+                      path="/balance"
+                      element={<Balance></Balance>}
+                    ></Route>
+                    <Route path="/cart" element={<Cart></Cart>}></Route>
+                    <Route
+                      path= "/productPage"
+                      element={<ProductPage></ProductPage>}
+                    ></Route>
+                    <Route path="/signup" element={<SignUp></SignUp>}></Route>
+                    <Route path="/signin" element={<SignIn></SignIn>}></Route>
+                  </Routes>
+                </>
+              </userDataContext.Provider>
+            </userContext.Provider>
+          </sessionContext.Provider>
+        </currentProductContext.Provider>
+      </cartContext.Provider>
+    </productsContext.Provider>
   );
 }
 

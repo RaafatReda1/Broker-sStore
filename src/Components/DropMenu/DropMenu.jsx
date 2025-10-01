@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, useContext } from "react";
 import "./DropMenu.css";
-import { currentPageContext, sessionContext } from "../../AppContexts";
+import { sessionContext } from "../../AppContexts";
 import supabase from "../../SupabaseClient";
+import { Link } from "react-router-dom";
 
+// eslint-disable-next-line react/prop-types
 const DropMenu = ({ isOpen, onClose }) => {
   const dropdownRef = useRef(null);
-  const { setcurrentPage } = useContext(currentPageContext);
   const { session } = useContext(sessionContext);
 
   // Close dropdown when clicking outside
@@ -25,26 +26,6 @@ const DropMenu = ({ isOpen, onClose }) => {
     };
   }, [isOpen, onClose]);
 
-  const handleSignUp = () => {
-    console.log("Sign Up clicked");
-    setcurrentPage("signUp");
-
-    onClose();
-  };
-
-  const handleSignIn = () => {
-    console.log("Sign In clicked");
-    setcurrentPage("signIn");
-    onClose();
-  };
-
-  const handleProfile = () => {
-    console.log("Profile clicked");
-    setcurrentPage("profile");
-
-    onClose();
-  };
-
   const handleLogOut = async () => {
     console.log("Log Out clicked");
     try {
@@ -55,25 +36,32 @@ const DropMenu = ({ isOpen, onClose }) => {
     onClose();
   };
 
+
   if (!isOpen) return null;
 
   return (
     <div className="dropdown-menu" ref={dropdownRef}>
       {!session && (
         <>
-          <button className="dropdown-btn" onClick={handleSignUp}>
-            Sign Up
-          </button>
-          <button className="dropdown-btn" onClick={handleSignIn}>
-            Sign In
-          </button>
+          <Link to="/signup">
+            <button className="dropdown-btn" onClick={onClose}>
+              Sign Up
+            </button>
+          </Link>
+          <Link to="/signin">
+            <button className="dropdown-btn" onClick={onClose}>
+              Sign In
+            </button>
+          </Link>
         </>
       )}
       {session && (
         <>
-          <button className="dropdown-btn" onClick={handleProfile}>
-            Profile
-          </button>
+          <Link to="/profile">
+            <button className="dropdown-btn" onClick={onClose}>
+              Profile
+            </button>
+          </Link>
           <button className="dropdown-btn logout-btn" onClick={handleLogOut}>
             Log Out
           </button>

@@ -40,6 +40,7 @@
   justify-content: center;
   z-index: 1000;
   animation: fadeIn 0.3s ease-out;
+  overflow: scroll;
 }
 
 @keyframes fadeIn {
@@ -60,7 +61,7 @@
   max-height: 80vh;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
+  overflow-y: scroll;
   animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -83,6 +84,8 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
 }
 
 .leaderboard-header h2 {
@@ -429,3 +432,4 @@
     text-align: center;
   }
 }
+

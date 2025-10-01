@@ -2,15 +2,12 @@
 import { useState, useContext } from "react";
 import "./Header.css";
 import DropMenu from "../DropMenu/DropMenu";
-import {
-  currentPageContext,
-  userDataContext,
-} from "../../AppContexts";
+import { userDataContext } from "../../AppContexts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserTie } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 const Header = () => {
-  const { setcurrentPage } = useContext(currentPageContext);
   const { userData } = useContext(userDataContext);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -25,13 +22,18 @@ const Header = () => {
 
       <nav>
         {!userData && (
-          <h4 onClick={() => setcurrentPage("cart")}>Cart</h4>
+          <Link to="/cart">
+            <h4>Cart</h4>
+          </Link>
         )}
         {userData && (
-          <h4 onClick={() => setcurrentPage("balance")}>Balance</h4>
+          <Link to="/balance">
+            <h4>Balance</h4>
+          </Link>
         )}
-        <h4 onClick={() => setcurrentPage("products")}>Products</h4>
-
+        <Link to="/">
+          <h4>Products</h4>
+        </Link>
         <div className="profile-container">
           {/* Avatar / Icon as dropdown toggle */}
           <div

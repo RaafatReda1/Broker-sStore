@@ -1,16 +1,12 @@
 import React, { useContext } from "react";
 import "./Cart.css";
-import {
-  cartContext,
-  currentPageContext,
-  currentProductContext,
-} from "../../AppContexts";
+import { cartContext, currentProductContext } from "../../AppContexts";
 import CheckOut from "../CheckOut/CheckOut";
+import { Link } from "react-router-dom";
 
 export default function Cart() {
   const { cart, setCart } = useContext(cartContext);
   const { setCurrentProduct } = useContext(currentProductContext);
-  const { setcurrentPage } = useContext(currentPageContext);
 
   // حساب الإجمالي
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -39,36 +35,38 @@ export default function Cart() {
           <>
             <ul className="cart-list">
               {cart.map((item, index) => (
-                <li
-                  key={index}
-                  className="cart-item"
-                  onClick={() => {
-                    setCurrentProduct(item); // مرر المنتج المختار
-                    setcurrentPage("productPage"); // روح لصفحة المنتج
-                  }}
-                >
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="cart-image"
-                  />
-                  <div className="cart-details">
-                    <h3>{item.name}</h3>
-                    <p>
-                      ${item.price} × {item.quantity} ={" "}
-                      <strong>${item.price * item.quantity}</strong>
-                    </p>
-                  </div>
-                  <button
-                    className="remove-btn"
-                    onClick={(e) => {
-                      e.stopPropagation(); // عشان ما يفتحش المنتج لما تدوس remove
-                      handleRemove(item.id);
+                <Link key={index} to="/productPage">
+                  <li
+                    key={index}
+                    className="cart-item"
+                    onClick={() => {
+                      setCurrentProduct(item); // مرر المنتج المختار
                     }}
                   >
-                    Remove
-                  </button>
-                </li>
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="cart-image"
+                    />
+                    <div className="cart-details">
+                      <h3>{item.name}</h3>
+                      <p>
+                        ${item.price} × {item.quantity} ={" "}
+                        <strong>${item.price * item.quantity}</strong>
+                      </p>
+                    </div>
+                    <button
+                      className="remove-btn"
+                      onClick={(e) => {
+                        e.stopPropagation(); // عشان ما يفتحش المنتج لما تدوس remove
+                        handleRemove(item.id);
+                        e.preventDefault()
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </li>
+                </Link>
               ))}
             </ul>
 

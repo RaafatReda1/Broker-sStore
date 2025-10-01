@@ -1,11 +1,12 @@
+/* eslint-disable react/prop-types */
 import React, { useContext } from "react";
 import "./Product.css";
 import {
-  currentPageContext,
   cartContext,
   currentProductContext,
   userDataContext,
 } from "../../AppContexts";
+import { Link } from "react-router-dom";
 
 const Product = ({
   id,
@@ -17,7 +18,6 @@ const Product = ({
   fullDescription,
   profit,
 }) => {
-  const { setcurrentPage } = useContext(currentPageContext);
   const { cart, setCart } = useContext(cartContext);
   const { setCurrentProduct } = useContext(currentProductContext);
   const {userData} = useContext(userDataContext);
@@ -53,11 +53,11 @@ const Product = ({
 
   return (
     <div className="card">
-      <img
+      <Link to = "productPage">
+              <img
         src={src}
         alt=""
         onClick={() => {
-          setcurrentPage("productPage");
           setCurrentProduct({
             id,
             name,
@@ -71,6 +71,7 @@ const Product = ({
           });
         }}
       />
+      </Link>
       <h3>{name}</h3>
       <h5>{description}</h5>
       <h5 className="price">{price}$</h5>
