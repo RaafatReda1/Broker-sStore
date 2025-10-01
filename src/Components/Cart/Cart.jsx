@@ -1,12 +1,11 @@
 import React, { useContext } from "react";
 import "./Cart.css";
-import { cartContext, currentProductContext } from "../../AppContexts";
+import { cartContext } from "../../AppContexts";
 import CheckOut from "../CheckOut/CheckOut";
 import { Link } from "react-router-dom";
 
 export default function Cart() {
   const { cart, setCart } = useContext(cartContext);
-  const { setCurrentProduct } = useContext(currentProductContext);
 
   // حساب الإجمالي
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -35,14 +34,8 @@ export default function Cart() {
           <>
             <ul className="cart-list">
               {cart.map((item, index) => (
-                <Link key={index} to= {`/productPage/productId:${item.id}`}>
-                  <li
-                    key={index}
-                    className="cart-item"
-                    onClick={() => {
-                      setCurrentProduct(item); // مرر المنتج المختار
-                    }}
-                  >
+                <Link key={index} to={`/productPage/productId:${item.id}`}>
+                  <li key={index} className="cart-item">
                     <img
                       src={item.image}
                       alt={item.name}
@@ -60,7 +53,7 @@ export default function Cart() {
                       onClick={(e) => {
                         e.stopPropagation(); // عشان ما يفتحش المنتج لما تدوس remove
                         handleRemove(item.id);
-                        e.preventDefault()
+                        e.preventDefault();
                       }}
                     >
                       Remove

@@ -16,7 +16,6 @@ import {
   userContext,
   productsContext,
   cartContext,
-  currentProductContext,
   sessionContext,
   userDataContext,
 } from "./AppContexts";
@@ -26,7 +25,6 @@ function App() {
   const [cart, setCart] = useState(
     JSON.parse(localStorage.getItem("cart") || "[]")
   );
-  const [currentProduct, setCurrentProduct] = useState({});
   const [session, setSession] = useState(null);
   const [user, setUser] = useState({ id: "", email: "" });
   const [userData, setUserData] = useState(null);
@@ -141,37 +139,27 @@ function App() {
   return (
     <productsContext.Provider value={{ products, setProducts }}>
       <cartContext.Provider value={{ cart, setCart }}>
-        <currentProductContext.Provider
-          value={{ currentProduct, setCurrentProduct }}
-        >
-          <sessionContext.Provider value={{ session, setSession }}>
-            <userContext.Provider value={{ user, setUser }}>
-              <userDataContext.Provider value={{ userData, setUserData }}>
-                <>
-                  <Header></Header>
-                  <Routes>
-                    <Route path="/" element={<Products></Products>}></Route>
-                    <Route
-                      path="/profile"
-                      element={<Profile></Profile>}
-                    ></Route>
-                    <Route
-                      path="/balance"
-                      element={<Balance></Balance>}
-                    ></Route>
-                    <Route path="/cart" element={<Cart></Cart>}></Route>
-                    <Route
-                      path= {`/productPage/*`}
-                      element={<ProductPage></ProductPage>}
-                    ></Route>
-                    <Route path="/signup" element={<SignUp></SignUp>}></Route>
-                    <Route path="/signin" element={<SignIn></SignIn>}></Route>
-                  </Routes>
-                </>
-              </userDataContext.Provider>
-            </userContext.Provider>
-          </sessionContext.Provider>
-        </currentProductContext.Provider>
+        <sessionContext.Provider value={{ session, setSession }}>
+          <userContext.Provider value={{ user, setUser }}>
+            <userDataContext.Provider value={{ userData, setUserData }}>
+              <>
+                <Header></Header>
+                <Routes>
+                  <Route path="/" element={<Products></Products>}></Route>
+                  <Route path="/profile" element={<Profile></Profile>}></Route>
+                  <Route path="/balance" element={<Balance></Balance>}></Route>
+                  <Route path="/cart" element={<Cart></Cart>}></Route>
+                  <Route
+                    path={`/productPage/*`}
+                    element={<ProductPage></ProductPage>}
+                  ></Route>
+                  <Route path="/signup" element={<SignUp></SignUp>}></Route>
+                  <Route path="/signin" element={<SignIn></SignIn>}></Route>
+                </Routes>
+              </>
+            </userDataContext.Provider>
+          </userContext.Provider>
+        </sessionContext.Provider>
       </cartContext.Provider>
     </productsContext.Provider>
   );
