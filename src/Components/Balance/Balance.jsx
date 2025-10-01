@@ -1,6 +1,7 @@
 import { useContext, useMemo } from "react";
 import "./Balance.css";
 import { userDataContext } from "../../AppContexts";
+import BrokersArrangement from "./BrokersArrangement/BrokersArrangement";
 
 const Balance = () => {
   const { userData } = useContext(userDataContext);
@@ -428,7 +429,7 @@ const Balance = () => {
                 <div className="stat-visual">
                   <DonutChart
                     completed={stats.completedOrders}
-                    pending={stats.pendingOrders}
+                    pending={stats.pendingOrders - stats.completedOrders}
                   />
                 </div>
                 <div className="stat-subtitle">Completed vs Pending</div>
@@ -458,6 +459,9 @@ const Balance = () => {
           </div>
         </div>
       )}
+
+      {/* Brokers Leaderboard */}
+      <BrokersArrangement />
     </div>
   );
 };

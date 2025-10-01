@@ -1,0 +1,204 @@
+import { useState, useContext } from "react";
+import "./BrokersArrangement.css";
+import { userDataContext, sessionContext } from "../../../AppContexts";
+import supabase from "../../../SupabaseClient";
+
+const BrokersArrangement = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [brokers, setBrokers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { userData } = useContext(userDataContext);
+  const { session } = useContext(sessionContext);
+
+  // Fetch all brokers data
+  const fetchBrokers = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("Brokers")
+        .select(
+          "id, fullName, nickName, avatar_url, totalRevenue, actualBalance"
+        )
+        .order("totalRevenue", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching brokers:", error);
+        return;
+      }
+
+      if (data) {
+        setBrokers(data);
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Open popup and fetch data
+  const handleOpenPopup = () => {
+    setIsOpen(true);
+    if (brokers.length === 0) {
+      fetchBrokers();
+    }
+  };
+
+  // Close popup
+  const handleClosePopup = () => {
+    setIsOpen(false);
+  };
+
+  // Get current user's rank
+  const getCurrentUserRank = () => {
+    if (!userData) return null;
+    return brokers.findIndex((broker) => broker.id === userData.id) + 1;
+  };
+
+  // Format currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    }).format(amount || 0);
+  };
+
+  // Get rank badge class
+  const getRankBadgeClass = (rank) => {
+    if (rank === 1) return "rank-gold";
+    if (rank === 2) return "rank-silver";
+    if (rank === 3) return "rank-bronze";
+    return "rank-other";
+  };
+
+  // Get rank icon
+  const getRankIcon = (rank) => {
+    if (rank === 1) return "🥇";
+    if (rank === 2) return "🥈";
+    if (rank === 3) return "🥉";
+    return `#${rank}`;
+  };
+
+  if (!session || !userData) {
+    return null; // Don't show for non-authenticated users
+  }
+
+  return (
+    <>
+      {/* Trigger Button */}
+      <button className="leaderboard-btn" onClick={handleOpenPopup}>
+        <i className="fa-solid fa-trophy" />
+        View Leaderboard
+      </button>
+
+      {/* Popup Overlay */}
+      {isOpen && (
+        <div className="leaderboard-overlay" onClick={handleClosePopup}>
+          <div
+            className="leaderboard-popup"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="leaderboard-header">
+              <h2>
+                <i className="fa-solid fa-trophy" />
+                Brokers Leaderboard
+              </h2>
+              <button className="close-btn" onClick={handleClosePopup}>
+                ✕
+              </button>
+            </div>
+
+            {/* Current User Status */}
+            {userData && (
+              <div className="current-user-status">
+                <div className="current-user-card">
+                  <div className="current-user-avatar">
+                    {userData.avatar_url ? (
+                      <img src={userData.avatar_url} alt={userData.fullName} />
+                    ) : (
+                      <i className="fa-solid fa-user-tie" />
+                    )}
+                  </div>
+                  <div className="current-user-info">
+                    <h4>{userData.fullName}</h4>
+                    <p>Your Rank: #{getCurrentUserRank() || "Loading..."}</p>
+                    <span className="current-user-revenue">
+                      {formatCurrency(userData.totalRevenue)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Leaderboard List */}
+            <div className="leaderboard-content">
+              {loading ? (
+                <div className="loading">
+                  <i className="fa-solid fa-spinner fa-spin" />
+                  Loading leaderboard...
+                </div>
+              ) : (
+                <div className="brokers-list">
+                  {brokers.map((broker, index) => {
+                    const rank = index + 1;
+                    const isCurrentUser = userData && broker.id === userData.id;
+
+                    return (
+                      <div
+                        key={broker.id}
+                        className={`broker-item ${getRankBadgeClass(rank)} ${
+                          isCurrentUser ? "current-user" : ""
+                        }`}
+                      >
+                        <div className="broker-rank">
+                          <span className="rank-badge">
+                            {getRankIcon(rank)}
+                          </span>
+                        </div>
+
+                        <div className="broker-avatar">
+                          {broker.avatar_url ? (
+                            <img
+                              src={broker.avatar_url}
+                              alt={broker.fullName}
+                            />
+                          ) : (
+                            <i className="fa-solid fa-user-tie" />
+                          )}
+                        </div>
+
+                        <div className="broker-info">
+                          <h4>{broker.fullName}</h4>
+                          <p>@{broker.nickName}</p>
+                        </div>
+
+                        <div className="broker-revenue">
+                          <span className="revenue-amount">
+                            {formatCurrency(broker.totalRevenue)}
+                          </span>
+                          <span className="revenue-label">Total Revenue</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="leaderboard-footer">
+              <p>
+                <i className="fa-solid fa-info-circle" />
+                Rankings are based on total revenue earned
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default BrokersArrangement;
