@@ -1,81 +1,66 @@
 import React, { useContext, useEffect, useState } from "react";
 import BrokersDataForm from "./BrokersDataForm/BrokersDataForm";
+import PreviewData from "./PreviewData/PreviewData";
 import supabase from "../../SupabaseClient";
 import { sessionContext, userDataContext } from "../../AppContexts";
-import PreviewData from "./PreviewData/PreviewData";
 
 const Profile = () => {
   const [brokerExists, setBrokerExists] = useState(null);
-  const { session } = useContext(sessionContext);
   const [checkDataIsLoading, setCheckDataIsLoading] = useState(true);
   const [responded, setResponded] = useState(false);
-  const {userData, setUserData} = useContext(userDataContext);
   const [refresh, setRefresh] = useState(false);
-  //Checking if the broker exists to preview the broker's form data submission or the profile data
-  const checkIfBrokerExists = async () => {
-    if (session) {
-      try {
-        const { data, error } = await supabase
-          .from("Brokers")
-          .select("*")
-          .eq("email", session.user.email);
-        if (error) {
-          setBrokerExists(false);
-          setResponded(false);
-        } else if (data.length > 0) {
-          setBrokerExists(true);
-          setResponded(true);
-        } else {
-          setBrokerExists(false);
-          setResponded(true);
-        }
-      } finally {
-        setCheckDataIsLoading(false);
-      }
+
+  const { session } = useContext(sessionContext);
+  const { userData, setUserData } = useContext(userDataContext);
+
+  // ✅ Unified function to fetch broker data
+  const fetchBrokerData = async () => {
+    if (!session?.user?.email) return;
+
+    setCheckDataIsLoading(true);
+
+    const { data, error } = await supabase
+      .from("Brokers")
+      .select("*")
+      .eq("email", session.user.email);
+
+    if (error) {
+      console.error("Error fetching broker data:", error.message);
+      setBrokerExists(false);
+      setResponded(false);
+      setUserData(null);
+    } else if (data && data.length > 0) {
+      setBrokerExists(true);
+      setUserData(data[0]);
+      setResponded(true);
+      console.log("✅ Broker found:", data[0]);
+    } else {
+      setBrokerExists(false);
+      setUserData(null);
+      setResponded(true);
+      console.log("⚠️ No broker data found for:", session.user.email);
     }
+
+    setCheckDataIsLoading(false);
   };
+
+  // ✅ Run on mount, session change, or refresh trigger
   useEffect(() => {
-    checkIfBrokerExists();
-  }, [refresh]);
-  //getting the userdata to preview just after uploading the form
-    const getUserData = (async () => {
-      if (!session?.user?.email) return;
-  
-      const { data, error } = await supabase
-        .from("Brokers")
-        .select("*")
-        .eq("email", session.user.email);
-  
-      if (error) {
-        console.error("Fetching user data error:", error.message);
-        return;
-      }
-  
-      if (data && data.length > 0) {
-        setUserData(data[0]);
-        console.log("Fetched user data:", data[0]);
-      } else {
-        setUserData(null);
-        console.log("No user data found for this email");
-      }
-    })
-    useEffect(()=>{
-       if (session) {
-      getUserData();
-      console.log("Getting user data");
-    }
-    },[refresh])
+    fetchBrokerData();
+  }, [session, refresh]);
+
   return (
     <>
       {checkDataIsLoading && <p>Loading...</p>}
-      {!checkDataIsLoading && !brokerExists && !responded && (
-        <p>Error fetching Data</p>
+
+      {!checkDataIsLoading && !responded && <p>Error fetching data</p>}
+
+      {!checkDataIsLoading && responded && !brokerExists && !userData && (
+        <BrokersDataForm setRefresh={setRefresh} />
       )}
-      {!brokerExists && brokerExists !== null && responded && !userData&&(
-        <BrokersDataForm setRefresh = {setRefresh}></BrokersDataForm>
-      )}
-      {brokerExists && userData &&(
-        <PreviewData></PreviewData>
+
+      {!checkDataIsLoading && responded && brokerExists && userData && (
+        <PreviewData />
       )}
     </>
   );
