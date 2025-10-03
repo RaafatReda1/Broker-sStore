@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./SignIn.css";
 import supabase from "../../SupabaseClient";
+import { sessionContext } from "../../AppContexts";
 const SignIn = () => {
   const [signInForm, setSignInForm] = useState({
     email: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-
+  const {session} = useContext(sessionContext);
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
+  if(session){
+    window.location.href = "/";
+  }
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSignInForm({ ...signInForm, [name]: value });

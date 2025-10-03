@@ -62,8 +62,8 @@ const Profile = () => {
     useEffect(()=>{
        if (session) {
       getUserData();
+      console.log("Getting user data");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[refresh])
   return (
     <>

@@ -1,9 +1,9 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useContext } from "react";
 import "./BrokersDataForm.css";
 import supabase from "../../../SupabaseClient";
 import { userContext, sessionContext } from "../../../AppContexts";
 // id_card_back
+// eslint-disable-next-line react/prop-types
 const BrokersDataForm = ({setRefresh}) => {
   const { user } = useContext(userContext);
   const { session } = useContext(sessionContext);

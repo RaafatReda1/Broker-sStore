@@ -52,16 +52,24 @@ function App() {
     }
   })();
   //detecting the auth state change (e.g., sign-in, sign-out)
-  useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session); // ✅ هيبقى عندك نفس الشكل
-      console.log("Auth state changed: ", _event, session);
-    });
+useEffect(() => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    console.log("Auth state changed:", _event);
 
-    return () => subscription.unsubscribe(); // عشان ما يحصلش memory leak
-  }, []);
+    setSession(session); // ✅ دايماً يحدث الـ session محليًا
+
+    if (_event === 'SIGNED_OUT') {
+      console.log("User logged out → reloading...");
+      window.location.reload(); // ✅ يعمل reload بس عند تسجيل الخروج
+    }
+  });
+
+  // 🧹 cleanup عشان متحصلش listeners زيادة
+  return () => {
+    subscription.unsubscribe();
+  };
+}, []); // 👈 مفيش dependencies علشان يشتغل مرة واحدة بس
+
   // Fetch products data with a random delay to simulate loading time
   useEffect(() => {
     getSession();
