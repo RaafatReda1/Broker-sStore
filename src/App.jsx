@@ -20,6 +20,12 @@ import {
   sessionContext,
   userDataContext,
 } from "./AppContexts";
+import {
+  NotificationProvider,
+  useNotification,
+} from "./Contexts/NotificationContext";
+import NotificationContainer from "./Components/Notification/NotificationContainer";
+import NotificationTest from "./Components/Notification/NotificationTest";
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -42,7 +48,6 @@ function App() {
     }
   };
   // Storing brokerId in localStorage if exists in URL
-  // eslint-disable-next-line no-unused-vars
   const setbrokerId = (() => {
     const params = new URLSearchParams(window.location.search);
     const brokerId = params.get("brokerId");
@@ -52,23 +57,25 @@ function App() {
     }
   })();
   //detecting the auth state change (e.g., sign-in, sign-out)
-useEffect(() => {
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-    console.log("Auth state changed:", _event);
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", _event);
 
-    setSession(session); // ✅ دايماً يحدث الـ session محليًا
+      setSession(session); // ✅ دايماً يحدث الـ session محليًا
 
-    if (_event === 'SIGNED_OUT') {
-      console.log("User logged out → reloading...");
-      window.location.reload(); // ✅ يعمل reload بس عند تسجيل الخروج
-    }
-  });
+      if (_event === "SIGNED_OUT") {
+        console.log("User logged out → reloading...");
+        window.location.reload(); // ✅ يعمل reload بس عند تسجيل الخروج
+      }
+    });
 
-  // 🧹 cleanup عشان متحصلش listeners زيادة
-  return () => {
-    subscription.unsubscribe();
-  };
-}, []); // 👈 مفيش dependencies علشان يشتغل مرة واحدة بس
+    // 🧹 cleanup عشان متحصلش listeners زيادة
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []); // 👈 مفيش dependencies علشان يشتغل مرة واحدة بس
 
   // Fetch products data with a random delay to simulate loading time
   useEffect(() => {
@@ -140,45 +147,52 @@ useEffect(() => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
   return (
-    <productsContext.Provider value={{ products, setProducts }}>
-      <cartContext.Provider value={{ cart, setCart }}>
-        <sessionContext.Provider value={{ session, setSession }}>
-          <userContext.Provider value={{ user, setUser }}>
-            <userDataContext.Provider value={{ userData, setUserData }}>
-              <>
-                <Header></Header>
-                <Routes>
-                  <Route path="/" element={<Products></Products>}></Route>
-                  <Route path="/profile" element={<Profile></Profile>}></Route>
-                  <Route
-                    path="/balance"
-                    element={
-                      <ProtectedRoute requireSession={true}>
-                        <Balance></Balance>
-                      </ProtectedRoute>
-                    }
-                  ></Route>
-                  <Route
-                    path="/cart"
-                    element={
-                      <ProtectedRoute blockBroker={true}>
-                        <Cart></Cart>
-                      </ProtectedRoute>
-                    }
-                  ></Route>
-                  <Route
-                    path={`/productPage/*`}
-                    element={<ProductPage></ProductPage>}
-                  ></Route>
-                  <Route path="/signup" element={<SignUp></SignUp>}></Route>
-                  <Route path="/signin" element={<SignIn></SignIn>}></Route>
-                </Routes>
-              </>
-            </userDataContext.Provider>
-          </userContext.Provider>
-        </sessionContext.Provider>
-      </cartContext.Provider>
-    </productsContext.Provider>
+    <NotificationProvider>
+      <productsContext.Provider value={{ products, setProducts }}>
+        <cartContext.Provider value={{ cart, setCart }}>
+          <sessionContext.Provider value={{ session, setSession }}>
+            <userContext.Provider value={{ user, setUser }}>
+              <userDataContext.Provider value={{ userData, setUserData }}>
+                <>
+                  <Header></Header>
+                  <Routes>
+                    <Route path="/" element={<Products></Products>}></Route>
+                    <Route
+                      path="/profile"
+                      element={<Profile></Profile>}
+                    ></Route>
+                    <Route
+                      path="/balance"
+                      element={
+                        <ProtectedRoute requireSession={true}>
+                          <Balance></Balance>
+                        </ProtectedRoute>
+                      }
+                    ></Route>
+                    <Route
+                      path="/cart"
+                      element={
+                        <ProtectedRoute blockBroker={true}>
+                          <Cart></Cart>
+                        </ProtectedRoute>
+                      }
+                    ></Route>
+                    <Route
+                      path={`/productPage/*`}
+                      element={<ProductPage></ProductPage>}
+                    ></Route>
+                    <Route path="/signup" element={<SignUp></SignUp>}></Route>
+                    <Route path="/signin" element={<SignIn></SignIn>}></Route>
+                  </Routes>
+                  <NotificationContainer />
+                  <NotificationTest />
+                </>
+              </userDataContext.Provider>
+            </userContext.Provider>
+          </sessionContext.Provider>
+        </cartContext.Provider>
+      </productsContext.Provider>
+    </NotificationProvider>
   );
 }
 

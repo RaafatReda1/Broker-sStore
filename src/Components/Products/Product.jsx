@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 import "./Product.css";
 import { cartContext, userDataContext } from "../../AppContexts";
 import { Link } from "react-router-dom";
+import { useNotification } from "../../Contexts/NotificationContext";
 
 const Product = ({
   id,
@@ -16,6 +17,7 @@ const Product = ({
 }) => {
   const { cart, setCart } = useContext(cartContext);
   const { userData } = useContext(userDataContext);
+  const { showSuccess, showError } = useNotification();
   const handleAddToCart = () => {
     const existingProductIndex = cart.findIndex((item) => item.id === id);
 
@@ -66,13 +68,24 @@ const Product = ({
             type="button"
             onClick={async () => {
               try {
-                const copiedTxt = await navigator.clipboard.writeText(
-                  window.location.href + "productPage/productId:" + id +"?brokerId=" + userData.id
+                await navigator.clipboard.writeText(
+                  window.location.href +
+                    "productPage/productId:" +
+                    id +
+                    "?brokerId=" +
+                    userData.id
                 );
                 console.log(userData);
-                alert("Copied to clipboard!", copiedTxt);
+                showSuccess(
+                  "Link Copied!",
+                  "Product link has been copied to your clipboard."
+                );
               } catch (err) {
                 console.error("Failed to copy: ", err);
+                showError(
+                  "Copy Failed",
+                  "Failed to copy link. Please try again."
+                );
               }
             }}
           >

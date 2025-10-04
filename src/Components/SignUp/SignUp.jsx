@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./SignUp.css";
 import supabase from "../../SupabaseClient";
+import { useNotification } from "../../Contexts/NotificationContext";
 const SignUp = () => {
   const [signUpForm, setSignUpForm] = useState({
     email: "",
@@ -10,6 +11,7 @@ const SignUp = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { showSuccess, showError, showWarning } = useNotification();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,21 +30,41 @@ const SignUp = () => {
     e.preventDefault();
 
     if (signUpForm.password !== signUpForm.confirmPassword) {
-      alert("Passwords do not match!");
+      showWarning(
+        "Password Mismatch",
+        "Passwords do not match! Please try again."
+      );
+      return;
+    }
+
+    if (signUpForm.password.length < 6) {
+      showWarning(
+        "Weak Password",
+        "Password must be at least 6 characters long."
+      );
       return;
     }
 
     try {
-      await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: signUpForm.email,
         password: signUpForm.password,
       });
-      alert(
-        "Sign up successful! Please check your email to confirm your account."
-      );
+
+      if (error) {
+        showError("Sign Up Failed", error.message);
+      } else {
+        showSuccess(
+          "Account Created!",
+          "Please check your email to confirm your account."
+        );
+      }
     } catch (error) {
       console.error("Error during sign up:", error);
-      alert("Sign up failed. Please try again.");
+      showError(
+        "Sign Up Error",
+        "An unexpected error occurred. Please try again."
+      );
     }
   };
 

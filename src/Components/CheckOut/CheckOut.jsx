@@ -2,12 +2,14 @@ import React, { useState, useEffect, useContext } from "react";
 import "./CheckOut.css";
 import { cartContext } from "../../AppContexts";
 import supabase from "../../SupabaseClient";
+import { useNotification } from "../../Contexts/NotificationContext";
 
 const CheckOut = () => {
   const [visible, setVisible] = useState(false);
 
   // ✅ Use cart context instead of local state
   const { cart } = useContext(cartContext);
+  const { showSuccess, showError } = useNotification();
 
   // ✅ form state
   const [form, setForm] = useState({
@@ -59,11 +61,11 @@ const CheckOut = () => {
   const handleSubmit = async () => {
     const { data, error } = await supabase.from("Orders").insert([form]);
     if (error) {
-      alert("Error sending the Order");
+      showError("Order Failed", "Error sending the order. Please try again.");
     } else if (data) {
-      alert("OrderPlaced!!");
+      showSuccess("Order Placed!", "Your order has been placed successfully!");
     } else {
-      alert("OrderPlaced!!");
+      showSuccess("Order Placed!", "Your order has been placed successfully!");
     }
   };
 

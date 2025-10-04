@@ -2,17 +2,19 @@ import React, { useContext, useState } from "react";
 import "./SignIn.css";
 import supabase from "../../SupabaseClient";
 import { sessionContext } from "../../AppContexts";
+import { useNotification } from "../../Contexts/NotificationContext";
 const SignIn = () => {
   const [signInForm, setSignInForm] = useState({
     email: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const {session} = useContext(sessionContext);
+  const { session } = useContext(sessionContext);
+  const { showSuccess, showError } = useNotification();
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  if(session){
+  if (session) {
     window.location.href = "/";
   }
   const handleChange = (e) => {
@@ -23,13 +25,22 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: signInForm.email,
         password: signInForm.password,
       });
-      alert("signed in successfully");
+
+      if (error) {
+        showError("Sign In Failed", error.message);
+      } else {
+        showSuccess("Welcome Back!", "You have been signed in successfully!");
+      }
     } catch (err) {
       console.log(err);
+      showError(
+        "Sign In Error",
+        "An unexpected error occurred. Please try again."
+      );
     }
   };
 

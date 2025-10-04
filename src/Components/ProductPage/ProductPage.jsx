@@ -8,12 +8,14 @@ import {
 } from "../../AppContexts";
 import PDF from "../PDF/PDF";
 import { Link } from "react-router-dom";
+import { useNotification } from "../../Contexts/NotificationContext";
 
 const ProductPage = () => {
   const { products } = useContext(productsContext);
   const { user } = useContext(userContext);
   const { cart, setCart } = useContext(cartContext);
   const { userData } = useContext(userDataContext);
+  const { showSuccess, showError } = useNotification();
   // Extract product ID from URL path
   const path = window.location.pathname;
   const productIdMatch = path.match(/productId:(\d+)/);
@@ -64,7 +66,10 @@ const ProductPage = () => {
 
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
-    alert("Added to cart!");
+    showSuccess(
+      "Added to Cart!",
+      `${product.name} has been added to your cart.`
+    );
   };
 
   return (
@@ -128,9 +133,16 @@ const ProductPage = () => {
                     await navigator.clipboard.writeText(
                       window.location.href + "?brokerId=" + userData.id
                     );
-                    alert("Copied to clipboard!");
+                    showSuccess(
+                      "Link Copied!",
+                      "Product link has been copied to your clipboard."
+                    );
                   } catch (err) {
                     console.error("Failed to copy: ", err);
+                    showError(
+                      "Copy Failed",
+                      "Failed to copy link. Please try again."
+                    );
                   }
                 }}
               >
@@ -145,7 +157,7 @@ const ProductPage = () => {
               >
                 Add to Cart
               </button>
-              <Link to = "/cart">
+              <Link to="/cart">
                 <button className="btn checkout" onClick={() => {}}>
                   Go to Checkout
                 </button>

@@ -4,10 +4,12 @@ import { sessionContext, userDataContext } from "../../../AppContexts";
 import supabase from "../../../SupabaseClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserTie } from "@fortawesome/free-solid-svg-icons";
+import { useNotification } from "../../../Contexts/NotificationContext";
 
 const PreviewData = () => {
   const { userData, setUserData } = useContext(userDataContext);
   const { session } = useContext(sessionContext);
+  const { showSuccess, showError, showWarning } = useNotification();
 
   const [isEditing, setIsEditing] = useState(false);
   const [refresh, setRefresh] = useState(false);
@@ -75,7 +77,10 @@ const PreviewData = () => {
   //sending the new form to the DB
   const handleUpdate = async () => {
     if (!userData) {
-      alert("No user data found");
+      showError(
+        "No User Data",
+        "No user data found. Please try refreshing the page."
+      );
       return;
     }
 
@@ -88,7 +93,10 @@ const PreviewData = () => {
     });
 
     if (Object.keys(updatedFields).length === 0) {
-      alert("No changes to update");
+      showWarning(
+        "No Changes",
+        "No changes to update. Please make some changes first."
+      );
       setIsEditing(false);
       return;
     }
@@ -100,13 +108,16 @@ const PreviewData = () => {
       .select();
 
     if (error) {
-      alert("Error Updating Data: " + error.message);
+      showError("Update Failed", "Error updating data: " + error.message);
     } else if (data && data.length > 0) {
-      alert("Data updated Successfully");
+      showSuccess(
+        "Profile Updated!",
+        "Your profile data has been updated successfully!"
+      );
       setRefresh((prev) => !prev);
       setIsEditing(false);
     } else {
-      alert("No data was updated");
+      showWarning("No Updates", "No data was updated. Please try again.");
     }
   };
   //handling the profile img temporary storage
@@ -143,7 +154,10 @@ const PreviewData = () => {
         .upload(newFileName, selectedFile);
 
       if (uploadError) {
-        alert("Uploading Img Error: " + uploadError.message);
+        showError(
+          "Upload Failed",
+          "Error uploading image: " + uploadError.message
+        );
         return;
       }
 
@@ -153,7 +167,10 @@ const PreviewData = () => {
         .getPublicUrl(newFileName);
 
       if (publicUrlError) {
-        alert("Error getting public URL: " + publicUrlError.message);
+        showError(
+          "URL Error",
+          "Error getting public URL: " + publicUrlError.message
+        );
         return;
       }
 
@@ -168,15 +185,21 @@ const PreviewData = () => {
         .select();
 
       if (updateError) {
-        alert("Error updating avatar URL: " + updateError.message);
+        showError(
+          "Update Failed",
+          "Error updating avatar URL: " + updateError.message
+        );
         return;
       }
 
-      alert("Profile picture updated successfully!");
+      showSuccess(
+        "Profile Picture Updated!",
+        "Your profile picture has been updated successfully!"
+      );
       setUserData((prev) => ({ ...prev, avatar_url: avatarUrl })); // تحديث الواجهة فورًا
     } catch (err) {
       console.error("Unexpected error:", err);
-      alert("Something went wrong!");
+      showError("Unexpected Error", "Something went wrong! Please try again.");
     }
   };
 

@@ -2,11 +2,13 @@ import React, { useState, useContext, useCallback, useMemo } from "react";
 import "./BrokersDataForm.css";
 import supabase from "../../../SupabaseClient";
 import { userContext, sessionContext } from "../../../AppContexts";
+import { useNotification } from "../../../Contexts/NotificationContext";
 // id_card_back
 // eslint-disable-next-line react/prop-types
 const BrokersDataForm = ({ setRefresh }) => {
   const { user } = useContext(userContext);
   const { session } = useContext(sessionContext);
+  const { showSuccess, showError, showLoading } = useNotification();
   const [brokerData, setBrokerData] = useState({
     fullName: "",
     nickName: "",
@@ -95,7 +97,10 @@ const BrokersDataForm = ({ setRefresh }) => {
       e.preventDefault();
 
       if (!session || !user.id) {
-        alert("Please sign in to submit broker data.");
+        showError(
+          "Authentication Required",
+          "Please sign in to submit broker data."
+        );
         return;
       }
 
@@ -104,12 +109,21 @@ const BrokersDataForm = ({ setRefresh }) => {
         !brokerData.idCardBack ||
         !brokerData.selfieWithIdCard
       ) {
-        alert("Please upload ID card photos and selfie with ID card.");
+        showError(
+          "Missing Documents",
+          "Please upload ID card photos and selfie with ID card."
+        );
         return;
       }
 
       setIsUploading(true);
       setUploadProgress({ front: 0, back: 0, selfie: 0 });
+
+      // Show loading notification
+      showLoading(
+        "Uploading Documents",
+        "Please wait while we upload your documents..."
+      );
 
       try {
         // Generate unique file names
@@ -145,7 +159,10 @@ const BrokersDataForm = ({ setRefresh }) => {
           throw error;
         }
 
-        alert("Broker data submitted successfully!");
+        showSuccess(
+          "Success!",
+          "Your broker data has been submitted successfully!"
+        );
         console.log("Broker data saved:", {
           ...brokerData,
           frontUrl,
@@ -172,7 +189,10 @@ const BrokersDataForm = ({ setRefresh }) => {
         }
       } catch (error) {
         console.error("Error submitting broker data:", error);
-        alert(`Error: ${error.message}`);
+        showError(
+          "Upload Failed",
+          `Failed to submit broker data: ${error.message}`
+        );
       } finally {
         setIsUploading(false);
         setUploadProgress({ front: 0, back: 0, selfie: 0 });
