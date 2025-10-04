@@ -369,7 +369,7 @@ const BrokersDataForm = ({ setRefresh }) => {
                       </div>
                     ) : (
                       <div className="file-placeholder">
-                        <span className="upload-icon">🤳</span>
+                        <span className="upload-icon">📷</span>
                         <span>Selfie with ID Card</span>
                       </div>
                     )}

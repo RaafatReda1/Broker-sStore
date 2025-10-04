@@ -75,17 +75,12 @@ useEffect(() => {
     getSession();
 
     const getData = async () => {
-      const RandomTime = Math.random() * 3000;
-
-      setTimeout(async () => {
-        try {
-          let productsRes = await fetch("/products.json");
-          let products = await productsRes.json();
-          setProducts(products);
-        } catch (err) {
-          console.log(err);
-        }
-      }, RandomTime);
+      const { data, error } = await supabase.from("Products").select("*");
+      if (error) {
+        console.error("Error fetching products:", error.message);
+      } else {
+        setProducts(data);
+      }
     };
     getData();
   }, []);
