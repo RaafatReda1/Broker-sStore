@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useCallback, useMemo } from "react";
 import React from "react";
 
 import "./BrokersArrangement.css";
@@ -13,7 +13,7 @@ const BrokersArrangement = () => {
   const { session } = useContext(sessionContext);
 
   // Fetch all brokers data
-  const fetchBrokers = async () => {
+  const fetchBrokers = useCallback(async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -36,51 +36,57 @@ const BrokersArrangement = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Open popup and fetch data
-  const handleOpenPopup = () => {
+  const handleOpenPopup = useCallback(() => {
     setIsOpen(true);
     if (brokers.length === 0) {
       fetchBrokers();
     }
-  };
+  }, [brokers.length, fetchBrokers]);
 
   // Close popup
-  const handleClosePopup = () => {
+  const handleClosePopup = useCallback(() => {
     setIsOpen(false);
-  };
+  }, []);
 
   // Get current user's rank
-  const getCurrentUserRank = () => {
+  const getCurrentUserRank = useCallback(() => {
     if (!userData) return null;
     return brokers.findIndex((broker) => broker.id === userData.id) + 1;
-  };
+  }, [brokers, userData]);
 
   // Format currency
-  const formatCurrency = (amount) => {
+  const formatCurrency = useCallback((amount) => {
     return new Intl.NumberFormat(undefined, {
       style: "currency",
       currency: "USD",
       maximumFractionDigits: 0,
     }).format(amount || 0);
-  };
+  }, []);
 
   // Get rank badge class
-  const getRankBadgeClass = (rank) => {
+  const getRankBadgeClass = useCallback((rank) => {
     if (rank === 1) return "rank-gold";
     if (rank === 2) return "rank-silver";
     if (rank === 3) return "rank-bronze";
     return "rank-other";
-  };
+  }, []);
 
   // Get rank icon
-  const getRankIcon = (rank) => {
+  const getRankIcon = useCallback((rank) => {
     if (rank === 1) return "🥇";
     if (rank === 2) return "🥈";
     if (rank === 3) return "🥉";
     return `#${rank}`;
-  };
+  }, []);
+
+  // Memoized current user rank
+  const currentUserRank = useMemo(
+    () => getCurrentUserRank(),
+    [getCurrentUserRank]
+  );
 
   if (!session || !userData) {
     return null; // Don't show for non-authenticated users
@@ -125,7 +131,7 @@ const BrokersArrangement = () => {
                   </div>
                   <div className="current-user-info">
                     <h4>{userData.fullName}</h4>
-                    <p>Your Rank: #{getCurrentUserRank() || "Loading..."}</p>
+                    <p>Your Rank: #{currentUserRank || "Loading..."}</p>
                     <span className="current-user-revenue">
                       {formatCurrency(userData.totalRevenue)}
                     </span>
@@ -203,4 +209,4 @@ const BrokersArrangement = () => {
   );
 };
 
-export default BrokersArrangement;
+export default React.memo(BrokersArrangement);

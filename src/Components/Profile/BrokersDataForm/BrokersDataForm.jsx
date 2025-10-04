@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useCallback, useMemo } from "react";
 import "./BrokersDataForm.css";
 import supabase from "../../../SupabaseClient";
 import { userContext, sessionContext } from "../../../AppContexts";
@@ -24,14 +24,14 @@ const BrokersDataForm = ({ setRefresh }) => {
     selfie: 0,
   });
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value, files } = e.target;
     if (files) {
-      setBrokerData({ ...brokerData, [name]: files[0] });
+      setBrokerData((prev) => ({ ...prev, [name]: files[0] }));
     } else {
-      setBrokerData({ ...brokerData, [name]: value });
+      setBrokerData((prev) => ({ ...prev, [name]: value }));
     }
-  };
+  }, []);
 
   const uploadImageToStorage = async (file, fileName) => {
     try {
@@ -58,124 +58,146 @@ const BrokersDataForm = ({ setRefresh }) => {
     }
   };
 
-  const uploadWithProgress = async (file, fileName, type) => {
-    return new Promise((resolve, reject) => {
-      const uploadTask = supabase.storage
+  const uploadWithProgress = useCallback(async (file, fileName, type) => {
+    try {
+      // Set initial progress
+      setUploadProgress((prev) => ({ ...prev, [type]: 10 }));
+
+      // Upload file
+      const { data, error } = await supabase.storage
         .from("BrokersCards")
         .upload(fileName, file, {
           cacheControl: "3600",
           upsert: false,
         });
 
-      // Simulate progress (Supabase doesn't provide real progress tracking)
-      let progress = 0;
-      const progressInterval = setInterval(() => {
-        progress += Math.random() * 20;
-        if (progress > 90) progress = 90;
-        setUploadProgress((prev) => ({ ...prev, [type]: progress }));
-      }, 200);
-
-      uploadTask
-        .then(({ data, error }) => {
-          clearInterval(progressInterval);
-          setUploadProgress((prev) => ({ ...prev, [type]: 100 }));
-
-          if (error) {
-            reject(error);
-            return;
-          }
-
-          // Get public URL
-          const {
-            data: { publicUrl },
-          } = supabase.storage.from("BrokersCards").getPublicUrl(fileName);
-
-          resolve(publicUrl);
-        })
-        .catch(reject);
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!session || !user.id) {
-      alert("Please sign in to submit broker data.");
-      return;
-    }
-
-    if (
-      !brokerData.idCardFront ||
-      !brokerData.idCardBack ||
-      !brokerData.selfieWithIdCard
-    ) {
-      alert("Please upload ID card photos and selfie with ID card.");
-      return;
-    }
-
-    setIsUploading(true);
-    setUploadProgress({ front: 0, back: 0, selfie: 0 });
-
-    try {
-      // Generate unique file names
-      const timestamp = Date.now();
-      const frontFileName = `${user.id}/id_front_${timestamp}.jpg`;
-      const backFileName = `${user.id}/id_back_${timestamp}.jpg`;
-      const selfieFileName = `${user.id}/selfie_with_id_${timestamp}.jpg`;
-
-      // Upload all images with progress tracking
-      const [frontUrl, backUrl, selfieUrl] = await Promise.all([
-        uploadWithProgress(brokerData.idCardFront, frontFileName, "front"),
-        uploadWithProgress(brokerData.idCardBack, backFileName, "back"),
-        uploadWithProgress(
-          brokerData.selfieWithIdCard,
-          selfieFileName,
-          "selfie"
-        ),
-      ]);
-
-      // Insert broker data into database
-      const { data, error } = await supabase.from("Brokers").insert({
-        fullName: brokerData.fullName,
-        nickName: brokerData.nickName,
-        phone: brokerData.phone,
-        email: user.email,
-        auth_id: user.id,
-        idCardFront: frontUrl,
-        idCardBack: backUrl,
-        selfieWithIdCard: selfieUrl,
-      });
-
       if (error) {
         throw error;
       }
 
-      alert("Broker data submitted successfully!");
-      console.log("Broker data saved:", {
-        ...brokerData,
-        frontUrl,
-        backUrl,
-        selfieUrl,
-      });
+      // Set completion progress
+      setUploadProgress((prev) => ({ ...prev, [type]: 100 }));
 
-      // Reset form
-      setBrokerData({
-        fullName: "",
-        nickName: "",
-        phone: "",
-        email: "",
-        idCardFront: null,
-        idCardBack: null,
-        selfieWithIdCard: null,
-      });
+      // Get public URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("BrokersCards").getPublicUrl(fileName);
+
+      return publicUrl;
     } catch (error) {
-      console.error("Error submitting broker data:", error);
-      alert(`Error: ${error.message}`);
-    } finally {
-      setIsUploading(false);
-      setUploadProgress({ front: 0, back: 0, selfie: 0 });
+      console.error(`Error uploading ${type}:`, error);
+      throw error;
     }
-  };
+  }, []);
+
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+
+      if (!session || !user.id) {
+        alert("Please sign in to submit broker data.");
+        return;
+      }
+
+      if (
+        !brokerData.idCardFront ||
+        !brokerData.idCardBack ||
+        !brokerData.selfieWithIdCard
+      ) {
+        alert("Please upload ID card photos and selfie with ID card.");
+        return;
+      }
+
+      setIsUploading(true);
+      setUploadProgress({ front: 0, back: 0, selfie: 0 });
+
+      try {
+        // Generate unique file names
+        const timestamp = Date.now();
+        const frontFileName = `${user.id}/id_front_${timestamp}.jpg`;
+        const backFileName = `${user.id}/id_back_${timestamp}.jpg`;
+        const selfieFileName = `${user.id}/selfie_with_id_${timestamp}.jpg`;
+
+        // Upload all images with progress tracking
+        const [frontUrl, backUrl, selfieUrl] = await Promise.all([
+          uploadWithProgress(brokerData.idCardFront, frontFileName, "front"),
+          uploadWithProgress(brokerData.idCardBack, backFileName, "back"),
+          uploadWithProgress(
+            brokerData.selfieWithIdCard,
+            selfieFileName,
+            "selfie"
+          ),
+        ]);
+
+        // Insert broker data into database
+        const { data, error } = await supabase.from("Brokers").insert({
+          fullName: brokerData.fullName,
+          nickName: brokerData.nickName,
+          phone: brokerData.phone,
+          email: user.email,
+          auth_id: user.id,
+          idCardFront: frontUrl,
+          idCardBack: backUrl,
+          selfieWithIdCard: selfieUrl,
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        alert("Broker data submitted successfully!");
+        console.log("Broker data saved:", {
+          ...brokerData,
+          frontUrl,
+          backUrl,
+          selfieUrl,
+        });
+
+        // Reset form
+        setBrokerData({
+          fullName: "",
+          nickName: "",
+          phone: "",
+          email: "",
+          idCardFront: null,
+          idCardBack: null,
+          selfieWithIdCard: null,
+        });
+
+        // Trigger refresh after successful submission
+        if (setRefresh) {
+          setTimeout(() => {
+            setRefresh((prev) => !prev);
+          }, 1000);
+        }
+      } catch (error) {
+        console.error("Error submitting broker data:", error);
+        alert(`Error: ${error.message}`);
+      } finally {
+        setIsUploading(false);
+        setUploadProgress({ front: 0, back: 0, selfie: 0 });
+      }
+    },
+    [brokerData, session, user, uploadWithProgress, setRefresh]
+  );
+
+  // Memoized file size calculation
+  const getFileSize = useCallback((file) => {
+    if (!file) return "0 MB";
+    return `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+  }, []);
+
+  // Memoized phone validation
+  const handlePhoneKeyDown = useCallback((e) => {
+    if (
+      !/[0-9]/.test(e.key) &&
+      e.key !== "Backspace" &&
+      e.key !== "ArrowLeft" &&
+      e.key !== "ArrowRight"
+    ) {
+      e.preventDefault();
+    }
+  }, []);
 
   return (
     <div className="broker-parent">
@@ -221,17 +243,7 @@ const BrokersDataForm = ({ setRefresh }) => {
             placeholder=" "
             inputMode="numeric"
             pattern="[0-9]*"
-            onKeyDown={(e) => {
-              // لو المفتاح مش رقم ومش Backspace/Arrow → منع الكتابة
-              if (
-                !/[0-9]/.test(e.key) &&
-                e.key !== "Backspace" &&
-                e.key !== "ArrowLeft" &&
-                e.key !== "ArrowRight"
-              ) {
-                e.preventDefault();
-              }
-            }}
+            onKeyDown={handlePhoneKeyDown}
             maxLength={11}
           />
           <span className="floating-label">Phone Number</span>
@@ -260,10 +272,7 @@ const BrokersDataForm = ({ setRefresh }) => {
                           {brokerData.idCardFront.name}
                         </span>
                         <span className="file-size">
-                          {(brokerData.idCardFront.size / 1024 / 1024).toFixed(
-                            2
-                          )}{" "}
-                          MB
+                          {getFileSize(brokerData.idCardFront)}
                         </span>
                       </div>
                     ) : (
@@ -309,10 +318,7 @@ const BrokersDataForm = ({ setRefresh }) => {
                           {brokerData.idCardBack.name}
                         </span>
                         <span className="file-size">
-                          {(brokerData.idCardBack.size / 1024 / 1024).toFixed(
-                            2
-                          )}{" "}
-                          MB
+                          {getFileSize(brokerData.idCardBack)}
                         </span>
                       </div>
                     ) : (
@@ -358,17 +364,12 @@ const BrokersDataForm = ({ setRefresh }) => {
                           {brokerData.selfieWithIdCard.name}
                         </span>
                         <span className="file-size">
-                          {(
-                            brokerData.selfieWithIdCard.size /
-                            1024 /
-                            1024
-                          ).toFixed(2)}{" "}
-                          MB
+                          {getFileSize(brokerData.selfieWithIdCard)}
                         </span>
                       </div>
                     ) : (
                       <div className="file-placeholder">
-                        <span className="upload-icon"></span>
+                        <span className="upload-icon">🤳</span>
                         <span>Selfie with ID Card</span>
                       </div>
                     )}
@@ -396,11 +397,6 @@ const BrokersDataForm = ({ setRefresh }) => {
           className="broker-submit-btn"
           type="submit"
           disabled={isUploading}
-          onClick={() => {
-            setTimeout(() => {
-              setRefresh((prev) => !prev);
-            }, 3000);
-          }}
         >
           {isUploading ? "Uploading..." : "Submit Broker Data"}
         </button>
@@ -409,4 +405,4 @@ const BrokersDataForm = ({ setRefresh }) => {
   );
 };
 
-export default BrokersDataForm;
+export default React.memo(BrokersDataForm);
