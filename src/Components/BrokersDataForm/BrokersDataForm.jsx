@@ -30,7 +30,6 @@ const BrokersDataForm = () => {
 
   const uploadImageToStorage = async (file, fileName) => {
     try {
-      // eslint-disable-next-line no-unused-vars
       const { data, error } = await supabase.storage
         .from("Brokers'Cards")
         .upload(fileName, file, {
@@ -72,7 +71,6 @@ const BrokersDataForm = () => {
       }, 200);
 
       uploadTask
-        // eslint-disable-next-line no-unused-vars
         .then(({ data, error }) => {
           clearInterval(progressInterval);
           setUploadProgress((prev) => ({ ...prev, [type]: 100 }));
@@ -122,7 +120,6 @@ const BrokersDataForm = () => {
       ]);
 
       // Insert broker data into database
-      // eslint-disable-next-line no-unused-vars
       const { data, error } = await supabase.from("Brokers").insert({
         fullName: brokerData.fullName,
         nickName: brokerData.nickName,
@@ -321,7 +318,7 @@ const BrokersDataForm = () => {
             </div>
           </div>
         </div>
-
+                
         <button
           className="broker-submit-btn"
           type="submit"

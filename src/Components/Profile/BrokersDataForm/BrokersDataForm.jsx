@@ -4,7 +4,7 @@ import supabase from "../../../SupabaseClient";
 import { userContext, sessionContext } from "../../../AppContexts";
 // id_card_back
 // eslint-disable-next-line react/prop-types
-const BrokersDataForm = ({setRefresh}) => {
+const BrokersDataForm = ({ setRefresh }) => {
   const { user } = useContext(userContext);
   const { session } = useContext(sessionContext);
   const [brokerData, setBrokerData] = useState({
@@ -14,10 +14,15 @@ const BrokersDataForm = ({setRefresh}) => {
     email: "",
     idCardFront: null,
     idCardBack: null,
+    selfieWithIdCard: null,
   });
 
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState({ front: 0, back: 0 });
+  const [uploadProgress, setUploadProgress] = useState({
+    front: 0,
+    back: 0,
+    selfie: 0,
+  });
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -99,24 +104,34 @@ const BrokersDataForm = ({setRefresh}) => {
       return;
     }
 
-    if (!brokerData.idCardFront || !brokerData.idCardBack) {
-      alert("Please upload both ID card photos.");
+    if (
+      !brokerData.idCardFront ||
+      !brokerData.idCardBack ||
+      !brokerData.selfieWithIdCard
+    ) {
+      alert("Please upload ID card photos and selfie with ID card.");
       return;
     }
 
     setIsUploading(true);
-    setUploadProgress({ front: 0, back: 0 });
+    setUploadProgress({ front: 0, back: 0, selfie: 0 });
 
     try {
       // Generate unique file names
       const timestamp = Date.now();
       const frontFileName = `${user.id}/id_front_${timestamp}.jpg`;
       const backFileName = `${user.id}/id_back_${timestamp}.jpg`;
+      const selfieFileName = `${user.id}/selfie_with_id_${timestamp}.jpg`;
 
-      // Upload both images with progress tracking
-      const [frontUrl, backUrl] = await Promise.all([
+      // Upload all images with progress tracking
+      const [frontUrl, backUrl, selfieUrl] = await Promise.all([
         uploadWithProgress(brokerData.idCardFront, frontFileName, "front"),
         uploadWithProgress(brokerData.idCardBack, backFileName, "back"),
+        uploadWithProgress(
+          brokerData.selfieWithIdCard,
+          selfieFileName,
+          "selfie"
+        ),
       ]);
 
       // Insert broker data into database
@@ -128,6 +143,7 @@ const BrokersDataForm = ({setRefresh}) => {
         auth_id: user.id,
         idCardFront: frontUrl,
         idCardBack: backUrl,
+        selfieWithIdCard: selfieUrl,
       });
 
       if (error) {
@@ -135,7 +151,12 @@ const BrokersDataForm = ({setRefresh}) => {
       }
 
       alert("Broker data submitted successfully!");
-      console.log("Broker data saved:", { ...brokerData, frontUrl, backUrl });
+      console.log("Broker data saved:", {
+        ...brokerData,
+        frontUrl,
+        backUrl,
+        selfieUrl,
+      });
 
       // Reset form
       setBrokerData({
@@ -145,13 +166,14 @@ const BrokersDataForm = ({setRefresh}) => {
         email: "",
         idCardFront: null,
         idCardBack: null,
+        selfieWithIdCard: null,
       });
     } catch (error) {
       console.error("Error submitting broker data:", error);
       alert(`Error: ${error.message}`);
     } finally {
       setIsUploading(false);
-      setUploadProgress({ front: 0, back: 0 });
+      setUploadProgress({ front: 0, back: 0, selfie: 0 });
     }
   };
 
@@ -316,6 +338,57 @@ const BrokersDataForm = ({setRefresh}) => {
                 )}
               </label>
             </div>
+
+            <div className="id-card-upload-item">
+              <label className="broker-label" htmlFor="selfieWithId">
+                <div className="file-input-container">
+                  <input
+                    className="broker-file"
+                    type="file"
+                    name="selfieWithIdCard"
+                    id="selfieWithId"
+                    accept="image/*"
+                    onChange={handleChange}
+                    required
+                  />
+                  <div className="file-input-display">
+                    {brokerData.selfieWithIdCard ? (
+                      <div className="file-selected">
+                        <span className="file-name">
+                          {brokerData.selfieWithIdCard.name}
+                        </span>
+                        <span className="file-size">
+                          {(
+                            brokerData.selfieWithIdCard.size /
+                            1024 /
+                            1024
+                          ).toFixed(2)}{" "}
+                          MB
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="file-placeholder">
+                        <span className="upload-icon"></span>
+                        <span>Selfie with ID Card</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {isUploading && (
+                  <div className="upload-progress">
+                    <div className="progress-bar">
+                      <div
+                        className="progress-fill"
+                        style={{ width: `${uploadProgress.selfie}%` }}
+                      ></div>
+                    </div>
+                    <span className="progress-text">
+                      {Math.round(uploadProgress.selfie)}%
+                    </span>
+                  </div>
+                )}
+              </label>
+            </div>
           </div>
         </div>
 
@@ -323,10 +396,10 @@ const BrokersDataForm = ({setRefresh}) => {
           className="broker-submit-btn"
           type="submit"
           disabled={isUploading}
-          onClick={()=>{
-            setTimeout(()=>{
-              setRefresh((prev)=>!prev);
-            },3000)
+          onClick={() => {
+            setTimeout(() => {
+              setRefresh((prev) => !prev);
+            }, 3000);
           }}
         >
           {isUploading ? "Uploading..." : "Submit Broker Data"}
