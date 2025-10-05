@@ -15,7 +15,7 @@ import supabase from "./SupabaseClient.js";
 import { Routes, Route, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { fetchBrokerData } from "./utils/userDataService";
+import { fetchUserData } from "./utils/userDataService";
 
 import {
   userContext,
@@ -23,6 +23,7 @@ import {
   cartContext,
   sessionContext,
   userDataContext,
+  staffContext,
 } from "./AppContexts";
 
 function App() {
@@ -33,6 +34,8 @@ function App() {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState({ id: "", email: "" });
   const [userData, setUserData] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
 
   // Fetch the current session
   const getSession = async () => {
@@ -102,9 +105,14 @@ function App() {
       });
     }
   }, [session]);
-  // fetch Broker's data from DB
+  // fetch User data from DB (Brokers or Staff)
   const getUserData = async () => {
-    await fetchBrokerData(session?.user?.email, setUserData);
+    await fetchUserData(
+      session?.user?.email,
+      setUserData,
+      setIsAdmin,
+      setIsModerator
+    );
   };
   useEffect(() => {
     if (session) {
@@ -134,52 +142,56 @@ function App() {
         <sessionContext.Provider value={{ session, setSession }}>
           <userContext.Provider value={{ user, setUser }}>
             <userDataContext.Provider value={{ userData, setUserData }}>
-              <>
-                <Header></Header>
-                <PageTransition>
-                  <Route path="/" element={<Products></Products>}></Route>
-                  <Route
-                    path="/profile"
-                    element={
-                      <ProtectedRoute requireSession={true}>
-                        <Profile></Profile>
-                      </ProtectedRoute>
-                    }
-                  ></Route>
-                  <Route
-                    path="/balance"
-                    element={
-                      <ProtectedRoute requireSession={true}>
-                        <Balance></Balance>
-                      </ProtectedRoute>
-                    }
-                  ></Route>
-                  <Route
-                    path="/cart"
-                    element={
-                      <ProtectedRoute blockBroker={true}>
-                        <Cart></Cart>
-                      </ProtectedRoute>
-                    }
-                  ></Route>
-                  <Route
-                    path={`/productPage/*`}
-                    element={<ProductPage></ProductPage>}
-                  ></Route>
-                  <Route path="/signup" element={<SignUp></SignUp>}></Route>
-                  <Route path="/signin" element={<SignIn></SignIn>}></Route>
-                </PageTransition>
-                <ToastContainer
-                  position="top-right"
-                  autoClose={2000}
-                  hideProgressBar={false}
-                  newestOnTop={false}
-                  closeOnClick
-                  pauseOnHover
-                  draggable
-                  theme="dark"
-                />
-              </>
+              <staffContext.Provider
+                value={{ isAdmin, setIsAdmin, isModerator, setIsModerator }}
+              >
+                <>
+                  <Header></Header>
+                  <PageTransition>
+                    <Route path="/" element={<Products></Products>}></Route>
+                    <Route
+                      path="/profile"
+                      element={
+                        <ProtectedRoute requireSession={true}>
+                          <Profile></Profile>
+                        </ProtectedRoute>
+                      }
+                    ></Route>
+                    <Route
+                      path="/balance"
+                      element={
+                        <ProtectedRoute requireSession={true}>
+                          <Balance></Balance>
+                        </ProtectedRoute>
+                      }
+                    ></Route>
+                    <Route
+                      path="/cart"
+                      element={
+                        <ProtectedRoute blockBroker={true}>
+                          <Cart></Cart>
+                        </ProtectedRoute>
+                      }
+                    ></Route>
+                    <Route
+                      path={`/productPage/*`}
+                      element={<ProductPage></ProductPage>}
+                    ></Route>
+                    <Route path="/signup" element={<SignUp></SignUp>}></Route>
+                    <Route path="/signin" element={<SignIn></SignIn>}></Route>
+                  </PageTransition>
+                  <ToastContainer
+                    position="top-right"
+                    autoClose={2000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    pauseOnHover
+                    draggable
+                    theme="dark"
+                  />
+                </>
+              </staffContext.Provider>
             </userDataContext.Provider>
           </userContext.Provider>
         </sessionContext.Provider>
