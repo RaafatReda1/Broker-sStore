@@ -25,13 +25,8 @@ import {
   userDataContext,
   staffContext,
 } from "./AppContexts";
-import Admin from "./Components/Manage/Admin/Admin.jsx";
-import Moderator from "./Components/Manage/Moderator/Moderator.jsx";
+import UserTypeRouter from "./Components/UserTypeRouter/UserTypeRouter.jsx";
 import ManagingDashboard from "./Components/Manage/ManagingDashboard/ManagingDashboard.jsx";
-import ManageBrokers from "./Components/Manage/ManageBrokers/ManageBrokers.jsx";
-import ManageOrders from "./Components/Manage/ManageOrders/ManageOrders.jsx";
-import ManageProducts from "./Components/Manage/ManageProducts/ManageProducts.jsx";
-import ManageModerators from "./Components/Manage/ManageModerators/ManageModerators.jsx";
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(
@@ -42,6 +37,7 @@ function App() {
   const [userData, setUserData] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isModerator, setIsModerator] = useState(false);
+  const [isLoadingUserData, setIsLoadingUserData] = useState(false);
 
   // Fetch the current session
   const getSession = async () => {
@@ -113,18 +109,27 @@ function App() {
   }, [session]);
   // fetch User data from DB (Brokers or Staff)
   const getUserData = async () => {
+    setIsLoadingUserData(true);
     await fetchUserData(
       session?.user?.email,
       setUserData,
       setIsAdmin,
       setIsModerator
     );
+    setIsLoadingUserData(false);
   };
   useEffect(() => {
     if (session) {
       getUserData();
+    } else {
+      // Reset user data when no session
+      setUserData(null);
+      setIsAdmin(false);
+      setIsModerator(false);
+      setIsLoadingUserData(false);
     }
   }, [session]);
+
   // ✅ Sync cart changes to localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -153,89 +158,39 @@ function App() {
                 value={{ isAdmin, setIsAdmin, isModerator, setIsModerator }}
               >
                 <>
-                  <Header></Header>
+                  {isAdmin || isModerator ? <ManagingDashboard /> : <Header />}
+
                   <PageTransition>
-                    {!isAdmin && !isModerator && (
-                      <>
-                        <Route path="/" element={<Products></Products>}></Route>
-                        <Route
-                          path="/profile"
-                          element={
-                            <ProtectedRoute requireSession={true}>
-                              <Profile></Profile>
-                            </ProtectedRoute>
-                          }
-                        ></Route>
-                        <Route
-                          path="/balance"
-                          element={
-                            <ProtectedRoute requireSession={true}>
-                              <Balance></Balance>
-                            </ProtectedRoute>
-                          }
-                        ></Route>
-                        <Route
-                          path="/cart"
-                          element={
-                            <ProtectedRoute blockBroker={true}>
-                              <Cart></Cart>
-                            </ProtectedRoute>
-                          }
-                        ></Route>
-                        <Route
-                          path={`/productPage/*`}
-                          element={<ProductPage></ProductPage>}
-                        ></Route>
-                        <Route
-                          path="/signup"
-                          element={<SignUp></SignUp>}
-                        ></Route>
-                        <Route
-                          path="/signin"
-                          element={<SignIn></SignIn>}
-                        ></Route>
-                      </>
-                    )}
-                    {isAdmin && (
-                      <Route path="/" element={<Admin>
-                        <ManagingDashboard /> 
-                            <Route
-                              path="/manageBrokers"
-                              element={<h1>HelloBrokers</h1>}
-                            />
-                            <Route
-                              path="/manageModerators"
-                              element={<ManageModerators />}
-                            />
-                            <Route
-                              path="/manageProducts"
-                              element={<ManageProducts />}
-                            />
-                            <Route
-                              path="/manageOrders"
-                              element={<ManageOrders />}
-                            />
-                      </Admin>}>
-                        
-                      </Route>
-                    )}
-                    {isModerator && (
-                      <Route path="/" element={<Moderator>
-                        <ManagingDashboard /> 
-                            <Route
-                              path="/manageBrokers"
-                              element={<ManageBrokers />}
-                            />
-                            <Route
-                              path="/manageOrders"
-                              element={<ManageOrders />}
-                            />
-                      </Moderator>}>
-                        
-                      </Route>
-                    )}
-                    
-                    </PageTransition>
+                    <Route path="/*" element={<UserTypeRouter />} />{" "}
+                    {/*This checks if the user Role inside UserTypeRouter.jsx first then renders the corresponding component if they're admin (<Admin />) or moderator (<Moderator />) or normal user (<Products />) */}
+                    <Route
+                      path="/profile"
+                      element={
+                        <ProtectedRoute requireSession={true}>
+                          <Profile />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/balance"
+                      element={
+                        <ProtectedRoute requireSession={true}>
+                          <Balance />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/cart"
+                      element={
+                        <ProtectedRoute blockBroker={true}>
+                          <Cart />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route path="/productPage/*" element={<ProductPage />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="/signin" element={<SignIn />} />
+                  </PageTransition>
                   <ToastContainer
                     position="top-right"
                     autoClose={2000}
