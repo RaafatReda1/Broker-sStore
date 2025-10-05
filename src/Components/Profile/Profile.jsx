@@ -4,6 +4,7 @@ import PreviewData from "./PreviewData/PreviewData";
 import supabase from "../../SupabaseClient";
 import { sessionContext, userDataContext } from "../../AppContexts";
 import { toast } from "react-toastify";
+import { fetchBrokerData } from "../../utils/userDataService";
 
 const Profile = () => {
   const [brokerExists, setBrokerExists] = useState(null);
@@ -15,29 +16,24 @@ const Profile = () => {
   const { userData, setUserData } = useContext(userDataContext);
 
   // ✅ Unified function to fetch broker data
-  const fetchBrokerData = async () => {
+  const fetchBrokerDataHandler = async () => {
     if (!session?.user?.email) return;
 
     setCheckDataIsLoading(true);
 
-    const { data, error } = await supabase
-      .from("Brokers")
-      .select("*")
-      .eq("email", session.user.email);
+    const userData = await fetchBrokerData(
+      session.user.email,
+      setUserData,
+      null,
+      true
+    );
 
-    if (error) {
-      console.error("Error fetching broker data:", error.message);
-      toast.error("Failed to load profile data. Please try again.");
-      setBrokerExists(false);
-      setResponded(false);
-      setUserData(null);
-    } else if (data && data.length > 0) {
+    if (userData) {
       setBrokerExists(true);
-      setUserData(data[0]);
       setResponded(true);
+      console.log("✅ Broker found:", userData);
     } else {
       setBrokerExists(false);
-      setUserData(null);
       setResponded(true);
       console.log("⚠️ No broker data found for:", session.user.email);
     }
@@ -47,7 +43,7 @@ const Profile = () => {
 
   // ✅ Run on mount, session change, or refresh trigger
   useEffect(() => {
-    fetchBrokerData();
+    fetchBrokerDataHandler();
   }, [session, refresh]);
 
   return (

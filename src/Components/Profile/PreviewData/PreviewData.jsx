@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import "./PreviewData.css";
 import { sessionContext, userDataContext } from "../../../AppContexts";
 import supabase from "../../../SupabaseClient";
+import { fetchBrokerData } from "../../../utils/userDataService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserTie,
@@ -46,24 +47,7 @@ const PreviewData = () => {
 
   // fetch data from DB
   const getUserData = async () => {
-    if (!session?.user?.email) return;
-
-    const { data, error } = await supabase
-      .from("Brokers")
-      .select("*")
-      .eq("email", session.user.email);
-
-    if (error) {
-      console.error("Fetching user data error:", error.message);
-      return;
-    }
-
-    if (data && data.length > 0) {
-      setUserData(data[0]);
-    } else {
-      setUserData(null);
-      console.log("No user data found for this email");
-    }
+    await fetchBrokerData(session?.user?.email, setUserData, null, false);
   };
   //rendering the data according to the refresh state
   useEffect(() => {

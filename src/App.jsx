@@ -15,6 +15,7 @@ import supabase from "./SupabaseClient.js";
 import { Routes, Route, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { fetchBrokerData } from "./utils/userDataService";
 
 import {
   userContext,
@@ -103,25 +104,7 @@ function App() {
   }, [session]);
   // fetch Broker's data from DB
   const getUserData = async () => {
-    if (!session?.user?.email) return;
-
-    const { data, error } = await supabase
-      .from("Brokers")
-      .select("*")
-      .eq("email", session.user.email);
-
-    if (error) {
-      console.error("Fetching user data error:", error.message);
-      toast.error("Failed to load profile data. Please try again.");
-      return;
-    }
-
-    if (data && data.length > 0) {
-      setUserData(data[0]);
-    } else {
-      setUserData(null);
-      console.log("No user data found for this email");
-    }
+    await fetchBrokerData(session?.user?.email, setUserData);
   };
   useEffect(() => {
     if (session) {
