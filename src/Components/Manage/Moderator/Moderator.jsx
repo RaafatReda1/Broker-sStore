@@ -9,18 +9,6 @@ const Moderator = () => {
 
   return (
     <>
-      <div
-        style={{
-          background: "#FF9800",
-          color: "white",
-          padding: "8px",
-          textAlign: "center",
-          fontWeight: "bold",
-        }}
-      >
-        👮 MODERATOR DASHBOARD - Limited Access
-      </div>
-      
       <Routes>
         <Route path="/manageBrokers" element={<ManageBrokers />} />
         <Route path="/manageOrders" element={<ManageOrders />} />

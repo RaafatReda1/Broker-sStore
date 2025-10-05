@@ -1,0 +1,75 @@
+.managing-dashboard {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 25px; /* 👈 الوضع الافتراضي */
+  background: linear-gradient(180deg, #0f172a, #1e293b);
+  color: white;
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: width 0.3s ease-in-out;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.managing-dashboard:hover {
+  width: 220px; /* 👈 وقت الـ hover */
+}
+
+.dashboard-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #38bdf8;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.managing-dashboard:hover .dashboard-title {
+  opacity: 1;
+}
+
+.dashboard-item {
+  width: 100%;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.dashboard-item:hover {
+  background-color: #2563eb;
+  color: #fff;
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+}
+
+.icon {
+  font-size: 1.4rem;
+  width: 25px;
+  text-align: center;
+  min-width: 25px;
+  color: #93c5fd;
+}
+
+.dashboard-item span {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+}
+
+.managing-dashboard:hover .dashboard-item span {
+  opacity: 1;
+  transform: translateX(0);
+}

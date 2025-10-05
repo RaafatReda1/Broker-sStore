@@ -159,7 +159,6 @@ function App() {
               >
                 <>
                   {isAdmin || isModerator ? <ManagingDashboard /> : <Header />}
-
                   <PageTransition>
                     <Route path="/*" element={<UserTypeRouter />} />{" "}
                     {/*This checks if the user Role inside UserTypeRouter.jsx first then renders the corresponding component if they're admin (<Admin />) or moderator (<Moderator />) or normal user (<Products />) */}
