@@ -35,7 +35,6 @@ const Profile = () => {
       setBrokerExists(true);
       setUserData(data[0]);
       setResponded(true);
-      console.log("✅ Broker found:", data[0]);
     } else {
       setBrokerExists(false);
       setUserData(null);

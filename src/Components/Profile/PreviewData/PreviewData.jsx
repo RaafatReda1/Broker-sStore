@@ -3,7 +3,12 @@ import "./PreviewData.css";
 import { sessionContext, userDataContext } from "../../../AppContexts";
 import supabase from "../../../SupabaseClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserTie } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUserTie,
+  faCheckCircle,
+  faExclamationTriangle,
+  faCircleCheck,
+} from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 
 const PreviewData = () => {
@@ -55,7 +60,6 @@ const PreviewData = () => {
 
     if (data && data.length > 0) {
       setUserData(data[0]);
-      console.log("Fetched user data:", data[0]);
     } else {
       setUserData(null);
       console.log("No user data found for this email");
@@ -172,14 +176,65 @@ const PreviewData = () => {
       setUserData((prev) => ({ ...prev, avatar_url: avatarUrl })); // تحديث الواجهة فورًا
     } catch (err) {
       console.error("Unexpected error:", err);
-      toast.error("An unexpected error occurred while updating avatar.", { autoClose: 5000 });
+      toast.error("An unexpected error occurred while updating avatar.", {
+        autoClose: 5000,
+      });
     }
   };
 
   return (
     <>
       <div className="dataContainer">
-        <h1>Profile</h1>
+        <h1>
+          Profile{" "}
+          {userData?.isVerified && (
+            <>
+              <FontAwesomeIcon
+                icon={faCircleCheck}
+                style={{
+                  color: "#00C853",
+                  marginLeft: "8px",
+                  filter: "drop-shadow(0 0 4px rgba(0, 200, 83, 0.6))",
+                  fontSize: "1.1rem",
+                }}
+              />
+              <span
+                style={{
+                  color: "#00C853",
+                  fontSize: "1.2rem",
+                  filter: "drop-shadow(0 0 4px rgba(0, 200, 83, 0.6))",
+                }}
+              >
+                {" "}
+                Verified
+              </span>
+            </>
+          )}
+        </h1>
+
+        {userData && !userData.isVerified && (
+          <div
+            style={{
+              background: "#fff3cd",
+              border: "1px solid #ffeaa7",
+              borderRadius: "8px",
+              padding: "12px",
+              marginBottom: "20px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faExclamationTriangle}
+              style={{ color: "#856404" }}
+            />
+            <span style={{ color: "#856404", fontSize: "14px" }}>
+              Your account is under review. You cannot work until verification
+              is complete.
+            </span>
+          </div>
+        )}
 
         <div className="profileContent">
           <div className="profileLeft">

@@ -76,13 +76,13 @@ const Product = ({
                     "?brokerId=" +
                     userData.id
                 );
-                console.log(userData);
                 toast.success("Link copied to clipboard!");
               } catch (err) {
                 console.error("Failed to copy: ", err);
                 toast.error("Failed to copy link. Please try again.");
               }
             }}
+            disabled = {userData.isVerified === false}
           >
             Copy Link
           </button>

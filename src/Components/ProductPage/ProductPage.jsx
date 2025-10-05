@@ -135,6 +135,8 @@ const ProductPage = () => {
                     toast.error("Failed to copy link. Please try again.");
                   }
                 }}
+                            disabled = {userData.isVerified === false}
+
               >
                 Copy Link
               </button>

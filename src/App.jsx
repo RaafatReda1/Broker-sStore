@@ -118,7 +118,6 @@ function App() {
 
     if (data && data.length > 0) {
       setUserData(data[0]);
-      console.log("Fetched user data:", data[0]);
     } else {
       setUserData(null);
       console.log("No user data found for this email");
