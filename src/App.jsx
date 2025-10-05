@@ -155,7 +155,14 @@ function App() {
                 <Header></Header>
                 <PageTransition>
                   <Route path="/" element={<Products></Products>}></Route>
-                  <Route path="/profile" element={<Profile></Profile>}></Route>
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute requireSession={true}>
+                        <Profile></Profile>
+                      </ProtectedRoute>
+                    }
+                  ></Route>
                   <Route
                     path="/balance"
                     element={
