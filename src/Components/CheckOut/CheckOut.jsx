@@ -69,6 +69,27 @@ const CheckOut = () => {
         return;
       } else if (data && data.length > 0) {
         toast.success("Order placed successfully!");
+        //Clearing the submission form
+        setForm({
+          brokerId:
+            JSON.parse(localStorage.getItem("brokerId") || "null") || "",
+          name: "",
+          address: "",
+          phone: "",
+          notes: "",
+          // date: "", this feild is deleted at the DB for now
+          cart: cart,
+          total: cart.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          ),
+          //adding the net profit logic
+          netProfit: cart.reduce((sum, product) => {
+            return sum + product.profit * product.quantity;
+          }, 0),
+        });
+        //closing the checkout
+        document.querySelector(".checkout-toggle-btnactive")?.click();
       }
     } catch (err) {
       console.error(err);
