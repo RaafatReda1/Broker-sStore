@@ -1,4 +1,4 @@
-import { useState, useEffect, React } from "react";
+import React, { useState, useEffect } from "react";
 
 import "./App.css";
 import Header from "./Components/Header/Header";
@@ -25,9 +25,13 @@ import {
   userDataContext,
   staffContext,
 } from "./AppContexts";
-import Admin from "./Components/Admin/Admin.jsx";
-import Moderator from "./Components/Moderator/Moderator.jsx";
-
+import Admin from "./Components/Manage/Admin/Admin.jsx";
+import Moderator from "./Components/Manage/Moderator/Moderator.jsx";
+import ManagingDashboard from "./Components/Manage/ManagingDashboard/ManagingDashboard.jsx";
+import ManageBrokers from "./Components/Manage/ManageBrokers/ManageBrokers.jsx";
+import ManageOrders from "./Components/Manage/ManageOrders/ManageOrders.jsx";
+import ManageProducts from "./Components/Manage/ManageProducts/ManageProducts.jsx";
+import ManageModerators from "./Components/Manage/ManageModerators/ManageModerators.jsx";
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(
@@ -138,6 +142,7 @@ function App() {
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
+
   return (
     <productsContext.Provider value={{ products, setProducts }}>
       <cartContext.Provider value={{ cart, setCart }}>
@@ -147,42 +152,90 @@ function App() {
               <staffContext.Provider
                 value={{ isAdmin, setIsAdmin, isModerator, setIsModerator }}
               >
-                {!isAdmin && !isModerator ? (
-                  <>
+                <>
                   <Header></Header>
                   <PageTransition>
-                    <Route path="/" element={<Products></Products>}></Route>
-                    <Route
-                      path="/profile"
-                      element={
-                        <ProtectedRoute requireSession={true}>
-                          <Profile></Profile>
-                        </ProtectedRoute>
-                      }
-                    ></Route>
-                    <Route
-                      path="/balance"
-                      element={
-                        <ProtectedRoute requireSession={true}>
-                          <Balance></Balance>
-                        </ProtectedRoute>
-                      }
-                    ></Route>
-                    <Route
-                      path="/cart"
-                      element={
-                        <ProtectedRoute blockBroker={true}>
-                          <Cart></Cart>
-                        </ProtectedRoute>
-                      }
-                    ></Route>
-                    <Route
-                      path={`/productPage/*`}
-                      element={<ProductPage></ProductPage>}
-                    ></Route>
-                    <Route path="/signup" element={<SignUp></SignUp>}></Route>
-                    <Route path="/signin" element={<SignIn></SignIn>}></Route>
-                  </PageTransition>
+                    {!isAdmin && !isModerator && (
+                      <>
+                        <Route path="/" element={<Products></Products>}></Route>
+                        <Route
+                          path="/profile"
+                          element={
+                            <ProtectedRoute requireSession={true}>
+                              <Profile></Profile>
+                            </ProtectedRoute>
+                          }
+                        ></Route>
+                        <Route
+                          path="/balance"
+                          element={
+                            <ProtectedRoute requireSession={true}>
+                              <Balance></Balance>
+                            </ProtectedRoute>
+                          }
+                        ></Route>
+                        <Route
+                          path="/cart"
+                          element={
+                            <ProtectedRoute blockBroker={true}>
+                              <Cart></Cart>
+                            </ProtectedRoute>
+                          }
+                        ></Route>
+                        <Route
+                          path={`/productPage/*`}
+                          element={<ProductPage></ProductPage>}
+                        ></Route>
+                        <Route
+                          path="/signup"
+                          element={<SignUp></SignUp>}
+                        ></Route>
+                        <Route
+                          path="/signin"
+                          element={<SignIn></SignIn>}
+                        ></Route>
+                      </>
+                    )}
+                    {isAdmin && (
+                      <Route path="/" element={<Admin>
+                        <ManagingDashboard /> 
+                            <Route
+                              path="/manageBrokers"
+                              element={<h1>HelloBrokers</h1>}
+                            />
+                            <Route
+                              path="/manageModerators"
+                              element={<ManageModerators />}
+                            />
+                            <Route
+                              path="/manageProducts"
+                              element={<ManageProducts />}
+                            />
+                            <Route
+                              path="/manageOrders"
+                              element={<ManageOrders />}
+                            />
+                      </Admin>}>
+                        
+                      </Route>
+                    )}
+                    {isModerator && (
+                      <Route path="/" element={<Moderator>
+                        <ManagingDashboard /> 
+                            <Route
+                              path="/manageBrokers"
+                              element={<ManageBrokers />}
+                            />
+                            <Route
+                              path="/manageOrders"
+                              element={<ManageOrders />}
+                            />
+                      </Moderator>}>
+                        
+                      </Route>
+                    )}
+                    
+                    </PageTransition>
                   <ToastContainer
                     position="top-right"
                     autoClose={2000}
@@ -194,19 +247,12 @@ function App() {
                     theme="dark"
                   />
                 </>
-                ) : (
-                  <>
-                    {isAdmin && <Admin></Admin>}
-                    {isModerator && <Moderator></Moderator>}
-                  </>
-                )}
               </staffContext.Provider>
             </userDataContext.Provider>
           </userContext.Provider>
         </sessionContext.Provider>
       </cartContext.Provider>
     </productsContext.Provider>
-
   );
 }
 
