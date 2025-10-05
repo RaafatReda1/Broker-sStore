@@ -4,6 +4,7 @@ import { sessionContext, userDataContext } from "../../../AppContexts";
 import supabase from "../../../SupabaseClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserTie } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
 
 const PreviewData = () => {
   const { userData, setUserData } = useContext(userDataContext);
@@ -63,7 +64,6 @@ const PreviewData = () => {
   //rendering the data according to the refresh state
   useEffect(() => {
     getUserData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh]);
   //setting the userFormData to the input values
   const handleChange = (e) => {
@@ -75,7 +75,7 @@ const PreviewData = () => {
   //sending the new form to the DB
   const handleUpdate = async () => {
     if (!userData) {
-      alert("No user data found");
+      toast.error("No user data found.");
       return;
     }
 
@@ -88,7 +88,6 @@ const PreviewData = () => {
     });
 
     if (Object.keys(updatedFields).length === 0) {
-      alert("No changes to update");
       setIsEditing(false);
       return;
     }
@@ -100,13 +99,13 @@ const PreviewData = () => {
       .select();
 
     if (error) {
-      alert("Error Updating Data: " + error.message);
+      toast.error(error.message);
     } else if (data && data.length > 0) {
-      alert("Data updated Successfully");
+      toast.success("Data updated successfully!");
       setRefresh((prev) => !prev);
       setIsEditing(false);
     } else {
-      alert("No data was updated");
+      toast.error("Failed to update data.");
     }
   };
   //handling the profile img temporary storage
@@ -137,13 +136,12 @@ const PreviewData = () => {
 
       // 2️⃣ رفع الصورة الجديدة
       const newFileName = `${userData.id}_${Date.now()}`;
-      // eslint-disable-next-line no-unused-vars
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("BrokersProfilePic")
         .upload(newFileName, selectedFile);
 
       if (uploadError) {
-        alert("Uploading Img Error: " + uploadError.message);
+        toast.error("Error uploading image: " + uploadError.message);
         return;
       }
 
@@ -153,14 +151,13 @@ const PreviewData = () => {
         .getPublicUrl(newFileName);
 
       if (publicUrlError) {
-        alert("Error getting public URL: " + publicUrlError.message);
+        toast.error("Error getting public URL: " + publicUrlError.message);
         return;
       }
 
       const avatarUrl = publicUrlData.publicUrl;
 
       // 4️⃣ تحديث الـ avatar_url في جدول الـ DB
-      // eslint-disable-next-line no-unused-vars
       const { data: updateData, error: updateError } = await supabase
         .from("Brokers")
         .update({ avatar_url: avatarUrl })
@@ -168,15 +165,14 @@ const PreviewData = () => {
         .select();
 
       if (updateError) {
-        alert("Error updating avatar URL: " + updateError.message);
+        toast.error("Error updating avatar URL: " + updateError.message);
         return;
       }
-
-      alert("Profile picture updated successfully!");
+      toast.success("Avatar updated successfully!");
       setUserData((prev) => ({ ...prev, avatar_url: avatarUrl })); // تحديث الواجهة فورًا
     } catch (err) {
       console.error("Unexpected error:", err);
-      alert("Something went wrong!");
+      toast.error("An unexpected error occurred while updating avatar.", { autoClose: 5000 });
     }
   };
 

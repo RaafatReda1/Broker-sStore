@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./SignUp.css";
 import supabase from "../../SupabaseClient";
+import { toast } from "react-toastify";
 const SignUp = () => {
   const [signUpForm, setSignUpForm] = useState({
     email: "",
@@ -28,7 +29,7 @@ const SignUp = () => {
     e.preventDefault();
 
     if (signUpForm.password !== signUpForm.confirmPassword) {
-      alert("Passwords do not match!");
+      toast.error("Passwords do not match.");
       return;
     }
 
@@ -37,12 +38,10 @@ const SignUp = () => {
         email: signUpForm.email,
         password: signUpForm.password,
       });
-      alert(
-        "Sign up successful! Please check your email to confirm your account."
-      );
+      toast.success("Sign up successful! Check your email for verification." , { autoClose: 5000 });
     } catch (error) {
       console.error("Error during sign up:", error);
-      alert("Sign up failed. Please try again.");
+      toast.error("Sign up failed. Please try again.");
     }
   };
 

@@ -3,6 +3,7 @@ import BrokersDataForm from "./BrokersDataForm/BrokersDataForm";
 import PreviewData from "./PreviewData/PreviewData";
 import supabase from "../../SupabaseClient";
 import { sessionContext, userDataContext } from "../../AppContexts";
+import { toast } from "react-toastify";
 
 const Profile = () => {
   const [brokerExists, setBrokerExists] = useState(null);
@@ -26,6 +27,7 @@ const Profile = () => {
 
     if (error) {
       console.error("Error fetching broker data:", error.message);
+      toast.error("Failed to load profile data. Please try again.");
       setBrokerExists(false);
       setResponded(false);
       setUserData(null);
@@ -53,7 +55,17 @@ const Profile = () => {
     <>
       {checkDataIsLoading && <p>Loading...</p>}
 
-      {!checkDataIsLoading && !responded && <p>Error fetching data</p>}
+      {!checkDataIsLoading && !responded && (
+        <div>
+          <p>Error fetching data</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="retry-button"
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       {!checkDataIsLoading && responded && !brokerExists && !userData && (
         <BrokersDataForm setRefresh={setRefresh} />

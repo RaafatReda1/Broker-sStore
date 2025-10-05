@@ -2,6 +2,7 @@ import React, { useState, useContext, useCallback, useMemo } from "react";
 import "./BrokersDataForm.css";
 import supabase from "../../../SupabaseClient";
 import { userContext, sessionContext } from "../../../AppContexts";
+import { toast } from "react-toastify";
 // id_card_back
 // eslint-disable-next-line react/prop-types
 const BrokersDataForm = ({ setRefresh }) => {
@@ -95,7 +96,7 @@ const BrokersDataForm = ({ setRefresh }) => {
       e.preventDefault();
 
       if (!session || !user.id) {
-        alert("Please sign in to submit broker data.");
+        toast.error("User not logged in.");
         return;
       }
 
@@ -104,7 +105,7 @@ const BrokersDataForm = ({ setRefresh }) => {
         !brokerData.idCardBack ||
         !brokerData.selfieWithIdCard
       ) {
-        alert("Please upload ID card photos and selfie with ID card.");
+        toast.error("Please upload all required images.");
         return;
       }
 
@@ -144,8 +145,7 @@ const BrokersDataForm = ({ setRefresh }) => {
         if (error) {
           throw error;
         }
-
-        alert("Broker data submitted successfully!");
+        toast.success("Broker data submitted successfully!");
         console.log("Broker data saved:", {
           ...brokerData,
           frontUrl,
@@ -172,7 +172,7 @@ const BrokersDataForm = ({ setRefresh }) => {
         }
       } catch (error) {
         console.error("Error submitting broker data:", error);
-        alert(`Error: ${error.message}`);
+        toast.error("Error submitting broker data.");
       } finally {
         setIsUploading(false);
         setUploadProgress({ front: 0, back: 0, selfie: 0 });

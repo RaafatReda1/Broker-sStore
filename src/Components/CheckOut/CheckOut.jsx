@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import "./CheckOut.css";
 import { cartContext } from "../../AppContexts";
 import supabase from "../../SupabaseClient";
+import { toast } from "react-toastify";
 
 const CheckOut = () => {
   const [visible, setVisible] = useState(false);
@@ -57,13 +58,21 @@ const CheckOut = () => {
 
   // ✅ handle form submit
   const handleSubmit = async () => {
-    const { data, error } = await supabase.from("Orders").insert([form]);
-    if (error) {
-      alert("Error sending the Order");
-    } else if (data) {
-      alert("OrderPlaced!!");
-    } else {
-      alert("OrderPlaced!!");
+    try {
+      const { data, error } = await supabase
+        .from("Orders")
+        .insert([form])
+        .select(); // ✅ علشان يرجعلك الـ data المدخلة
+
+      if (error) {
+        toast.error(`Error: ${error.message}`);
+        return;
+      } else if (data && data.length > 0) {
+        toast.success("Order placed successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Unexpected error occurred! " + err.message);
     }
   };
 
@@ -146,15 +155,7 @@ const CheckOut = () => {
               <button
                 className="checkout-submit-btn"
                 type="button"
-                onClick={() => {
-                  setForm((prev) => ({
-                    ...prev,
-                    date: new Date().toLocaleString(),
-                  }));
-                  setTimeout(() => {
-                    handleSubmit();
-                  }, 500);
-                }}
+                onClick={handleSubmit}
               >
                 Submit Order
               </button>

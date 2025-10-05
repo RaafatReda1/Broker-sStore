@@ -4,6 +4,7 @@ import React from "react";
 import "./BrokersArrangement.css";
 import { userDataContext, sessionContext } from "../../../AppContexts";
 import supabase from "../../../SupabaseClient";
+import { toast } from "react-toastify";
 
 const BrokersArrangement = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +26,7 @@ const BrokersArrangement = () => {
 
       if (error) {
         console.error("Error fetching brokers:", error);
+        toast.error("Failed to load leaderboard. Please try again.");
         return;
       }
 
@@ -33,6 +35,7 @@ const BrokersArrangement = () => {
       }
     } catch (err) {
       console.error("Error:", err);
+      toast.error("Failed to load leaderboard. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -3,6 +3,7 @@ import "./Cart.css";
 import { cartContext } from "../../AppContexts";
 import CheckOut from "../CheckOut/CheckOut";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Cart() {
   const { cart, setCart } = useContext(cartContext);
@@ -21,6 +22,7 @@ export default function Cart() {
 
     setCart(updatedCart);
     // localStorage is now handled in App.jsx
+    toast.success("Removed from cart!");
   };
 
   return (
@@ -72,6 +74,7 @@ export default function Cart() {
                 onClick={() => {
                   setCart([]);
                   // localStorage is now handled in App.jsx
+                  toast.success("Your cart is now empty!");
                 }}
               >
                 Remove All

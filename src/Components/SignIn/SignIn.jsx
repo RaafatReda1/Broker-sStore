@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import "./SignIn.css";
 import supabase from "../../SupabaseClient";
 import { sessionContext } from "../../AppContexts";
+import { toast } from "react-toastify";
 const SignIn = () => {
   const [signInForm, setSignInForm] = useState({
     email: "",
@@ -22,15 +23,16 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await supabase.auth.signInWithPassword({
+    const {data, error} =await supabase.auth.signInWithPassword({
         email: signInForm.email,
         password: signInForm.password,
       });
-      alert("signed in successfully");
-    } catch (err) {
-      console.log(err);
-    }
+      if(error){
+        console.error("Error during sign in:", error);
+        toast.error("Sign in failed. Please try again.");
+      } else if(data){
+        toast.success("Sign in successful!");
+      }
   };
 
   return (

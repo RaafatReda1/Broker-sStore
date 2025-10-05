@@ -8,6 +8,7 @@ import {
 } from "../../AppContexts";
 import PDF from "../PDF/PDF";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ProductPage = () => {
   const { products } = useContext(productsContext);
@@ -64,7 +65,7 @@ const ProductPage = () => {
 
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
-    alert("Added to cart!");
+    toast.success("Added to cart!");
   };
 
   return (
@@ -128,9 +129,10 @@ const ProductPage = () => {
                     await navigator.clipboard.writeText(
                       window.location.href + "?brokerId=" + userData.id
                     );
-                    alert("Copied to clipboard!");
+                    toast.success("Link copied to clipboard!");
                   } catch (err) {
                     console.error("Failed to copy: ", err);
+                    toast.error("Failed to copy link. Please try again.");
                   }
                 }}
               >
@@ -145,7 +147,7 @@ const ProductPage = () => {
               >
                 Add to Cart
               </button>
-              <Link to = "/cart">
+              <Link to="/cart">
                 <button className="btn checkout" onClick={() => {}}>
                   Go to Checkout
                 </button>

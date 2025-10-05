@@ -12,6 +12,8 @@ import SignIn from "./Components/SignIn/SignIn";
 import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute";
 import supabase from "./SupabaseClient.js";
 import { Routes, Route, Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   userContext,
@@ -52,23 +54,25 @@ function App() {
     }
   })();
   //detecting the auth state change (e.g., sign-in, sign-out)
-useEffect(() => {
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-    console.log("Auth state changed:", _event);
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", _event);
 
-    setSession(session); // ✅ دايماً يحدث الـ session محليًا
+      setSession(session); // ✅ دايماً يحدث الـ session محليًا
 
-    if (_event === 'SIGNED_OUT') {
-      console.log("User logged out → reloading...");
-      window.location.reload(); // ✅ يعمل reload بس عند تسجيل الخروج
-    }
-  });
+      if (_event === "SIGNED_OUT") {
+        console.log("User logged out → reloading...");
+        window.location.reload(); // ✅ يعمل reload بس عند تسجيل الخروج
+      }
+    });
 
-  // 🧹 cleanup عشان متحصلش listeners زيادة
-  return () => {
-    subscription.unsubscribe();
-  };
-}, []); // 👈 مفيش dependencies علشان يشتغل مرة واحدة بس
+    // 🧹 cleanup عشان متحصلش listeners زيادة
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []); // 👈 مفيش dependencies علشان يشتغل مرة واحدة بس
 
   // Fetch products data with a random delay to simulate loading time
   useEffect(() => {
@@ -78,6 +82,7 @@ useEffect(() => {
       const { data, error } = await supabase.from("Products").select("*");
       if (error) {
         console.error("Error fetching products:", error.message);
+        toast.error("Failed to load products. Please refresh the page.");
       } else {
         setProducts(data);
       }
@@ -106,6 +111,7 @@ useEffect(() => {
 
     if (error) {
       console.error("Fetching user data error:", error.message);
+      toast.error("Failed to load profile data. Please try again.");
       return;
     }
 
@@ -173,6 +179,16 @@ useEffect(() => {
                   <Route path="/signup" element={<SignUp></SignUp>}></Route>
                   <Route path="/signin" element={<SignIn></SignIn>}></Route>
                 </Routes>
+                <ToastContainer
+                  position="top-right"
+                  autoClose={2000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  pauseOnHover
+                  draggable
+                  theme="dark"
+                />
               </>
             </userDataContext.Provider>
           </userContext.Provider>

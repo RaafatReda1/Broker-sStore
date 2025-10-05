@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 import "./Product.css";
 import { cartContext, userDataContext } from "../../AppContexts";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Product = ({
   id,
@@ -44,6 +45,8 @@ const Product = ({
 
     setCart(updatedCart);
     // localStorage is now handled in App.jsx
+
+    toast.success("Added to cart!");
   };
 
   return (
@@ -67,12 +70,17 @@ const Product = ({
             onClick={async () => {
               try {
                 const copiedTxt = await navigator.clipboard.writeText(
-                  window.location.href + "productPage/productId:" + id +"?brokerId=" + userData.id
+                  window.location.href +
+                    "productPage/productId:" +
+                    id +
+                    "?brokerId=" +
+                    userData.id
                 );
                 console.log(userData);
-                alert("Copied to clipboard!", copiedTxt);
+                toast.success("Link copied to clipboard!");
               } catch (err) {
                 console.error("Failed to copy: ", err);
+                toast.error("Failed to copy link. Please try again.");
               }
             }}
           >
