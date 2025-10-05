@@ -10,6 +10,7 @@ import ProductPage from "./Components/ProductPage/ProductPage";
 import SignUp from "./Components/SignUp/SignUp";
 import SignIn from "./Components/SignIn/SignIn";
 import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute";
+import PageTransition from "./Components/PageTransition/PageTransition";
 import supabase from "./SupabaseClient.js";
 import { Routes, Route, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -44,7 +45,6 @@ function App() {
     }
   };
   // Storing brokerId in localStorage if exists in URL
-  // eslint-disable-next-line no-unused-vars
   const setbrokerId = (() => {
     const params = new URLSearchParams(window.location.search);
     const brokerId = params.get("brokerId");
@@ -65,6 +65,7 @@ function App() {
       if (_event === "SIGNED_OUT") {
         console.log("User logged out → reloading...");
         window.location.reload(); // ✅ يعمل reload بس عند تسجيل الخروج
+        window.location.href = "/";
       }
     });
 
@@ -153,7 +154,7 @@ function App() {
             <userDataContext.Provider value={{ userData, setUserData }}>
               <>
                 <Header></Header>
-                <Routes>
+                <PageTransition>
                   <Route path="/" element={<Products></Products>}></Route>
                   <Route path="/profile" element={<Profile></Profile>}></Route>
                   <Route
@@ -178,7 +179,7 @@ function App() {
                   ></Route>
                   <Route path="/signup" element={<SignUp></SignUp>}></Route>
                   <Route path="/signin" element={<SignIn></SignIn>}></Route>
-                </Routes>
+                </PageTransition>
                 <ToastContainer
                   position="top-right"
                   autoClose={2000}
