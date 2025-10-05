@@ -25,6 +25,8 @@ import {
   userDataContext,
   staffContext,
 } from "./AppContexts";
+import Admin from "./Components/Admin/Admin.jsx";
+import Moderator from "./Components/Moderator/Moderator.jsx";
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -145,7 +147,8 @@ function App() {
               <staffContext.Provider
                 value={{ isAdmin, setIsAdmin, isModerator, setIsModerator }}
               >
-                <>
+                {!isAdmin && !isModerator ? (
+                  <>
                   <Header></Header>
                   <PageTransition>
                     <Route path="/" element={<Products></Products>}></Route>
@@ -191,12 +194,19 @@ function App() {
                     theme="dark"
                   />
                 </>
+                ) : (
+                  <>
+                    {isAdmin && <Admin></Admin>}
+                    {isModerator && <Moderator></Moderator>}
+                  </>
+                )}
               </staffContext.Provider>
             </userDataContext.Provider>
           </userContext.Provider>
         </sessionContext.Provider>
       </cartContext.Provider>
     </productsContext.Provider>
+
   );
 }
 
