@@ -3,18 +3,27 @@ import { staffContext } from "../../../AppContexts";
 import { Link } from "react-router-dom";
 import "./ManagingDashboard.css";
 
-// ✅ FontAwesome React Imports
+// ✅ FontAwesome Imports
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserTie,
   faBox,
   faCubes,
   faUsersGear,
+  faRightFromBracket, // logout icon
 } from "@fortawesome/free-solid-svg-icons";
 import supabase from "../../../SupabaseClient";
 
 const ManagingDashboard = () => {
   const { isAdmin, isModerator } = useContext(staffContext);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.log("LoggingOut Err: " + err.message);
+    }
+  };
 
   return (
     <div className="managing-dashboard">
@@ -43,13 +52,11 @@ const ManagingDashboard = () => {
           </Link>
         </>
       )}
-      <button className="logout-btn" onClick={async()=>{
-        try {
-          await supabase.auth.signOut();
-        } catch (err) {
-          console.log("LoggingOut Err:   " + err.message);
-        }
-      }}>Logout</button>
+
+      <a className="dashboard-logout dashboard-item" onClick={handleLogout}>
+        <FontAwesomeIcon icon={faRightFromBracket} className="icon logout-icon" />
+        <span>Logout</span>
+      </a>
     </div>
   );
 };

@@ -62,6 +62,10 @@
   min-width: 25px;
   color: #93c5fd;
 }
+.logout-icon{
+      color: #fdc193;
+
+}
 
 .dashboard-item span {
   opacity: 0;
@@ -72,4 +76,14 @@
 .managing-dashboard:hover .dashboard-item span {
   opacity: 1;
   transform: translateX(0);
+}
+.dashboard-logout{
+    cursor: pointer;
+    position: absolute;
+    bottom: 50px;
+    margin-left: 20px;
+}
+.dashboard-logout:hover{
+    background: #a81212d8;
+      box-shadow: 0 2px 8px rgba(246, 103, 59, 0.4);
 }
