@@ -52,7 +52,7 @@ const ViewImages = ({ broker, show, onClose }) => {
 
       {selectedImg !== null && (
         <div className="lightbox-overlay" onClick={() => setSelectedImg(null)}>
-          <button className="lightbox-close" onClick={() => setSelectedImg(null)}>×</button>
+          <button className="lightbox-close" onClick={() => setSelectedImg(null)}>X</button>
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
             <div className="lightbox-main-wrapper" onMouseMove={handleMouseMove}>
               <img 

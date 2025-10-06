@@ -143,9 +143,10 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(169, 18, 18, 0.395);
+  padding: 0;
+  color: rgba(169, 18, 18, 0.395);
+  border: none;
   border-radius: 50%;
   width: 48px;
   height: 48px;
@@ -161,9 +162,9 @@
 }
 
 .lightbox-close:hover {
-  background: white;
-  color: #000;
-  transform: rotate(90deg);
+  background: rgb(150, 30, 30);
+  color: #fff;
+  transform: scale(1.1);
 }
 
 /* Lightbox Content */
