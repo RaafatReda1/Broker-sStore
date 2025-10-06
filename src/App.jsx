@@ -81,7 +81,7 @@ function App() {
     };
   }, []); // 👈 مفيش dependencies علشان يشتغل مرة واحدة بس
 
-  // Fetch products data with a random delay to simulate loading time
+  // Fetch products data 
   useEffect(() => {
     getSession();
 
