@@ -30,7 +30,7 @@ const ManageBrokers = () => {
       <table
         border="1"
         cellPadding="8"
-        style={{ width: "100%", borderCollapse: "collapse" }}
+        style={{ width: "100%", borderCollapse: "collapse" ,height:"100vh"}}
       >
         <thead style={{ backgroundColor: "#f2f2f2" }}>
           <tr>
