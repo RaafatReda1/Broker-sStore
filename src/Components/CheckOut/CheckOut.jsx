@@ -12,7 +12,7 @@ const CheckOut = () => {
 
   // ✅ form state
   const [form, setForm] = useState({
-    brokerId: JSON.parse(localStorage.getItem("brokerId") || "null") || "",
+    brokerId: JSON.parse(localStorage.getItem("brokerId") || "null") || 35,
     name: "",
     address: "",
     phone: "",
@@ -72,7 +72,7 @@ const CheckOut = () => {
         //Clearing the submission form
         setForm({
           brokerId:
-            JSON.parse(localStorage.getItem("brokerId") || "null") || "",
+            JSON.parse(localStorage.getItem("brokerId") || "null") || "" || 35,
           name: "",
           address: "",
           phone: "",
