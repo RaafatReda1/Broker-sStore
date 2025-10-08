@@ -27,6 +27,7 @@ import {
 } from "./AppContexts";
 import UserTypeRouter from "./Components/UserTypeRouter/UserTypeRouter.jsx";
 import ManagingDashboard from "./Components/Manage/ManagingDashboard/ManagingDashboard.jsx";
+import ViewNotifications from "./Components/ViewNotifications/ViewNotifications.jsx";
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(
@@ -81,7 +82,7 @@ function App() {
     };
   }, []); // 👈 مفيش dependencies علشان يشتغل مرة واحدة بس
 
-  // Fetch products data 
+  // Fetch products data
   useEffect(() => {
     getSession();
 
@@ -175,6 +176,14 @@ function App() {
                       element={
                         <ProtectedRoute requireSession={true}>
                           <Balance />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/notifications"
+                      element={
+                        <ProtectedRoute requireSession={true}>
+                          <ViewNotifications />
                         </ProtectedRoute>
                       }
                     />

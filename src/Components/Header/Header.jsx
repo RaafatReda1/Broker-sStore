@@ -27,9 +27,14 @@ const Header = () => {
           </Link>
         )}
         {userData && (
-          <Link to="/balance">
-            <h4>Balance</h4>
-          </Link>
+          <>
+            <Link to="/notifications">
+              <h4>Notifications</h4>
+            </Link>
+            <Link to="/balance">
+              <h4>Balance</h4>
+            </Link>
+          </>
         )}
         <Link to="/">
           <h4>Products</h4>
