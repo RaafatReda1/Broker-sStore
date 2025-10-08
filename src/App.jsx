@@ -13,7 +13,7 @@ import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute";
 import PageTransition from "./Components/PageTransition/PageTransition";
 import AppLoading from "./Components/AppLoading/AppLoading";
 import supabase from "./SupabaseClient.js";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, data } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchUserData } from "./utils/userDataService";
