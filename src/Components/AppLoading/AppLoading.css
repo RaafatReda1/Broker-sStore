@@ -1,0 +1,172 @@
+.app-loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.app-loading-content {
+  text-align: center;
+  color: white;
+  max-width: 500px;
+  padding: 2rem;
+}
+
+.loading-logo {
+  margin-bottom: 3rem;
+}
+
+.logo-icon {
+  color: #ffd700;
+  margin-bottom: 1rem;
+  animation: pulse 2s infinite;
+}
+
+.loading-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.loading-spinner-container {
+  margin-bottom: 2rem;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  color: #ffd700;
+}
+
+.loading-text-container {
+  margin-bottom: 3rem;
+}
+
+.loading-message {
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.loading-subtitle {
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.role-icons-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.role-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.role-icon-item:hover {
+  opacity: 1;
+}
+
+.role-icon {
+  color: #ffd700;
+}
+
+.role-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.progress-container {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  border-radius: 2px;
+  animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+    transform: translateX(-100%);
+  }
+  50% {
+    width: 100%;
+    transform: translateX(0%);
+  }
+  100% {
+    width: 100%;
+    transform: translateX(100%);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-loading-content {
+    padding: 1rem;
+  }
+
+  .loading-title {
+    font-size: 2rem;
+  }
+
+  .loading-message {
+    font-size: 1.2rem;
+  }
+
+  .role-icons-container {
+    gap: 1rem;
+  }
+
+  .role-icon-item {
+    gap: 0.25rem;
+  }
+
+  .role-label {
+    font-size: 0.8rem;
+  }
+}

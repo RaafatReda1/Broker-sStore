@@ -11,6 +11,7 @@ import SignUp from "./Components/SignUp/SignUp";
 import SignIn from "./Components/SignIn/SignIn";
 import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute";
 import PageTransition from "./Components/PageTransition/PageTransition";
+import AppLoading from "./Components/AppLoading/AppLoading";
 import supabase from "./SupabaseClient.js";
 import { Routes, Route, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -36,9 +37,72 @@ function App() {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState({ id: "", email: "" });
   const [userData, setUserData] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isModerator, setIsModerator] = useState(false);
-  const [isLoadingUserData, setIsLoadingUserData] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(null);
+  const [isModerator, setIsModerator] = useState(null);
+  const [isAppInitialized, setIsAppInitialized] = useState(false);
+
+  // Data loading states
+  const [dataLoadingStates, setDataLoadingStates] = useState({
+    products: false,
+    session: false,
+    userData: false,
+  });
+
+  // Check if all required data is loaded
+  const isAllDataLoaded = () => {
+    const {
+      products: productsLoaded,
+      session: sessionLoaded,
+      userData: userDataLoaded,
+    } = dataLoadingStates;
+
+    console.log("🔍 Data Loading Check:", {
+      productsLoaded,
+      sessionLoaded,
+      userDataLoaded,
+      hasSession: !!session,
+      userDataValue: userData,
+    });
+
+    // Products are always required
+    if (!productsLoaded) {
+      console.log("❌ Products not loaded yet");
+      return false;
+    }
+
+    // Session is always required
+    if (!sessionLoaded) {
+      console.log("❌ Session not loaded yet");
+      return false;
+    }
+
+    // If there's a session, userData must be loaded
+    if (session && !userDataLoaded) {
+      console.log("❌ Session exists but userData not loaded yet");
+      return false;
+    }
+
+    // If no session, userData should be null (which means loaded)
+    if (!session && userData !== null) {
+      console.log("❌ No session but userData is not null");
+      return false;
+    }
+
+    console.log("✅ All data loaded successfully!");
+    return true;
+  };
+
+  // Check what component should be shown based on loaded data
+  const getComponentToShow = () => {
+    if (!isAllDataLoaded()) {
+      return "loading";
+    }
+
+    if (isAdmin) return "admin";
+    if (isModerator) return "moderator";
+    if (session) return "user";
+    return "guest";
+  };
 
   // Fetch the current session
   const getSession = async () => {
@@ -82,20 +146,51 @@ function App() {
     };
   }, []); // 👈 مفيش dependencies علشان يشتغل مرة واحدة بس
 
-  // Fetch products data
-  useEffect(() => {
-    getSession();
+  // Initialize all app data
+  const initializeApp = async () => {
+    try {
+      console.log("🚀 Starting app initialization...");
 
-    const getData = async () => {
+      // Reset all loading states
+      setDataLoadingStates({
+        products: false,
+        session: false,
+        userData: false,
+      });
+
+      // 1. Get session
+      console.log("📡 Loading session...");
+      await getSession();
+      setDataLoadingStates((prev) => ({ ...prev, session: true }));
+      console.log("✅ Session loaded");
+
+      // 2. Fetch products data
+      console.log("🛍️ Loading products...");
       const { data, error } = await supabase.from("Products").select("*");
       if (error) {
         console.error("Error fetching products:", error.message);
         toast.error("Failed to load products. Please refresh the page.");
       } else {
         setProducts(data);
+        setDataLoadingStates((prev) => ({ ...prev, products: true }));
+        console.log("✅ Products loaded:", data.length);
       }
-    };
-    getData();
+
+      // 3. Wait a bit for smooth UX (optional)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      console.log("🎉 App initialization complete!");
+      setIsAppInitialized(true);
+    } catch (error) {
+      console.error("❌ App initialization failed:", error);
+      toast.error("Failed to initialize app. Please refresh the page.");
+      setIsAppInitialized(true); // Still show app even if there's an error
+    }
+  };
+
+  // Initialize app on mount
+  useEffect(() => {
+    initializeApp();
   }, []);
   // Redirecting to products page if user is authenticated and trying to access signIn or signUp page
 
@@ -110,26 +205,41 @@ function App() {
   }, [session]);
   // fetch User data from DB (Brokers or Staff)
   const getUserData = async () => {
-    setIsLoadingUserData(true);
+    if (!session?.user?.email) {
+      // No session, mark userData as loaded (null)
+      setDataLoadingStates((prev) => ({ ...prev, userData: true }));
+      return;
+    }
+
+    console.log("👤 Fetching user data for:", session.user.email);
+    setDataLoadingStates((prev) => ({ ...prev, userData: false }));
+
     await fetchUserData(
-      session?.user?.email,
+      session.user.email,
       setUserData,
       setIsAdmin,
       setIsModerator
     );
-    setIsLoadingUserData(false);
+
+    setDataLoadingStates((prev) => ({ ...prev, userData: true }));
+    console.log("✅ User data loaded");
   };
+
+  // Handle user data when session changes (only after app is initialized)
   useEffect(() => {
-    if (session) {
-      getUserData();
-    } else {
-      // Reset user data when no session
-      setUserData(null);
-      setIsAdmin(false);
-      setIsModerator(false);
-      setIsLoadingUserData(false);
+    if (isAppInitialized) {
+      if (session) {
+        console.log("🔄 App: Session detected, fetching user data...");
+        getUserData();
+      } else {
+        console.log("🔄 App: No session, resetting user data...");
+        // Reset user data when no session
+        setUserData(null);
+        setIsAdmin(false);
+        setIsModerator(false);
+      }
     }
-  }, [session]);
+  }, [session, isAppInitialized]);
 
   // ✅ Sync cart changes to localStorage
   useEffect(() => {
@@ -148,6 +258,28 @@ function App() {
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
+  const componentToShow = getComponentToShow();
+  const allDataLoaded = isAllDataLoaded();
+
+  console.log("App State:", {
+    isAppInitialized,
+    allDataLoaded,
+    componentToShow,
+    dataLoadingStates,
+    userData,
+    isAdmin,
+    isModerator,
+  });
+
+  // Show loading screen until app is fully initialized
+  if (!isAppInitialized) {
+    return <AppLoading />;
+  }
+
+  // Show loading screen until all required data is loaded
+  if (!allDataLoaded) {
+    return <AppLoading />;
+  }
 
   return (
     <productsContext.Provider value={{ products, setProducts }}>
@@ -158,58 +290,63 @@ function App() {
               <staffContext.Provider
                 value={{ isAdmin, setIsAdmin, isModerator, setIsModerator }}
               >
-                <>
-                  {isAdmin || isModerator ? <ManagingDashboard /> : <Header />}
-                  <PageTransition>
-                    <Route path="/*" element={<UserTypeRouter />} />{" "}
-                    {/*This checks if the user Role inside UserTypeRouter.jsx first then renders the corresponding component if they're admin (<Admin />) or moderator (<Moderator />) or normal user (<Products />) */}
-                    <Route
-                      path="/profile"
-                      element={
-                        <ProtectedRoute requireSession={true}>
-                          <Profile />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/balance"
-                      element={
-                        <ProtectedRoute requireSession={true}>
-                          <Balance />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/notifications"
-                      element={
-                        <ProtectedRoute requireSession={true}>
-                          <ViewNotifications />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/cart"
-                      element={
-                        <ProtectedRoute blockBroker={true}>
-                          <Cart />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route path="/productPage/*" element={<ProductPage />} />
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/signin" element={<SignIn />} />
-                  </PageTransition>
-                  <ToastContainer
-                    position="top-right"
-                    autoClose={2000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    pauseOnHover
-                    draggable
-                    theme="dark"
-                  />
-                </>
+                {componentToShow === "admin" ||
+                componentToShow === "moderator" ? (
+                  <ManagingDashboard />
+                ) : (
+                  <>
+                    <Header />
+                    <PageTransition>
+                      <Route path="/*" element={<UserTypeRouter />} />{" "}
+                      {/*This checks if the user Role inside UserTypeRouter.jsx first then renders the corresponding component if they're admin (<Admin />) or moderator (<Moderator />) or normal user (<Products />) */}
+                      <Route
+                        path="/profile"
+                        element={
+                          <ProtectedRoute requireSession={true}>
+                            <Profile />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/balance"
+                        element={
+                          <ProtectedRoute requireSession={true}>
+                            <Balance />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/notifications"
+                        element={
+                          <ProtectedRoute requireSession={true}>
+                            <ViewNotifications />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/cart"
+                        element={
+                          <ProtectedRoute blockBroker={true}>
+                            <Cart />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route path="/productPage/*" element={<ProductPage />} />
+                      <Route path="/signup" element={<SignUp />} />
+                      <Route path="/signin" element={<SignIn />} />
+                    </PageTransition>
+                  </>
+                )}
+                <ToastContainer
+                  position="top-right"
+                  autoClose={2000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  pauseOnHover
+                  draggable
+                  theme="dark"
+                />
               </staffContext.Provider>
             </userDataContext.Provider>
           </userContext.Provider>

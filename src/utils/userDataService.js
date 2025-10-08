@@ -16,12 +16,10 @@ export const fetchUserData = async (
   setUserData,
   setIsAdmin,
   setIsModerator,
-  setLoading = null,
   showToast = true
 ) => {
   if (!email) return null;
 
-  if (setLoading) setLoading(true);
 
   try {
     // First, check if user is in Staff table
@@ -90,7 +88,6 @@ export const fetchUserData = async (
     }
     return null;
   } finally {
-    if (setLoading) setLoading(false);
   }
 };
 
