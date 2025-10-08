@@ -15,7 +15,8 @@ import supabase from "./SupabaseClient.js";
 import { Routes, Route, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { fetchUserData } from "./utils/userDataService";
+import { fetchUserData, initializeApp } from "./utils/userDataService";
+import AppLoading from "./Components/Loading/AppLoading";
 
 import {
   userContext,
@@ -39,18 +40,9 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isModerator, setIsModerator] = useState(false);
   const [isLoadingUserData, setIsLoadingUserData] = useState(false);
+  const [appLoading, setAppLoading] = useState(true);
+  const [appInitialized, setAppInitialized] = useState(false);
 
-  // Fetch the current session
-  const getSession = async () => {
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setSession(session);
-    } catch (err) {
-      console.log(err);
-    }
-  };
   // Storing brokerId in localStorage if exists in URL
   const setbrokerId = (() => {
     const params = new URLSearchParams(window.location.search);
@@ -60,76 +52,73 @@ function App() {
       localStorage.setItem("brokerId", JSON.stringify(brokerId));
     }
   })();
-  //detecting the auth state change (e.g., sign-in, sign-out)
+
+  // Initialize app on mount
   useEffect(() => {
+    const initializeAppData = async () => {
+      try {
+        // Initialize user authentication and role
+        await initializeApp(
+          setSession,
+          setUser,
+          setUserData,
+          setIsAdmin,
+          setIsModerator,
+          setAppLoading
+        );
+
+        // Fetch products data
+        const { data, error } = await supabase.from("Products").select("*");
+        if (error) {
+          console.error("Error fetching products:", error.message);
+          toast.error("Failed to load products. Please refresh the page.");
+        } else {
+          setProducts(data);
+        }
+
+        setAppInitialized(true);
+      } catch (error) {
+        console.error("Error initializing app:", error);
+        setAppLoading(false);
+        setAppInitialized(true);
+      }
+    };
+
+    initializeAppData();
+  }, []);
+
+  // Handle auth state changes after initialization
+  useEffect(() => {
+    if (!appInitialized) return;
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log("Auth state changed:", _event);
-
-      setSession(session); // ✅ دايماً يحدث الـ session محليًا
 
       if (_event === "SIGNED_OUT") {
         console.log("User logged out → reloading...");
-        window.location.reload(); // ✅ يعمل reload بس عند تسجيل الخروج
-        window.location.href = "/";
+        window.location.reload();
+        return;
+      }
+
+      if (_event === "SIGNED_IN" && session?.user?.email) {
+        // Re-initialize user data when signed in
+        await fetchUserData(
+          session.user.email,
+          setUserData,
+          setIsAdmin,
+          setIsModerator,
+          null,
+          true
+        );
       }
     });
 
-    // 🧹 cleanup عشان متحصلش listeners زيادة
     return () => {
       subscription.unsubscribe();
     };
-  }, []); // 👈 مفيش dependencies علشان يشتغل مرة واحدة بس
-
-  // Fetch products data
-  useEffect(() => {
-    getSession();
-
-    const getData = async () => {
-      const { data, error } = await supabase.from("Products").select("*");
-      if (error) {
-        console.error("Error fetching products:", error.message);
-        toast.error("Failed to load products. Please refresh the page.");
-      } else {
-        setProducts(data);
-      }
-    };
-    getData();
-  }, []);
-  // Redirecting to products page if user is authenticated and trying to access signIn or signUp page
-
-  // Setting user data when session changes
-  useEffect(() => {
-    if (session) {
-      setUser({
-        id: session.user.id,
-        email: session.user.email,
-      });
-    }
-  }, [session]);
-  // fetch User data from DB (Brokers or Staff)
-  const getUserData = async () => {
-    setIsLoadingUserData(true);
-    await fetchUserData(
-      session?.user?.email,
-      setUserData,
-      setIsAdmin,
-      setIsModerator
-    );
-    setIsLoadingUserData(false);
-  };
-  useEffect(() => {
-    if (session) {
-      getUserData();
-    } else {
-      // Reset user data when no session
-      setUserData(null);
-      setIsAdmin(false);
-      setIsModerator(false);
-      setIsLoadingUserData(false);
-    }
-  }, [session]);
+  }, [appInitialized]);
 
   // ✅ Sync cart changes to localStorage
   useEffect(() => {
@@ -148,6 +137,12 @@ function App() {
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
+  // Show loading screen while app is initializing
+  if (appLoading || !appInitialized) {
+    return <AppLoading />;
+  }
+
+  console.log("App initialized with user data:", userData);
 
   return (
     <productsContext.Provider value={{ products, setProducts }}>

@@ -114,10 +114,50 @@ const ManageNotifications = () => {
           return;
         }
 
+        // Validate user exists before sending
         if (identifierType === "id") {
-          insertData.brokerIdTo = parseFloat(singleIdentifier);
+          const brokerId = parseFloat(singleIdentifier);
+          if (isNaN(brokerId)) {
+            toast.error("Please enter a valid user ID");
+            setIsLoading(false);
+            return;
+          }
+
+          // Check if broker exists
+          const { data: brokerData, error: brokerError } = await supabase
+            .from("Brokers")
+            .select("id, fullName, email")
+            .eq("id", brokerId)
+            .single();
+
+          if (brokerError || !brokerData) {
+            toast.error(`No broker found with ID: ${brokerId}`);
+            setIsLoading(false);
+            return;
+          }
+
+          insertData.brokerIdTo = brokerId;
+          console.log(
+            `Sending notification to broker: ${brokerData.fullName} (${brokerData.email})`
+          );
         } else {
+          // Check if broker exists by email
+          const { data: brokerData, error: brokerError } = await supabase
+            .from("Brokers")
+            .select("id, fullName, email")
+            .eq("email", singleIdentifier)
+            .single();
+
+          if (brokerError || !brokerData) {
+            toast.error(`No broker found with email: ${singleIdentifier}`);
+            setIsLoading(false);
+            return;
+          }
+
           insertData.brokerEmail = singleIdentifier;
+          console.log(
+            `Sending notification to broker: ${brokerData.fullName} (ID: ${brokerData.id})`
+          );
         }
       } else if (sendType === "range") {
         if (!brokerIdFrom || !brokerIdTo) {
@@ -126,10 +166,65 @@ const ManageNotifications = () => {
           return;
         }
 
-        insertData.brokerIdFrom = parseFloat(brokerIdFrom);
-        insertData.brokerIdTo = parseFloat(brokerIdTo);
+        const fromId = parseFloat(brokerIdFrom);
+        const toId = parseFloat(brokerIdTo);
+
+        if (isNaN(fromId) || isNaN(toId)) {
+          toast.error("Please enter valid numeric IDs");
+          setIsLoading(false);
+          return;
+        }
+
+        if (fromId > toId) {
+          toast.error("From ID must be less than or equal to To ID");
+          setIsLoading(false);
+          return;
+        }
+
+        // Check if any brokers exist in this range
+        const { data: brokersInRange, error: rangeError } = await supabase
+          .from("Brokers")
+          .select("id, fullName, email")
+          .gte("id", fromId)
+          .lte("id", toId);
+
+        if (rangeError) {
+          toast.error("Error checking broker range");
+          setIsLoading(false);
+          return;
+        }
+
+        if (!brokersInRange || brokersInRange.length === 0) {
+          toast.error(`No brokers found in range ${fromId} - ${toId}`);
+          setIsLoading(false);
+          return;
+        }
+
+        insertData.brokerIdFrom = fromId;
+        insertData.brokerIdTo = toId;
+        console.log(
+          `Sending notification to ${brokersInRange.length} brokers in range ${fromId} - ${toId}`
+        );
       } else if (sendType === "all") {
+        // Check how many brokers will receive this notification
+        const { data: allBrokers, error: allBrokersError } = await supabase
+          .from("Brokers")
+          .select("id, fullName, email");
+
+        if (allBrokersError) {
+          toast.error("Error checking broker count");
+          setIsLoading(false);
+          return;
+        }
+
+        if (!allBrokers || allBrokers.length === 0) {
+          toast.error("No brokers found in the system");
+          setIsLoading(false);
+          return;
+        }
+
         insertData.isAll = true;
+        console.log(`Sending notification to all ${allBrokers.length} brokers`);
       }
 
       const { data, error } = await supabase

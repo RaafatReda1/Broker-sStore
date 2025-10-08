@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
  * @param {function} setIsModerator - State setter function for moderator status
  * @param {function} setLoading - Optional loading state setter
  * @param {boolean} showToast - Whether to show error toast (default: true)
- * @returns {Promise<Object|null>} - User data object or null
+ * @returns {Promise<Object|null>} - User data object with role information or null
  */
 export const fetchUserData = async (
   email,
@@ -37,7 +37,13 @@ export const fetchUserData = async (
     // If user is staff member
     if (staffData && staffData.length > 0) {
       const staff = staffData[0];
-      setUserData(staff);
+      const userWithRole = {
+        ...staff,
+        role: staff.authority === "admin" ? "admin" : "moderator",
+        userType: "staff",
+      };
+
+      setUserData(userWithRole);
 
       // Set role based on authority
       if (staff.authority === "admin") {
@@ -50,7 +56,7 @@ export const fetchUserData = async (
         console.log("👮 User role: MODERATOR");
       }
 
-      return staff;
+      return userWithRole;
     }
 
     // If not staff, check Brokers table
@@ -70,19 +76,31 @@ export const fetchUserData = async (
     // If user is broker
     if (brokerData && brokerData.length > 0) {
       const broker = brokerData[0];
-      setUserData(broker);
+      const userWithRole = {
+        ...broker,
+        role: "broker",
+        userType: "broker",
+      };
+
+      setUserData(userWithRole);
       setIsAdmin(false);
       setIsModerator(false);
       console.log("💼 User role: BROKER");
-      return broker;
+      return userWithRole;
     }
 
-    // User not found in either table
-    setUserData(null);
+    // User not found in either table - treat as customer
+    const customerData = {
+      email: email,
+      role: "customer",
+      userType: "customer",
+    };
+
+    setUserData(customerData);
     setIsAdmin(false);
     setIsModerator(false);
-    console.log("❌ No user data found for this email");
-    return null;
+    console.log("🛒 User role: CUSTOMER");
+    return customerData;
   } catch (err) {
     console.error("Unexpected error fetching user data:", err);
     if (showToast) {
@@ -117,4 +135,78 @@ export const fetchBrokerData = async (
     setLoading,
     showToast
   );
+};
+
+/**
+ * Initializes the app by checking user authentication and role
+ * @param {function} setSession - State setter for session
+ * @param {function} setUser - State setter for user
+ * @param {function} setUserData - State setter for user data
+ * @param {function} setIsAdmin - State setter for admin status
+ * @param {function} setIsModerator - State setter for moderator status
+ * @param {function} setAppLoading - State setter for app loading state
+ * @returns {Promise<Object>} - Initialization result with user info
+ */
+export const initializeApp = async (
+  setSession,
+  setUser,
+  setUserData,
+  setIsAdmin,
+  setIsModerator,
+  setAppLoading
+) => {
+  setAppLoading(true);
+
+  try {
+    // Get current session
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError) {
+      console.error("Error getting session:", sessionError);
+      setAppLoading(false);
+      return { userData: null, role: "customer", userType: "customer" };
+    }
+
+    setSession(session);
+
+    if (session?.user?.email) {
+      setUser({
+        id: session.user.id,
+        email: session.user.email,
+      });
+
+      // Fetch user data and role
+      const userData = await fetchUserData(
+        session.user.email,
+        setUserData,
+        setIsAdmin,
+        setIsModerator,
+        null, // No loading state needed here
+        false // Don't show toast during initialization
+      );
+
+      setAppLoading(false);
+      return userData;
+    } else {
+      // No session - user is a customer
+      const customerData = {
+        email: null,
+        role: "customer",
+        userType: "customer",
+      };
+
+      setUserData(customerData);
+      setIsAdmin(false);
+      setIsModerator(false);
+      setAppLoading(false);
+      return customerData;
+    }
+  } catch (error) {
+    console.error("Error initializing app:", error);
+    setAppLoading(false);
+    return { userData: null, role: "customer", userType: "customer" };
+  }
 };
