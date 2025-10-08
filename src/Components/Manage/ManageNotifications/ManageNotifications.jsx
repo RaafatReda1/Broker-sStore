@@ -165,10 +165,17 @@ const ManageNotifications = () => {
           </div>
           <div className="header-actions">
             <button
-              onClick={() => setShowHistory(!showHistory)}
+              onClick={() => {
+                if (!showHistory) {
+                  setTimeout(() => {
+                    window.scrollTo({ top: 1000, behavior: "smooth" });
+                  }, 500);
+                }
+                setShowHistory(!showHistory);
+              }}
               className={`toggle-btn ${showHistory ? "active" : ""}`}
             >
-              <span className="btn-icon">📋</span>
+              <span className="btn-icon">{!showHistory ? "Show History" : "Hide History"}</span>
               <span className="btn-text">
                 {showHistory ? "Hide History" : "Show History"}
               </span>

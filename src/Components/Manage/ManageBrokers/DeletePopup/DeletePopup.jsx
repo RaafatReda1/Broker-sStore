@@ -22,7 +22,7 @@ const DeletePopup = ({
           </button>
         </div>
 
-        <div className="modal-content">
+        <div className="modal-msg-content">
           <p>Select a message to send to the broker before deletion:</p>
 
           {/* Send Customizable Message Button */}
@@ -31,8 +31,7 @@ const DeletePopup = ({
               onClick={() => onNavigateToNotifications(selectedBroker.email)}
               className="custom-message-btn"
             >
-              <span className="btn-icon">✏️</span>
-              <span className="btn-text">Send Customizable Message</span>
+              <span className="btn-icon">✏️ Send Customizable Message</span>
             </button>
           </div>
 

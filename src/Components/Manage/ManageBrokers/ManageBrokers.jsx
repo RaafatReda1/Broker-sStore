@@ -34,6 +34,10 @@ const ManageBrokers = () => {
   // 🔹 Update verification status
   const updateVerificationStatus = async (brokerId, isVerified) => {
     try {
+      // Get the broker data before updating
+      const broker = brokers.find((b) => b.id === brokerId);
+      const wasUnverified = !broker?.isVerified;
+
       const { error } = await supabase
         .from("Brokers")
         .update({ isVerified })
@@ -46,9 +50,71 @@ const ManageBrokers = () => {
         prev.map((b) => (b.id === brokerId ? { ...b, isVerified } : b))
       );
 
+      // Send verification message if broker is being verified (was unverified, now verified)
+      if (wasUnverified && isVerified) {
+        await sendVerificationMessage(broker);
+      }
+
       console.log("Verification status updated successfully");
     } catch (error) {
       console.error("Error updating verification status:", error);
+    }
+  };
+
+  // 🔹 Send verification message to broker
+  const sendVerificationMessage = async (broker) => {
+    try {
+      // Create verification message
+      const verificationMessage = `
+# 🎉 Congratulations! Your Account Has Been Verified
+
+Dear **${broker.fullName}**,
+
+We are pleased to inform you that your broker account has been successfully verified and is now active!
+
+## ✅ What This Means:
+- Your account is now fully functional
+- You can start receiving orders
+- All verification requirements have been met
+- Your profile is now visible to customers
+
+## 🚀 Next Steps:
+- Complete your profile setup if you haven't already
+- Upload any additional documents if required
+- Start exploring the platform features
+- Contact support if you have any questions
+
+Thank you for your patience during the verification process. We look forward to working with you!
+
+Best regards,  
+The Cicada Team
+      `;
+
+      // Send notification to broker
+      const { error: notificationError } = await supabase
+        .from("Notifications")
+        .insert({
+          msg: verificationMessage,
+          title: "Account Verification Successful",
+          brokerEmail: broker.email,
+          isAll: false,
+          brokerIdFrom: null,
+          brokerIdTo: null,
+          isTemp: false,
+        });
+
+      if (notificationError) throw notificationError;
+
+      // Show success toast
+      toast.success(`Verification message sent to ${broker.fullName}`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+
+      console.log("Verification message sent successfully");
+    } catch (error) {
+      console.error("Error sending verification message:", error);
+      toast.error("Failed to send verification message");
     }
   };
 
