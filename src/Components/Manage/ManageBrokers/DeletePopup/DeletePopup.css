@@ -1,0 +1,537 @@
+/* DeletePopup.css - Enhanced Dark Theme */
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: overlayFadeIn 0.3s ease-out;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Delete Modal */
+.delete-modal {
+  background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6), 
+              0 0 0 1px rgba(255, 255, 255, 0.05);
+  width: 80%;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.delete-modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ef4444, #dc2626, #ef4444);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, transparent 100%);
+  width: 80%;
+}
+
+.modal-header h3 {
+  color: #f8fafc;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header h3::before {
+  content: '🗑️';
+  font-size: 1.5rem;
+  animation: wiggle 1s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+/* Close Button */
+.close-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+
+}
+
+.close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fecaca;
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.close-btn:active {
+  transform: rotate(90deg) scale(0.95);
+}
+
+/* Modal Content */
+.modal-content {
+  padding: 24px 28px;
+  max-height: 65vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #1e293b;
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.modal-content > p {
+  color: #cbd5e1;
+  margin-bottom: 24px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+/* No Messages State */
+.no-temp-messages {
+  text-align: center;
+  padding: 50px 24px;
+  background: rgba(59, 130, 246, 0.05);
+  border: 2px dashed rgba(59, 130, 246, 0.2);
+  border-radius: 16px;
+  margin-top: 16px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.no-temp-messages p {
+  margin: 0;
+  font-size: 1rem;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.no-temp-messages::before {
+  content: '📭';
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Custom Message Section */
+.custom-message-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(37, 99, 235, 0.08) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.custom-message-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom Message Button */
+.custom-message-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+  border: none;
+  border-radius: 14px;
+  color: white;
+  font-weight: 600;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35),
+              0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.custom-message-btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+  z-index: -1;
+}
+
+.custom-message-btn:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.custom-message-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.5),
+              0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
+}
+
+.custom-message-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.custom-message-btn .btn-icon {
+  font-size: 1.35rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.custom-message-btn .btn-text {
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Temp Messages List */
+.temp-messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Temp Message Button */
+.temp-message-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 16px 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #e5e7eb;
+  position: relative;
+  overflow: hidden;
+}
+
+.temp-message-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.temp-message-btn:hover::before {
+  left: 100%;
+}
+
+.temp-message-btn:hover {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateX(6px) translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25),
+              -4px 0 0 rgba(59, 130, 246, 0.5);
+}
+
+.temp-message-btn:active {
+  transform: translateX(4px) translateY(-1px);
+}
+
+/* Temp Message Title */
+.temp-msg-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #f8fafc;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.temp-msg-title::before {
+  content: '📨';
+  font-size: 1.1rem;
+}
+
+/* Temp Message Preview */
+.temp-msg-preview {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  max-height: 65px;
+  overflow: hidden;
+  position: relative;
+  padding-left: 12px;
+  border-left: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.temp-msg-html-preview {
+  color: #94a3b8;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+/* HTML Content Styling */
+.temp-msg-html-preview h1,
+.temp-msg-html-preview h2,
+.temp-msg-html-preview h3,
+.temp-msg-html-preview h4,
+.temp-msg-html-preview h5,
+.temp-msg-html-preview h6 {
+  color: #cbd5e1;
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.temp-msg-html-preview p {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.temp-msg-html-preview ul,
+.temp-msg-html-preview ol {
+  margin: 0.3rem 0;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+}
+
+.temp-msg-html-preview li {
+  margin: 0.15rem 0;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.temp-msg-html-preview a {
+  color: #60a5fa;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.temp-msg-html-preview a:hover {
+  color: #93c5fd;
+  text-decoration: underline;
+}
+
+.temp-msg-html-preview strong {
+  color: #e5e7eb;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.temp-msg-html-preview em {
+  color: #c4b5fd;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .delete-modal {
+    max-height: 92vh;
+    border-radius: 16px;
+  }
+
+  .modal-header {
+    padding: 20px 20px;
+  }
+
+  .modal-header h3 {
+    font-size: 1.15rem;
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .modal-content > p {
+    font-size: 0.95rem;
+  }
+
+  .custom-message-section {
+    padding: 16px;
+  }
+
+  .custom-message-btn {
+    padding: 16px 22px;
+    font-size: 0.95rem;
+  }
+
+  .temp-message-btn {
+    padding: 16px 18px;
+  }
+
+  .temp-msg-title {
+    font-size: 0.95rem;
+  }
+
+  .temp-msg-preview {
+    max-height: 50px;
+    font-size: 0.85rem;
+  }
+
+  .no-temp-messages {
+    padding: 40px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-header h3 {
+    font-size: 1rem;
+  }
+
+  .close-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.3rem;
+  }
+
+  .custom-message-btn .btn-text {
+    font-size: 0.9rem;
+  }
+
+  .custom-message-btn .btn-icon {
+    font-size: 1.2rem;
+  }
+}

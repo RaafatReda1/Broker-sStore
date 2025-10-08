@@ -10,9 +10,11 @@ import {
   faBox,
   faCubes,
   faUsersGear,
-  faRightFromBracket, // logout icon
+  faRightFromBracket,
+  faBell, // logout icon
 } from "@fortawesome/free-solid-svg-icons";
 import supabase from "../../../SupabaseClient";
+import { faComment } from "@fortawesome/free-solid-svg-icons/faComment";
 
 const ManagingDashboard = () => {
   const { isAdmin, isModerator } = useContext(staffContext);
@@ -50,11 +52,18 @@ const ManagingDashboard = () => {
             <FontAwesomeIcon icon={faUsersGear} className="icon" />
             <span>Moderators</span>
           </Link>
+          <Link to="/manageNotifications" className="dashboard-item">
+            <FontAwesomeIcon icon={faComment} className="icon" />
+            <span>Notifications</span>
+          </Link>
         </>
       )}
 
       <a className="dashboard-logout dashboard-item" onClick={handleLogout}>
-        <FontAwesomeIcon icon={faRightFromBracket} className="icon logout-icon" />
+        <FontAwesomeIcon
+          icon={faRightFromBracket}
+          className="icon logout-icon"
+        />
         <span>Logout</span>
       </a>
     </div>

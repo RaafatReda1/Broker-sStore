@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import supabase from "../../../SupabaseClient";
 import ViewImages from "./ViewImages/ViewImages";
 import ViewStatistics from "./ViewStatistics/ViewStatistics";
+import DeletePopup from "./DeletePopup/DeletePopup";
 import "./ManageBrokers.css";
 
 const ManageBrokers = () => {
+  const navigate = useNavigate();
   const [brokers, setBrokers] = useState([]);
   const [selectedBroker, setSelectedBroker] = useState(null);
   const [showImages, setShowImages] = useState(false);
   const [showStatistics, setShowStatistics] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [tempMessages, setTempMessages] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [deletedBroker, setDeletedBroker] = useState(null);
+  const [undoTimeoutId, setUndoTimeoutId] = useState(null);
 
   // 🔹 Fetch brokers from DB
   const fetchBrokers = async () => {
@@ -44,9 +52,219 @@ const ManageBrokers = () => {
     }
   };
 
+  // 🔹 Fetch temp messages from Notifications table
+  const fetchTempMessages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("Notifications")
+        .select("*")
+        .eq("isTemp", true);
+
+      if (error) throw error;
+
+      setTempMessages(data || []);
+      console.log("Fetched temp messages:", data);
+    } catch (error) {
+      console.error("Error fetching temp messages:", error);
+    }
+  };
+
+  // 🔹 Handle delete broker with temp message
+  const handleDeleteBroker = async (brokerId, tempMessage) => {
+    try {
+      // Store broker data for potential undo
+      const brokerToDelete = brokers.find((b) => b.id === brokerId);
+
+      // Create notification with temp message
+      const { error: notificationError } = await supabase
+        .from("Notifications")
+        .insert({
+          msg: tempMessage.msg,
+          title: tempMessage.title,
+          brokerEmail: selectedBroker.email,
+          isAll: false,
+          brokerIdFrom: null,
+          brokerIdTo: null,
+        });
+
+      if (notificationError) throw notificationError;
+
+      // Delete broker
+      const { error: deleteError } = await supabase
+        .from("Brokers")
+        .delete()
+        .eq("id", brokerId);
+
+      if (deleteError) throw deleteError;
+
+      // Update local state
+      setBrokers((prev) => prev.filter((b) => b.id !== brokerId));
+
+      // Store deleted broker for undo
+      setDeletedBroker(brokerToDelete);
+
+      // Close modal
+      setShowDeleteModal(false);
+      setSelectedBroker(null);
+
+      // Show undo toast
+      showUndoToast(brokerToDelete);
+
+      console.log("Broker deleted and notification sent successfully");
+    } catch (error) {
+      console.error("Error deleting broker:", error);
+    }
+  };
+
+  // 🔹 Show undo toast notification
+  const showUndoToast = (broker) => {
+    // Clear any existing timeout
+    if (undoTimeoutId) {
+      clearTimeout(undoTimeoutId);
+    }
+
+    // Create custom toast with undo button
+    const toastId = `undo-${broker.id}`;
+
+    // Show the toast
+    toast(
+      <div className="undo-toast">
+        <div className="undo-toast-content">
+          <div className="undo-toast-icon">🗑️</div>
+          <div className="undo-toast-text">
+            <div className="undo-toast-title">Broker Deleted</div>
+            <div className="undo-toast-message">
+              {broker.fullName} has been deleted
+            </div>
+          </div>
+        </div>
+        <button
+          className="undo-toast-button"
+          onClick={() => handleUndoDelete(broker, toastId)}
+        >
+          Undo
+        </button>
+      </div>,
+      {
+        toastId: toastId,
+        position: "top-right",
+        autoClose: 8000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        className: "undo-toast-container",
+      }
+    );
+
+    // Set timeout to clear deleted broker data
+    const timeoutId = setTimeout(() => {
+      setDeletedBroker(null);
+    }, 8000);
+
+    setUndoTimeoutId(timeoutId);
+  };
+
+  // 🔹 Handle undo delete
+  const handleUndoDelete = async (broker, toastId) => {
+    try {
+      // Restore broker to database
+      const { error: restoreError } = await supabase
+        .from("Brokers")
+        .insert(broker);
+
+      if (restoreError) throw restoreError;
+
+      // Update local state
+      setBrokers((prev) => [...prev, broker]);
+
+      // Clear deleted broker data
+      setDeletedBroker(null);
+
+      // Clear timeout
+      if (undoTimeoutId) {
+        clearTimeout(undoTimeoutId);
+        setUndoTimeoutId(null);
+      }
+
+      // Dismiss toast
+      toast.dismiss(toastId);
+
+      // Show success message
+      toast.success(`${broker.fullName} has been restored successfully!`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+
+      console.log("Broker restored successfully");
+    } catch (error) {
+      console.error("Error restoring broker:", error);
+      toast.error("Failed to restore broker. Please try again.");
+    }
+  };
+
+  // 🔹 Open delete modal
+  const openDeleteModal = async (broker) => {
+    setSelectedBroker(broker);
+    await fetchTempMessages();
+    setShowDeleteModal(true);
+  };
+
+  // 🔹 Navigate to notifications with broker email and delete broker
+  const navigateToNotifications = async (brokerEmail) => {
+    try {
+      // Store broker data for potential undo
+      const brokerToDelete = selectedBroker;
+
+      // Delete broker from database
+      const { error: deleteError } = await supabase
+        .from("Brokers")
+        .delete()
+        .eq("id", selectedBroker.id);
+
+      if (deleteError) throw deleteError;
+
+      // Update local state
+      setBrokers((prev) => prev.filter((b) => b.id !== selectedBroker.id));
+
+      // Store deleted broker for undo
+      setDeletedBroker(brokerToDelete);
+
+      // Close modal
+      setShowDeleteModal(false);
+      setSelectedBroker(null);
+
+      // Show undo toast
+      showUndoToast(brokerToDelete);
+
+      // Navigate to notifications page
+      navigate("/manageNotifications", {
+        state: {
+          brokerEmail: brokerEmail,
+          sendType: "single",
+          identifierType: "email",
+        },
+      });
+
+      console.log("Broker deleted and navigating to notifications");
+    } catch (error) {
+      console.error("Error deleting broker:", error);
+      toast.error("Failed to delete broker. Please try again.");
+    }
+  };
+
   useEffect(() => {
     fetchBrokers();
   }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (undoTimeoutId) {
+        clearTimeout(undoTimeoutId);
+      }
+    };
+  }, [undoTimeoutId]);
 
   // Filter brokers
   const filteredBrokers = brokers.filter((broker) => {
@@ -104,19 +322,25 @@ const ManageBrokers = () => {
 
         <div className="filter-buttons">
           <button
-            className={filterStatus === "all" ? "filter-btn active" : "filter-btn"}
+            className={
+              filterStatus === "all" ? "filter-btn active" : "filter-btn"
+            }
             onClick={() => setFilterStatus("all")}
           >
             All
           </button>
           <button
-            className={filterStatus === "verified" ? "filter-btn active" : "filter-btn"}
+            className={
+              filterStatus === "verified" ? "filter-btn active" : "filter-btn"
+            }
             onClick={() => setFilterStatus("verified")}
           >
             Verified
           </button>
           <button
-            className={filterStatus === "unverified" ? "filter-btn active" : "filter-btn"}
+            className={
+              filterStatus === "unverified" ? "filter-btn active" : "filter-btn"
+            }
             onClick={() => setFilterStatus("unverified")}
           >
             Pending
@@ -224,6 +448,15 @@ const ManageBrokers = () => {
                         <span className="btn-icon">📊</span>
                         <span className="btn-text">Stats</span>
                       </button>
+
+                      <button
+                        onClick={() => openDeleteModal(broker)}
+                        className="action-btn delete-btn"
+                        title="Delete Broker"
+                      >
+                        <span className="btn-icon">🗑️</span>
+                        <span className="btn-text">Delete</span>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -249,6 +482,19 @@ const ManageBrokers = () => {
           show={{ showStatistics, setShowStatistics }}
         />
       )}
+
+      {/* Delete Broker Modal */}
+      <DeletePopup
+        showModal={showDeleteModal}
+        selectedBroker={selectedBroker}
+        tempMessages={tempMessages}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setSelectedBroker(null);
+        }}
+        onDeleteBroker={handleDeleteBroker}
+        onNavigateToNotifications={navigateToNotifications}
+      />
     </div>
   );
 };
