@@ -8,7 +8,9 @@ const WithDraw = () => {
   const { userData } = useContext(userDataContext);
   const [paymentMethod, setPaymentMethod] = useState(""); // 'vodafone' or 'instapay'
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [hasPendingRequest, setHasPendingRequest] = useState(false);
+  const [pendingRequestInfo, setPendingRequestInfo] = useState(null);
+
   const [formData, setFormData] = useState({
     withDrawalPhone: userData?.phone || "",
     vodaCarrierName: "",
@@ -17,6 +19,40 @@ const WithDraw = () => {
   });
 
   const [errors, setErrors] = useState({});
+
+  // Check for pending withdrawal requests on component load
+  useEffect(() => {
+    const checkPendingRequests = async () => {
+      if (!userData?.id) return;
+
+      try {
+        const { data: existingRequests, error } = await supabase
+          .from("WithDrawalRequests")
+          .select("id, created_at, actualBalance")
+          .eq("brokerId", userData.id)
+          .eq("Status", false)
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        if (error) {
+          console.error("Error checking pending requests:", error);
+          return;
+        }
+
+        if (existingRequests && existingRequests.length > 0) {
+          setHasPendingRequest(true);
+          setPendingRequestInfo(existingRequests[0]);
+        } else {
+          setHasPendingRequest(false);
+          setPendingRequestInfo(null);
+        }
+      } catch (error) {
+        console.error("Error checking pending requests:", error);
+      }
+    };
+
+    checkPendingRequests();
+  }, [userData?.id]);
 
   // Reset form when payment method changes
   useEffect(() => {
@@ -35,11 +71,11 @@ const WithDraw = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     // Clear error for this field when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -49,7 +85,9 @@ const WithDraw = () => {
     // Phone validation
     if (!formData.withDrawalPhone.trim()) {
       newErrors.withDrawalPhone = "Phone number is required";
-    } else if (!/^[0-9]{10,15}$/.test(formData.withDrawalPhone.replace(/\s/g, ""))) {
+    } else if (
+      !/^[0-9]{10,15}$/.test(formData.withDrawalPhone.replace(/\s/g, ""))
+    ) {
       newErrors.withDrawalPhone = "Please enter a valid phone number";
     }
 
@@ -65,8 +103,11 @@ const WithDraw = () => {
       if (!formData.instaEmail.trim() && !formData.instaAccountName.trim()) {
         newErrors.instaEmail = "Please provide either email or account name";
       }
-      
-      if (formData.instaEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.instaEmail)) {
+
+      if (
+        formData.instaEmail.trim() &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.instaEmail)
+      ) {
         newErrors.instaEmail = "Please enter a valid email address";
       }
     }
@@ -91,6 +132,48 @@ const WithDraw = () => {
       return;
     }
 
+    // Check for existing pending withdrawal requests
+    try {
+      const { data: existingRequests, error: checkError } = await supabase
+        .from("WithDrawalRequests")
+        .select("id, created_at, actualBalance")
+        .eq("brokerId", userData.id)
+        .eq("Status", false); // false means pending
+
+      if (checkError) {
+        console.error("Error checking existing requests:", checkError);
+        toast.error("Unable to verify existing requests. Please try again.");
+        return;
+      }
+
+      if (existingRequests && existingRequests.length > 0) {
+        const latestRequest = existingRequests[0];
+        const requestDate = new Date(
+          latestRequest.created_at
+        ).toLocaleDateString();
+        const requestAmount = parseFloat(
+          latestRequest.actualBalance
+        ).toLocaleString("en-US", {
+          style: "currency",
+          currency: "EGP",
+        });
+
+        toast.error(
+          `❌ You already have a pending withdrawal request!\n\n` +
+            `📋 **Existing Request:**\n` +
+            `• Amount: ${requestAmount}\n` +
+            `• Date: ${requestDate}\n` +
+            `• Status: ⏳ Pending Review\n\n` +
+            `⏳ Please wait for your current request to be processed before submitting a new one.`
+        );
+        return;
+      }
+    } catch (error) {
+      console.error("Error checking pending requests:", error);
+      toast.error("Unable to verify existing requests. Please try again.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -101,11 +184,18 @@ const WithDraw = () => {
         brokerName: userData.fullName,
         withDrawalPhone: formData.withDrawalPhone.trim() || null,
         isVodafone: paymentMethod === "vodafone",
-        vodaCarrierName: paymentMethod === "vodafone" ? formData.vodaCarrierName.trim() : null,
+        vodaCarrierName:
+          paymentMethod === "vodafone" ? formData.vodaCarrierName.trim() : null,
         isInstaPay: paymentMethod === "instapay",
-        instaEmail: paymentMethod === "instapay" && formData.instaEmail.trim() ? formData.instaEmail.trim() : null,
-        instaAccountName: paymentMethod === "instapay" && formData.instaAccountName.trim() ? formData.instaAccountName.trim() : null,
-        actualBalance: userData.actualBalance
+        instaEmail:
+          paymentMethod === "instapay" && formData.instaEmail.trim()
+            ? formData.instaEmail.trim()
+            : null,
+        instaAccountName:
+          paymentMethod === "instapay" && formData.instaAccountName.trim()
+            ? formData.instaAccountName.trim()
+            : null,
+        actualBalance: userData.actualBalance,
       };
 
       const { error } = await supabase
@@ -138,16 +228,48 @@ const WithDraw = () => {
     <div className="withdraw-container">
       <div className="withdraw-card">
         <h2 className="withdraw-title">Request Withdrawal</h2>
-        
+
         <div className="balance-info">
           <span className="balance-label">Available Balance:</span>
           <span className="balance-amount">
-            {userData?.actualBalance?.toLocaleString('en-US', {
-              style: 'currency',
-              currency: 'EGP'
-            }) || 'EGP 0.00'}
+            {userData?.actualBalance?.toLocaleString("en-US", {
+              style: "currency",
+              currency: "EGP",
+            }) || "EGP 0.00"}
           </span>
         </div>
+
+        {hasPendingRequest && pendingRequestInfo && (
+          <div className="pending-request-alert">
+            <div className="alert-icon">⏳</div>
+            <div className="alert-content">
+              <h3 className="alert-title">Pending Withdrawal Request</h3>
+              <div className="alert-details">
+                <p>
+                  <strong>Amount:</strong>{" "}
+                  {parseFloat(pendingRequestInfo.actualBalance).toLocaleString(
+                    "en-US",
+                    {
+                      style: "currency",
+                      currency: "EGP",
+                    }
+                  )}
+                </p>
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {new Date(pendingRequestInfo.created_at).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>Status:</strong> ⏳ Under Review
+                </p>
+              </div>
+              <p className="alert-message">
+                You already have a withdrawal request pending. Please wait for
+                it to be processed before submitting a new one.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="form-wrapper">
           <div className="withdraw-section">
@@ -159,6 +281,7 @@ const WithDraw = () => {
                   className="checkbox-input"
                   checked={paymentMethod === "vodafone"}
                   onChange={() => handlePaymentMethodChange("vodafone")}
+                  disabled={hasPendingRequest}
                 />
                 <span className="checkbox-text">Vodafone Cash</span>
               </label>
@@ -168,6 +291,7 @@ const WithDraw = () => {
                   className="checkbox-input"
                   checked={paymentMethod === "instapay"}
                   onChange={() => handlePaymentMethodChange("instapay")}
+                  disabled={hasPendingRequest}
                 />
                 <span className="checkbox-text">InstaPay</span>
               </label>
@@ -185,8 +309,12 @@ const WithDraw = () => {
                   name="withDrawalPhone"
                   value={formData.withDrawalPhone}
                   onChange={handleInputChange}
-                  placeholder={`${paymentMethod === "instapay" ? "InstaPay" : "Vodafone Cash"} Phone Number`}
-                  className={`withdraw-input ${errors.withDrawalPhone ? 'input-error' : ''}`}
+                  placeholder={`${
+                    paymentMethod === "instapay" ? "InstaPay" : "Vodafone Cash"
+                  } Phone Number`}
+                  className={`withdraw-input ${
+                    errors.withDrawalPhone ? "input-error" : ""
+                  }`}
                 />
                 {errors.withDrawalPhone && (
                   <span className="error-text">{errors.withDrawalPhone}</span>
@@ -204,7 +332,9 @@ const WithDraw = () => {
                     value={formData.vodaCarrierName}
                     onChange={handleInputChange}
                     placeholder="Full name on Vodafone Cash account"
-                    className={`withdraw-input ${errors.vodaCarrierName ? 'input-error' : ''}`}
+                    className={`withdraw-input ${
+                      errors.vodaCarrierName ? "input-error" : ""
+                    }`}
                   />
                   {errors.vodaCarrierName && (
                     <span className="error-text">{errors.vodaCarrierName}</span>
@@ -215,14 +345,18 @@ const WithDraw = () => {
               {paymentMethod === "instapay" && (
                 <>
                   <div className="input-group">
-                    <label className="input-label">InstaPay Account Email</label>
+                    <label className="input-label">
+                      InstaPay Account Email
+                    </label>
                     <input
                       type="email"
                       name="instaEmail"
                       value={formData.instaEmail}
                       onChange={handleInputChange}
                       placeholder="your.email@example.com"
-                      className={`withdraw-input ${errors.instaEmail ? 'input-error' : ''}`}
+                      className={`withdraw-input ${
+                        errors.instaEmail ? "input-error" : ""
+                      }`}
                     />
                     {errors.instaEmail && (
                       <span className="error-text">{errors.instaEmail}</span>
@@ -242,9 +376,9 @@ const WithDraw = () => {
                   </div>
 
                   <div className="info-box">
-
                     <p className="info-text">
-                      Either phone or email is required for InstaPay transactions
+                      Either phone or email is required for InstaPay
+                      transactions
                     </p>
                   </div>
                 </>
@@ -253,10 +387,18 @@ const WithDraw = () => {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isSubmitting}
-                className={`submit-button ${isSubmitting ? 'submit-button-disabled loading' : ''}`}
+                disabled={isSubmitting || hasPendingRequest}
+                className={`submit-button ${
+                  isSubmitting || hasPendingRequest
+                    ? "submit-button-disabled loading"
+                    : ""
+                }`}
               >
-                {isSubmitting ? "Processing..." : "Submit Withdrawal Request"}
+                {isSubmitting
+                  ? "Processing..."
+                  : hasPendingRequest
+                  ? "Request Pending"
+                  : "Submit Withdrawal Request"}
               </button>
             </div>
           )}
