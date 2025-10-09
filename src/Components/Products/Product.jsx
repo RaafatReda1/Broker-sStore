@@ -96,7 +96,7 @@ const Product = ({
         </div>
       </div>
 
-      <div className="card-content">
+      <div className="card-content" >
         <h3 className="product-name">{name}</h3>
         <p className="product-description">{description}</p>
         <div className="price-container">
