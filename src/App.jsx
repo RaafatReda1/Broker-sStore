@@ -30,6 +30,7 @@ import UserTypeRouter from "./Components/UserTypeRouter/UserTypeRouter.jsx";
 import ManagingDashboard from "./Components/Manage/ManagingDashboard/ManagingDashboard.jsx";
 import ViewNotifications from "./Components/ViewNotifications/ViewNotifications.jsx";
 import WithDraw from "./Components/WithDraw/WithDraw.jsx";
+import ScrollToTop from "./Components/ScrollToTop/ScrollToTop";
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(
@@ -357,6 +358,7 @@ function App() {
                   draggable
                   theme="dark"
                 />
+                <ScrollToTop />
               </staffContext.Provider>
             </userDataContext.Provider>
           </userContext.Provider>

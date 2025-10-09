@@ -577,17 +577,7 @@ const ManageNotifications = () => {
           )}
         </div>
       </div>
-      {showScrollToTop &&
-        createPortal(
-          <button
-            className="scroll-to-topBtn"
-            onClick={scrollToTop}
-            title="Scroll to top"
-          >
-            ↑
-          </button>,
-          document.body
-        )}
+
     </>
   );
 };
