@@ -3,6 +3,7 @@ import "./WithDraw.css";
 import { userDataContext } from "../../AppContexts";
 import supabase from "../../SupabaseClient";
 import { toast } from "react-toastify";
+import CredentialVerificationModal from "./CredentialVerificationModal/CredentialVerificationModal";
 
 const WithDraw = () => {
   const { userData } = useContext(userDataContext);
@@ -10,6 +11,7 @@ const WithDraw = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [pendingRequestInfo, setPendingRequestInfo] = useState(null);
+  const [showCredentialModal, setShowCredentialModal] = useState(false);
 
   const [formData, setFormData] = useState({
     withDrawalPhone: userData?.phone || "",
@@ -120,6 +122,19 @@ const WithDraw = () => {
     }
   };
 
+  const handleCredentialVerified = async () => {
+    setShowCredentialModal(false);
+    await submitWithdrawalRequest();
+  };
+
+  const openCredentialModal = () => {
+    setShowCredentialModal(true);
+  };
+
+  const closeCredentialModal = () => {
+    setShowCredentialModal(false);
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -215,6 +230,11 @@ const WithDraw = () => {
       return;
     }
 
+    // Show credential verification modal for authentication
+    openCredentialModal();
+  };
+
+  const submitWithdrawalRequest = async () => {
     setIsSubmitting(true);
 
     try {
@@ -468,6 +488,16 @@ const WithDraw = () => {
           )}
         </div>
       </div>
+
+      {/* Credential Verification Modal */}
+      <CredentialVerificationModal
+        isOpen={showCredentialModal}
+        onClose={closeCredentialModal}
+        onVerified={handleCredentialVerified}
+        brokerEmail={userData?.email}
+        title="🔐 Verify Your Identity"
+        message="Please confirm your credentials to proceed with this withdrawal request."
+      />
     </div>
   );
 };
