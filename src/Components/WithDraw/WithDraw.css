@@ -1,0 +1,732 @@
+/* ===========================
+   CSS Variables for Dark Theme
+   =========================== */
+:root {
+  /* Dark Theme Colors */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-gradient-start: #1a1f35;
+  --bg-gradient-end: #2d1b4e;
+  
+  --card-bg: #1e293b;
+  --card-bg-light: #334155;
+  
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  
+  --accent-primary: #8b5cf6;
+  --accent-secondary: #a78bfa;
+  --accent-gradient-start: #8b5cf6;
+  --accent-gradient-end: #c084fc;
+  
+  --border-color: #334155;
+  --border-hover: #475569;
+  --border-focus: #8b5cf6;
+  
+  --success-color: #10b981;
+  --error-color: #ef4444;
+  --warning-color: #f59e0b;
+  --info-color: #3b82f6;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
+  
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 20px;
+}
+
+/* ===========================
+   Keyframe Animations
+   =========================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes backgroundMove {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+  }
+}
+
+/* ===========================
+   Main Container
+   =========================== */
+.withdraw-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.withdraw-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: backgroundMove 30s linear infinite;
+  pointer-events: none;
+}
+
+.withdraw-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 50%, rgba(192, 132, 252, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ===========================
+   Card
+   =========================== */
+.withdraw-card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 2.5rem;
+  max-width: 600px;
+  width: 100%;
+  position: relative;
+  animation: fadeInUp 0.6s ease-out;
+  z-index: 1;
+  border: 1px solid var(--border-color);
+}
+
+.withdraw-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end), var(--accent-gradient-start));
+  border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ===========================
+   Title
+   =========================== */
+.withdraw-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  animation: slideInRight 0.6s ease-out 0.2s both;
+  position: relative;
+  letter-spacing: -0.02em;
+}
+
+.withdraw-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+  border-radius: 2px;
+}
+
+/* ===========================
+   Balance Info
+   =========================== */
+.balance-info {
+  background: linear-gradient(135deg, var(--card-bg-light) 0%, var(--bg-tertiary) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slideInRight 0.6s ease-out 0.3s both;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.balance-info::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+  transition: left var(--transition-slow);
+}
+
+.balance-info:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  border-color: var(--border-hover);
+}
+
+.balance-info:hover::before {
+  left: 100%;
+}
+
+.balance-label {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.balance-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ===========================
+   Form Wrapper
+   =========================== */
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: slideInRight 0.6s ease-out 0.4s both;
+}
+
+/* ===========================
+   Section
+   =========================== */
+.withdraw-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+/* ===========================
+   Checkbox Group
+   =========================== */
+.checkbox-group {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 1rem 1.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-normal);
+  background-color: var(--card-bg-light);
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  min-width: 200px;
+}
+
+.checkbox-label::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width var(--transition-slow), height var(--transition-slow);
+}
+
+.checkbox-label:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md), 0 0 15px rgba(139, 92, 246, 0.2);
+}
+
+.checkbox-label:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.checkbox-label:active {
+  transform: translateY(-1px);
+}
+
+.checkbox-input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--accent-primary);
+  transition: transform var(--transition-fast);
+  position: relative;
+  z-index: 1;
+}
+
+.checkbox-input:checked {
+  animation: bounce 0.4s ease;
+}
+
+.checkbox-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  position: relative;
+  z-index: 1;
+  transition: color var(--transition-normal);
+}
+
+.checkbox-label:hover .checkbox-text {
+  color: var(--accent-secondary);
+}
+
+/* ===========================
+   Payment Form
+   =========================== */
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+  padding: 1.5rem;
+  background: var(--card-bg-light);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  animation: slideInRight 0.4s ease-out;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ===========================
+   Input Group
+   =========================== */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  animation: slideInRight 0.4s ease-out;
+}
+
+.input-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.required {
+  color: var(--error-color);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* ===========================
+   Input Fields
+   =========================== */
+.withdraw-input {
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  outline: none;
+  transition: all var(--transition-normal);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.withdraw-input::placeholder {
+  color: var(--text-muted);
+  transition: opacity var(--transition-normal);
+}
+
+.withdraw-input:hover:not(:focus) {
+  border-color: var(--border-hover);
+  background-color: var(--bg-tertiary);
+}
+
+.withdraw-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15), var(--shadow-sm);
+  transform: translateY(-2px);
+  background-color: var(--bg-tertiary);
+}
+
+.withdraw-input:focus::placeholder {
+  opacity: 0.5;
+}
+
+.input-error {
+  border-color: var(--error-color) !important;
+  animation: shake 0.4s ease;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15), var(--shadow-sm);
+}
+
+/* ===========================
+   Error Text
+   =========================== */
+.error-text {
+  font-size: 0.85rem;
+  color: var(--error-color);
+  margin-top: 0.25rem;
+  animation: slideInRight 0.3s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.error-text::before {
+  content: '⚠';
+  font-size: 1rem;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+/* ===========================
+   Info Box
+   =========================== */
+.info-box {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-left: 4px solid var(--info-color);
+  border-radius: var(--border-radius-sm);
+  padding: 1rem 1.25rem;
+  margin-top: 0.5rem;
+  animation: slideInRight 0.4s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.info-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 0;
+  background: linear-gradient(180deg, var(--info-color), #2563eb);
+  transition: height var(--transition-slow);
+}
+
+.info-box:hover::before {
+  height: 100%;
+}
+
+.info-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0;
+  line-height: 1.6;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.info-text::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.info-text:first-child::before {
+  content: '💡';
+}
+
+.info-text:last-child::before {
+  content: 'ℹ️';
+}
+
+/* ===========================
+   Submit Button
+   =========================== */
+.submit-button {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--accent-gradient-start) 0%, var(--accent-gradient-end) 100%);
+  background-size: 200% 100%;
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md), 0 0 20px rgba(139, 92, 246, 0.4);
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.submit-button:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(139, 92, 246, 0.6);
+  animation: glow 2s ease-in-out infinite;
+}
+
+.submit-button:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.submit-button:active {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md), 0 0 20px rgba(139, 92, 246, 0.4);
+}
+
+.submit-button-disabled {
+  background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+  animation: none;
+}
+
+.submit-button-disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.submit-button-disabled::before {
+  display: none;
+}
+
+/* Loading Spinner */
+.submit-button.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin-left: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ===========================
+   Responsive Design
+   =========================== */
+@media (max-width: 768px) {
+  .withdraw-container {
+    padding: 1rem;
+  }
+
+  .withdraw-card {
+    padding: 1.5rem;
+  }
+
+  .withdraw-title {
+    font-size: 1.5rem;
+  }
+
+  .balance-amount {
+    font-size: 1.25rem;
+  }
+
+  .checkbox-group {
+    flex-direction: column;
+  }
+
+  .checkbox-label {
+    min-width: 100%;
+  }
+
+  .submit-button {
+    font-size: 1rem;
+    padding: 0.875rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .withdraw-card {
+    padding: 1.25rem;
+  }
+
+  .balance-info {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .withdraw-title {
+    font-size: 1.25rem;
+  }
+
+  .payment-form {
+    padding: 1rem;
+  }
+}
+
+/* ===========================
+   Accessibility
+   =========================== */
+*:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
