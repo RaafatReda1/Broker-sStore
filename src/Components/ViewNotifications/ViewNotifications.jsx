@@ -82,6 +82,17 @@ const ViewNotifications = () => {
           n.id === notification.id ? { ...n, read_by: updatedReadBy } : n
         )
       );
+
+      // Dispatch custom event to notify Header component
+      const event = new CustomEvent("notificationRead", {
+        detail: {
+          notificationId: notification.id,
+          userId: userData.id,
+          timestamp: new Date().toISOString(),
+        },
+      });
+      window.dispatchEvent(event);
+      console.log("ViewNotifications: Dispatched notification read event");
     }
   };
 
@@ -123,6 +134,18 @@ const ViewNotifications = () => {
       );
 
       toast.success("All notifications marked as read");
+
+      // Dispatch custom event to notify Header component
+      const event = new CustomEvent("notificationRead", {
+        detail: {
+          notificationIds: unreadNotifications.map((n) => n.id),
+          userId: userData.id,
+          timestamp: new Date().toISOString(),
+          markAll: true,
+        },
+      });
+      window.dispatchEvent(event);
+      console.log("ViewNotifications: Dispatched mark all read event");
     } catch (error) {
       toast.error("Failed to mark all as read");
     }

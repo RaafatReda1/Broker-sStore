@@ -125,7 +125,6 @@ const ManageOrders = () => {
 
       <div className="controls-section">
         <div className="search-box">
-          <span className="search-icon">🔍</span>
           <input
             type="text"
             placeholder="Search by order ID, name, phone, or address..."

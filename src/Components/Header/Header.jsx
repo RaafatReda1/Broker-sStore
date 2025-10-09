@@ -42,6 +42,7 @@ const Header = () => {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [badgeAnimation, setBadgeAnimation] = useState("");
 
   const searchRef = useRef(null);
 
@@ -134,30 +135,41 @@ const Header = () => {
           table: "Notifications",
         },
         (payload) => {
+          console.log("Header: Real-time notification update:", payload);
+
           if (payload.eventType === "INSERT") {
+            console.log("Header: New notification inserted");
             setNotifications((prev) => [payload.new, ...prev]);
           } else if (payload.eventType === "UPDATE") {
+            console.log("Header: Notification updated", payload.new);
             setNotifications((prev) =>
               prev.map((n) => (n.id === payload.new.id ? payload.new : n))
             );
           } else if (payload.eventType === "DELETE") {
+            console.log("Header: Notification deleted");
             setNotifications((prev) =>
               prev.filter((n) => n.id !== payload.old.id)
             );
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Header: Subscription status:", status);
+      });
 
     return () => {
       supabase.removeChannel(notificationsSubscription);
     };
   }, [userData?.id]);
 
-  // Calculate unread count
+  // Calculate unread count with animation
   useEffect(() => {
     if (!userData?.id || notifications.length === 0) {
+      const prevCount = unreadCount;
       setUnreadCount(0);
+      if (prevCount > 0) {
+        triggerBadgeAnimation();
+      }
       return;
     }
 
@@ -195,8 +207,77 @@ const Header = () => {
       return notification.read_by[userData.id] !== true;
     });
 
-    setUnreadCount(unreadNotifications.length);
-  }, [notifications, userData]);
+    const newCount = unreadNotifications.length;
+    const prevCount = unreadCount;
+
+    console.log("Header: Unread count calculation:", {
+      totalNotifications: notifications.length,
+      filteredNotifications: filteredNotifications.length,
+      unreadNotifications: unreadNotifications.length,
+      prevCount,
+      newCount,
+      userData: userData?.id,
+    });
+
+    setUnreadCount(newCount);
+
+    // Trigger animation if count changed
+    if (prevCount !== newCount) {
+      console.log("Header: Count changed, triggering animation");
+      triggerBadgeAnimation();
+    }
+  }, [notifications, userData?.id, userData?.email]);
+
+  // Function to trigger badge animation
+  const triggerBadgeAnimation = () => {
+    setBadgeAnimation("count-change");
+    setTimeout(() => {
+      setBadgeAnimation("");
+    }, 600);
+  };
+
+  // Manual refresh function for testing
+  const refreshNotificationCount = async () => {
+    if (!userData?.id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("Notifications")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error refreshing notifications:", error);
+        return;
+      }
+
+      if (data) {
+        console.log(
+          "Header: Manual refresh - fetched notifications:",
+          data.length
+        );
+        setNotifications(data);
+      }
+    } catch (error) {
+      console.error("Error refreshing notifications:", error);
+    }
+  };
+
+  // Listen for custom events from ViewNotifications when messages are read
+  useEffect(() => {
+    const handleNotificationRead = (event) => {
+      console.log("Header: Received notification read event:", event.detail);
+      // Immediately refresh the notification count
+      refreshNotificationCount();
+    };
+
+    // Listen for custom events
+    window.addEventListener("notificationRead", handleNotificationRead);
+
+    return () => {
+      window.removeEventListener("notificationRead", handleNotificationRead);
+    };
+  }, [userData?.id]);
 
   // Handlers
   const handleSearch = useCallback(
@@ -289,15 +370,16 @@ const Header = () => {
                 to="/notifications"
                 className="nav-link"
                 aria-label={`Notifications (${unreadCount} unread)`}
+                onClick={refreshNotificationCount}
               >
                 <FontAwesomeIcon icon={faBell} aria-hidden="true" />
                 <span>Notifications</span>
                 {unreadCount > 0 && (
                   <span
-                    className="notification-badge"
+                    className={`notification-badge ${badgeAnimation}`}
                     aria-label={`${unreadCount} unread notifications`}
                   >
-                    {unreadCount}
+                    {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
               </Link>
@@ -392,7 +474,7 @@ const Header = () => {
                       }}
                     >
                       <FontAwesomeIcon icon={faSearch} aria-hidden="true" />
-                      View all results for "{searchQuery}"
+                      View all results for &quot;{searchQuery}&quot;
                     </div>
                   </div>
                 )}
@@ -494,17 +576,20 @@ const Header = () => {
             <Link
               to="/notifications"
               className="mobile-nav-link"
-              onClick={closeMobileMenu}
+              onClick={() => {
+                closeMobileMenu();
+                refreshNotificationCount();
+              }}
               aria-label={`Notifications (${unreadCount} unread)`}
             >
               <FontAwesomeIcon icon={faBell} aria-hidden="true" />
               <span>Notifications</span>
               {unreadCount > 0 && (
                 <span
-                  className="notification-badge"
+                  className={`notification-badge ${badgeAnimation}`}
                   aria-label={`${unreadCount} unread notifications`}
                 >
-                  {unreadCount}
+                  {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}
             </Link>
