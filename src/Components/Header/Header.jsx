@@ -1,4 +1,10 @@
-import React, { useState, useContext, useEffect, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -16,10 +22,10 @@ import {
 import { userDataContext, productsContext } from "../../AppContexts";
 import DropMenu from "../DropMenu/DropMenu";
 import "./Header.css";
+import supabase from "../../SupabaseClient";
 
 const SEARCH_RESULTS_LIMIT = 5;
 const SCROLL_THRESHOLD = 20;
-const NOTIFICATION_COUNT = 3;
 
 const Header = () => {
   const { userData } = useContext(userDataContext);
@@ -34,6 +40,8 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const searchRef = useRef(null);
 
@@ -58,7 +66,8 @@ const Header = () => {
 
     if (isSearchOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isSearchOpen]);
 
@@ -83,6 +92,111 @@ const Header = () => {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [navigate]);
+
+  // Fetch notifications and calculate unread count
+  useEffect(() => {
+    if (!userData?.id) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
+
+    const fetchNotifications = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("Notifications")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching notifications:", error);
+          return;
+        }
+
+        if (data) {
+          setNotifications(data);
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+
+    // Set up real-time subscription for notifications
+    const notificationsSubscription = supabase
+      .channel("notifications_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Notifications",
+        },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            setNotifications((prev) => [payload.new, ...prev]);
+          } else if (payload.eventType === "UPDATE") {
+            setNotifications((prev) =>
+              prev.map((n) => (n.id === payload.new.id ? payload.new : n))
+            );
+          } else if (payload.eventType === "DELETE") {
+            setNotifications((prev) =>
+              prev.filter((n) => n.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(notificationsSubscription);
+    };
+  }, [userData?.id]);
+
+  // Calculate unread count
+  useEffect(() => {
+    if (!userData?.id || notifications.length === 0) {
+      setUnreadCount(0);
+      return;
+    }
+
+    // Filter notifications based on user eligibility (same logic as ViewNotifications)
+    const filteredNotifications = notifications.filter((notification) => {
+      // If it's a broadcast to all users
+      if (notification.isAll) {
+        return true;
+      }
+
+      // If it's a direct email notification
+      if (notification.brokerEmail && userData.email) {
+        return notification.brokerEmail === userData.email;
+      }
+
+      // If it's a direct ID notification
+      if (notification.brokerIdTo && userData.id) {
+        return notification.brokerIdTo === userData.id;
+      }
+
+      // If it's a range notification
+      if (notification.brokerIdFrom && notification.brokerIdTo && userData.id) {
+        return (
+          userData.id >= notification.brokerIdFrom &&
+          userData.id <= notification.brokerIdTo
+        );
+      }
+
+      return false;
+    });
+
+    // Count unread notifications
+    const unreadNotifications = filteredNotifications.filter((notification) => {
+      if (!notification.read_by) return true;
+      return notification.read_by[userData.id] !== true;
+    });
+
+    setUnreadCount(unreadNotifications.length);
+  }, [notifications, userData]);
 
   // Handlers
   const handleSearch = useCallback(
@@ -162,22 +276,37 @@ const Header = () => {
 
           {userData && (
             <>
-              <Link to="/withdraw" className="nav-link" aria-label="Withdraw funds">
+              <Link
+                to="/withdraw"
+                className="nav-link"
+                aria-label="Withdraw funds"
+              >
                 <FontAwesomeIcon icon={faMoneyBillWave} aria-hidden="true" />
                 <span>Withdraw</span>
               </Link>
 
-              <Link to="/notifications" className="nav-link" aria-label={`Notifications (${NOTIFICATION_COUNT} unread)`}>
+              <Link
+                to="/notifications"
+                className="nav-link"
+                aria-label={`Notifications (${unreadCount} unread)`}
+              >
                 <FontAwesomeIcon icon={faBell} aria-hidden="true" />
                 <span>Notifications</span>
-                {NOTIFICATION_COUNT > 0 && (
-                  <span className="notification-badge" aria-label={`${NOTIFICATION_COUNT} unread notifications`}>
-                    {NOTIFICATION_COUNT}
+                {unreadCount > 0 && (
+                  <span
+                    className="notification-badge"
+                    aria-label={`${unreadCount} unread notifications`}
+                  >
+                    {unreadCount}
                   </span>
                 )}
               </Link>
 
-              <Link to="/balance" className="nav-link" aria-label="Account balance">
+              <Link
+                to="/balance"
+                className="nav-link"
+                aria-label="Account balance"
+              >
                 <FontAwesomeIcon icon={faWallet} aria-hidden="true" />
                 <span>Balance</span>
               </Link>
@@ -205,7 +334,11 @@ const Header = () => {
 
             {isSearchOpen && (
               <div className="search-form-wrapper">
-                <form onSubmit={handleSearch} className="search-form" role="search">
+                <form
+                  onSubmit={handleSearch}
+                  className="search-form"
+                  role="search"
+                >
                   <input
                     type="text"
                     placeholder="Search products..."
@@ -362,13 +495,16 @@ const Header = () => {
               to="/notifications"
               className="mobile-nav-link"
               onClick={closeMobileMenu}
-              aria-label={`Notifications (${NOTIFICATION_COUNT} unread)`}
+              aria-label={`Notifications (${unreadCount} unread)`}
             >
               <FontAwesomeIcon icon={faBell} aria-hidden="true" />
               <span>Notifications</span>
-              {NOTIFICATION_COUNT > 0 && (
-                <span className="notification-badge" aria-label={`${NOTIFICATION_COUNT} unread notifications`}>
-                  {NOTIFICATION_COUNT}
+              {unreadCount > 0 && (
+                <span
+                  className="notification-badge"
+                  aria-label={`${unreadCount} unread notifications`}
+                >
+                  {unreadCount}
                 </span>
               )}
             </Link>
