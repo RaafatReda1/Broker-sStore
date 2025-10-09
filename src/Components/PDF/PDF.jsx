@@ -111,7 +111,7 @@ const PDF = ({ name, fullDescription, Images, price, profit }) => {
   };
 
   return (
-    <button onClick={generatePDF} type="button">
+    <button onClick={generatePDF} type="button" className="action-btn pdf-btn">
       Generate PDF
     </button>
   );

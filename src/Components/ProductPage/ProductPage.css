@@ -115,19 +115,72 @@
   overflow: hidden;
   background: linear-gradient(135deg, #f8fafc, #e2e8f0);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 450px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .main-image {
   width: 100%;
-  height: 450px;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   filter: brightness(1.05) contrast(1.1);
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .main-image:hover {
   transform: scale(1.02);
   filter: brightness(1.1) contrast(1.15);
+}
+
+/* Image loading and error states */
+.main-image-container::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(59, 130, 246, 0.3);
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  opacity: 0;
+  z-index: 1;
+}
+
+.main-image-container.loading::before {
+  opacity: 1;
+}
+
+.main-image-container.error {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.main-image-container.error::after {
+  content: "Image failed to load";
+  text-align: center;
+  font-size: 14px;
+}
+
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 .image-overlay {
@@ -171,6 +224,17 @@
   color: #111827;
 }
 
+.preview-btn {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+  color: white !important;
+  border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+.preview-btn:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  color: white !important;
+}
+
 /* Thumbnails */
 .thumbnails {
   display: flex;
@@ -183,11 +247,13 @@
   width: 80px;
   height: 80px;
   object-fit: cover;
+  object-position: center;
   border-radius: 15px;
   cursor: pointer;
   border: 2px solid rgba(255, 255, 255, 0.3);
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .thumbnail:hover {
@@ -426,20 +492,22 @@
   content: "";
   position: absolute;
   top: 0;
-  left: -100%;
-  width: 100%;
+  left: 50%;
+  width: 0;
   height: 100%;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.4),
     transparent
   );
-  transition: left 0.5s;
+  transform: translateX(-50%);
+  transition: width 0.6s ease;
+  z-index: 1;
 }
 
 .action-btn:hover::before {
-  left: 100%;
+  width: 100%;
 }
 
 .product-page .add-to-cart-btn {
@@ -521,8 +589,12 @@
     font-size: 2.2rem;
   }
 
-  .main-image {
+  .main-image-container {
     height: 400px;
+  }
+
+  .main-image {
+    max-height: 400px;
   }
 }
 
@@ -540,8 +612,12 @@
     font-size: 2rem;
   }
 
-  .main-image {
+  .main-image-container {
     height: 350px;
+  }
+
+  .main-image {
+    max-height: 350px;
   }
 
   .action-buttons {
@@ -572,8 +648,12 @@
     font-size: 1.8rem;
   }
 
-  .main-image {
+  .main-image-container {
     height: 300px;
+  }
+
+  .main-image {
+    max-height: 300px;
   }
 
   .price-value {
@@ -592,6 +672,179 @@
   .quantity-input {
     width: 70px;
     height: 40px;
+  }
+
+  .thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Image Preview Modal */
+.image-preview-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease;
+}
+
+.image-preview-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  animation: slideIn 0.3s ease;
+}
+
+.close-preview-btn {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.close-preview-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.preview-image-container {
+  position: relative;
+  max-width: 100%;
+  max-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 15px;
+  transition: transform 0.3s ease;
+}
+
+.preview-image:hover {
+  transform: scale(1.05);
+}
+
+.preview-thumbnails {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 10px;
+}
+
+.preview-thumbnail {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.preview-thumbnail:hover {
+  transform: scale(1.1);
+  border-color: #8b5cf6;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.preview-thumbnail.active {
+  border: 3px solid #8b5cf6;
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive Preview Modal */
+@media (max-width: 768px) {
+  .image-preview-content {
+    max-width: 95vw;
+    max-height: 95vh;
+    gap: 15px;
+  }
+
+  .preview-image-container {
+    max-height: 60vh;
+  }
+
+  .close-preview-btn {
+    top: -40px;
+    width: 35px;
+    height: 35px;
+  }
+
+  .preview-thumbnails {
+    gap: 8px;
+  }
+
+  .preview-thumbnail {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .preview-thumbnail {
+    width: 40px;
+    height: 40px;
+  }
+
+  .preview-thumbnails {
+    gap: 6px;
   }
 }
 

@@ -16,6 +16,8 @@ import {
   ArrowLeft,
   Heart,
   Download,
+  ZoomIn,
+  X,
 } from "lucide-react";
 
 const ProductPage = () => {
@@ -33,6 +35,7 @@ const ProductPage = () => {
 
   const [currentImage, setCurrentImage] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [showImagePreview, setShowImagePreview] = useState(false);
 
   // Update currentImage when currentProduct is found
   useEffect(() => {
@@ -95,8 +98,12 @@ const ProductPage = () => {
     }
   };
 
-  const handleQuantityChange = (change) => {
-    setQuantity((prev) => Math.max(1, prev + change));
+  const handlePreviewImage = () => {
+    setShowImagePreview(true);
+  };
+
+  const closeImagePreview = () => {
+    setShowImagePreview(false);
   };
 
   return (
@@ -122,6 +129,13 @@ const ProductPage = () => {
               <button className="overlay-action-btn" onClick={handleShare}>
                 <Share2 size={20} />
                 <span>Share</span>
+              </button>
+              <button
+                className="overlay-action-btn preview-btn"
+                onClick={handlePreviewImage}
+              >
+                <ZoomIn size={20} />
+                <span>Preview</span>
               </button>
             </div>
           </div>
@@ -254,6 +268,40 @@ const ProductPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Image Preview Modal */}
+      {showImagePreview && (
+        <div className="image-preview-modal" onClick={closeImagePreview}>
+          <div
+            className="image-preview-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="close-preview-btn" onClick={closeImagePreview}>
+              <X size={24} />
+            </button>
+            <div className="preview-image-container">
+              <img
+                src={currentImage}
+                alt={currentProduct.name}
+                className="preview-image"
+              />
+            </div>
+            <div className="preview-thumbnails">
+              {currentProduct.images?.map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  alt={currentProduct.name}
+                  className={`preview-thumbnail ${
+                    currentImage === img ? "active" : ""
+                  }`}
+                  onClick={() => setCurrentImage(img)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
