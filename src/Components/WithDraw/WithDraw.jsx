@@ -28,7 +28,7 @@ const WithDraw = () => {
       try {
         const { data: existingRequests, error } = await supabase
           .from("WithDrawalRequests")
-          .select("id, created_at, actualBalance")
+          .select("id, created_at, actualBalance, Status")
           .eq("brokerId", userData.id)
           .eq("Status", false)
           .order("created_at", { ascending: false })
@@ -52,6 +52,47 @@ const WithDraw = () => {
     };
 
     checkPendingRequests();
+
+    // Set up real-time subscription for withdrawal requests
+    const withdrawalSubscription = supabase
+      .channel("withdrawal_requests_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "WithDrawalRequests",
+          filter: `brokerId=eq.${userData?.id}`,
+        },
+        (payload) => {
+          console.log("Real-time withdrawal request update:", payload);
+
+          if (payload.eventType === "UPDATE") {
+            // Check if the request status changed to finished (true)
+            if (payload.new.Status === true && payload.old.Status === false) {
+              console.log("Withdrawal request completed!");
+              toast.success("🎉 Your withdrawal request has been processed!");
+
+              // Update local state to remove pending request
+              setHasPendingRequest(false);
+              setPendingRequestInfo(null);
+            }
+          } else if (payload.eventType === "INSERT") {
+            // New withdrawal request added
+            if (payload.new.Status === false) {
+              console.log("New pending withdrawal request added");
+              setHasPendingRequest(true);
+              setPendingRequestInfo(payload.new);
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription on component unmount
+    return () => {
+      supabase.removeChannel(withdrawalSubscription);
+    };
   }, [userData?.id]);
 
   // Reset form when payment method changes
@@ -177,6 +218,23 @@ const WithDraw = () => {
     setIsSubmitting(true);
 
     try {
+      // First, fetch all completed orders for this broker to get their IDs
+      const { data: completedOrders, error: ordersError } = await supabase
+        .from("Orders")
+        .select("id")
+        .eq("brokerId", userData.id)
+        .eq("status", true);
+
+      if (ordersError) {
+        console.error("Error fetching orders:", ordersError);
+        toast.error("Error fetching orders. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Extract order IDs
+      const orderIds = completedOrders?.map((order) => order.id) || [];
+
       const withdrawalData = {
         brokerId: userData.id,
         brokerEmail: userData.email,
@@ -196,6 +254,7 @@ const WithDraw = () => {
             ? formData.instaAccountName.trim()
             : null,
         actualBalance: userData.actualBalance,
+        orders: orderIds, // Store the order IDs in the orders field
       };
 
       const { error } = await supabase
@@ -206,7 +265,9 @@ const WithDraw = () => {
         console.error("Error:", error);
         toast.error("Error sending request. Please try again.");
       } else {
-        toast.success("Withdrawal request submitted successfully!");
+        toast.success(
+          "✅ Withdrawal request submitted successfully!\n\n📱 You'll be notified in real-time when it's processed."
+        );
         // Reset form
         setPaymentMethod("");
         setFormData({
@@ -265,7 +326,8 @@ const WithDraw = () => {
               </div>
               <p className="alert-message">
                 You already have a withdrawal request pending. Please wait for
-                it to be processed before submitting a new one.
+                it to be processed before submitting a new one. You'll be
+                notified instantly when it's completed!
               </p>
             </div>
           </div>
@@ -386,7 +448,9 @@ const WithDraw = () => {
 
               <button
                 type="button"
-                onClick={handleSubmit}
+                onClick={() => {
+                  handleSubmit();
+                }}
                 disabled={isSubmitting || hasPendingRequest}
                 className={`submit-button ${
                   isSubmitting || hasPendingRequest

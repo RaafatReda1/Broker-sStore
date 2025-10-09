@@ -11,7 +11,7 @@ const ManageWithDrawal = () => {
   const [brokerData, setBrokerData] = useState(null);
   const [brokerOrders, setBrokerOrders] = useState([]);
   const [deletedOrders, setDeletedOrders] = useState([]);
-  const [activeTab, setActiveTab] = useState("pending"); // pending or finished
+  const [activeTab, setActiveTab] = useState("pending");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -61,7 +61,6 @@ const ManageWithDrawal = () => {
 
   const fetchRequestCounts = async () => {
     try {
-      // Fetch pending count
       const { count: pendingCountData, error: pendingError } = await supabase
         .from("WithDrawalRequests")
         .select("*", { count: "exact", head: true })
@@ -70,7 +69,6 @@ const ManageWithDrawal = () => {
       if (pendingError) throw pendingError;
       setPendingCount(pendingCountData || 0);
 
-      // Fetch finished count
       const { count: finishedCountData, error: finishedError } = await supabase
         .from("WithDrawalRequests")
         .select("*", { count: "exact", head: true })
@@ -118,28 +116,38 @@ const ManageWithDrawal = () => {
       if (brokerError) throw brokerError;
       setBrokerData(broker);
 
-      if (activeTab === "pending") {
-        // Fetch completed orders for pending requests
-        const { data: orders, error: ordersError } = await supabase
-          .from("Orders")
-          .select("*")
-          .eq("brokerId", request.brokerId)
-          .eq("status", true)
-          .order("created_at", { ascending: false });
+      // Get order IDs from the withdrawal request
+      const orderIds = request.orders || [];
 
-        if (ordersError) throw ordersError;
-        setBrokerOrders(orders || []);
+      if (activeTab === "pending") {
+        // Fetch orders from Orders table using the stored order IDs
+        if (orderIds.length > 0) {
+          const { data: orders, error: ordersError } = await supabase
+            .from("Orders")
+            .select("*")
+            .in("id", orderIds)
+            .order("created_at", { ascending: false });
+
+          if (ordersError) throw ordersError;
+          setBrokerOrders(orders || []);
+        } else {
+          setBrokerOrders([]);
+        }
         setDeletedOrders([]);
       } else {
-        // Fetch deleted orders for finished requests
-        const { data: delOrders, error: delOrdersError } = await supabase
-          .from("DeletedOrders")
-          .select("*")
-          .eq("brokerId", request.brokerId)
-          .order("created_at", { ascending: false });
+        // Fetch orders from DeletedOrders table using orderPrevId to match original order IDs
+        if (orderIds.length > 0) {
+          const { data: delOrders, error: delOrdersError } = await supabase
+            .from("DeletedOrders")
+            .select("*")
+            .in("orderPrevId", orderIds) // Use orderPrevId to match the original order IDs
+            .order("created_at", { ascending: false });
 
-        if (delOrdersError) throw delOrdersError;
-        setDeletedOrders(delOrders || []);
+          if (delOrdersError) throw delOrdersError;
+          setDeletedOrders(delOrders || []);
+        } else {
+          setDeletedOrders([]);
+        }
         setBrokerOrders([]);
       }
     } catch (error) {
@@ -154,7 +162,7 @@ const ManageWithDrawal = () => {
     showConfirmationModal({
       title: "Complete Withdrawal Request",
       message:
-        "✨ Ready to complete this withdrawal?\n\n📋 This will:\n• Mark the request as finished\n• Archive completed orders (placed before request)\n• Process the broker's payment\n• Keep new orders available for future withdrawals\n\n💡 Don't worry - archived orders can be restored if needed!",
+        "✨ Ready to complete this withdrawal?\n\n📋 This will:\n• Mark the request as finished\n• Archive specific orders (only those included in this request)\n• Process the broker's payment\n• Keep other orders available for future withdrawals\n\n💡 Don't worry - archived orders can be restored if needed!",
       type: "success",
       confirmText: "Complete Withdrawal",
       cancelText: "Keep Pending",
@@ -168,49 +176,56 @@ const ManageWithDrawal = () => {
     setIsProcessing(true);
 
     try {
-      // 1. Fetch completed orders that were placed BEFORE the withdrawal request
-      const { data: completedOrders, error: fetchError } = await supabase
-        .from("Orders")
-        .select("*")
-        .eq("brokerId", request.brokerId)
-        .eq("status", true)
-        .lt("created_at", request.created_at) // Only orders created BEFORE the withdrawal request
-        .order("created_at", { ascending: false });
+      // Get the specific order IDs from the withdrawal request
+      const orderIds = request.orders || [];
+      let completedOrders = [];
 
-      if (fetchError) throw fetchError;
-
-      if (completedOrders && completedOrders.length > 0) {
-        // 2. Copy orders to DeletedOrders table
-        const ordersToDelete = completedOrders.map((order) => ({
-          name: order.name,
-          phone: order.phone,
-          address: order.address,
-          cart: order.cart,
-          total: order.total,
-          notes: order.notes,
-          brokerId: order.brokerId,
-          status: order.status,
-          netProfit: order.netProfit,
-          created_at: order.created_at,
-        }));
-
-        const { error: insertError } = await supabase
-          .from("DeletedOrders")
-          .insert(ordersToDelete);
-
-        if (insertError) throw insertError;
-
-        // 3. Delete orders from Orders table
-        const orderIds = completedOrders.map((order) => order.id);
-        const { error: deleteError } = await supabase
+      if (orderIds.length === 0) {
+        console.warn("No orders found in withdrawal request");
+      } else {
+        // Fetch ONLY the orders that are in the request's order list
+        const { data: fetchedOrders, error: fetchError } = await supabase
           .from("Orders")
-          .delete()
+          .select("*")
           .in("id", orderIds);
 
-        if (deleteError) throw deleteError;
+        if (fetchError) throw fetchError;
+
+        completedOrders = fetchedOrders || [];
+
+        if (completedOrders.length > 0) {
+          // Copy orders to DeletedOrders table, storing original ID in orderPrevId
+          const ordersToArchive = completedOrders.map((order) => ({
+            name: order.name,
+            phone: order.phone,
+            address: order.address,
+            cart: order.cart,
+            total: order.total,
+            notes: order.notes,
+            brokerId: order.brokerId,
+            status: order.status,
+            netProfit: order.netProfit,
+            created_at: order.created_at,
+            orderPrevId: order.id, // Store the original order ID
+          }));
+
+          const { error: insertError } = await supabase
+            .from("DeletedOrders")
+            .insert(ordersToArchive);
+
+          if (insertError) throw insertError;
+
+          // Delete orders from Orders table
+          const { error: deleteError } = await supabase
+            .from("Orders")
+            .delete()
+            .in("id", orderIds);
+
+          if (deleteError) throw deleteError;
+        }
       }
 
-      // 4. Update withdrawal request status to finished
+      // Update withdrawal request status to finished
       const { error: updateError } = await supabase
         .from("WithDrawalRequests")
         .update({ Status: true })
@@ -218,18 +233,16 @@ const ManageWithDrawal = () => {
 
       if (updateError) throw updateError;
 
-      // 5. Send notification to broker about successful withdrawal
-      await sendWithdrawalNotification(request, completedOrders?.length || 0);
+      // Send notification
+      await sendWithdrawalNotification(request, completedOrders.length);
 
       toast.success(
         `🎉 Withdrawal completed successfully!\n` +
-          `📦 ${
-            completedOrders?.length || 0
-          } orders archived (placed before request)\n` +
+          `📦 ${completedOrders.length} orders archived\n` +
           `💰 Broker payment processed\n` +
-          `📱 Notification sent to broker\n` +
-          `⏰ New orders after request remain available for future withdrawals`
+          `📱 Notification sent to broker`
       );
+
       fetchWithdrawalRequests();
       fetchRequestCounts();
       setSelectedRequest(null);
@@ -249,7 +262,7 @@ const ManageWithDrawal = () => {
     showConfirmationModal({
       title: "Restore Request to Pending",
       message:
-        "🔄 Ready to restore this request?\n\n📋 This will:\n• Move the request back to pending\n• Restore all archived orders\n• Make orders active again\n\n💡 This is reversible - you can finish it again later!",
+        "🔄 Ready to restore this request?\n\n📋 This will:\n• Move the request back to pending\n• Restore specific archived orders (only those from this request)\n• Make orders active again\n• Keep other archived orders untouched\n\n💡 This is reversible - you can finish it again later!",
       type: "info",
       confirmText: "Restore Request",
       cancelText: "Keep Finished",
@@ -263,46 +276,58 @@ const ManageWithDrawal = () => {
     setIsProcessing(true);
 
     try {
-      // 1. Fetch archived orders for this broker
-      const { data: archivedOrders, error: fetchError } = await supabase
-        .from("DeletedOrders")
-        .select("*")
-        .eq("brokerId", request.brokerId);
+      // Get the specific order IDs from the withdrawal request
+      const orderIds = request.orders || [];
+      let archivedOrders = [];
 
-      if (fetchError) throw fetchError;
+      if (orderIds.length === 0) {
+        console.warn("No orders found in withdrawal request to restore");
+      } else {
+        // Fetch ONLY the archived orders that match the original order IDs from the request
+        const { data: fetchedArchivedOrders, error: fetchError } =
+          await supabase
+            .from("DeletedOrders")
+            .select("*")
+            .in("orderPrevId", orderIds); // Match by orderPrevId instead of id
 
-      if (archivedOrders && archivedOrders.length > 0) {
-        // 2. Copy orders back to Orders table
-        const ordersToRestore = archivedOrders.map((order) => ({
-          name: order.name,
-          phone: order.phone,
-          address: order.address,
-          cart: order.cart,
-          total: order.total,
-          notes: order.notes,
-          brokerId: order.brokerId,
-          status: order.status,
-          netProfit: order.netProfit,
-          created_at: order.created_at,
-        }));
+        if (fetchError) throw fetchError;
 
-        const { error: insertError } = await supabase
-          .from("Orders")
-          .insert(ordersToRestore);
+        archivedOrders = fetchedArchivedOrders || [];
 
-        if (insertError) throw insertError;
+        if (archivedOrders.length > 0) {
+          // Copy orders back to Orders table with their original IDs
+          const ordersToRestore = archivedOrders.map((order) => ({
+            id: order.orderPrevId, // Restore with original ID
+            name: order.name,
+            phone: order.phone,
+            address: order.address,
+            cart: order.cart,
+            total: order.total,
+            notes: order.notes,
+            brokerId: order.brokerId,
+            status: order.status,
+            netProfit: order.netProfit,
+            created_at: order.created_at,
+          }));
 
-        // 3. Delete orders from DeletedOrders table
-        const orderIds = archivedOrders.map((order) => order.id);
-        const { error: deleteError } = await supabase
-          .from("DeletedOrders")
-          .delete()
-          .in("id", orderIds);
+          const { error: insertError } = await supabase
+            .from("Orders")
+            .insert(ordersToRestore);
 
-        if (deleteError) throw deleteError;
+          if (insertError) throw insertError;
+
+          // Delete orders from DeletedOrders table
+          const deletedOrderIds = archivedOrders.map((order) => order.id);
+          const { error: deleteError } = await supabase
+            .from("DeletedOrders")
+            .delete()
+            .in("id", deletedOrderIds);
+
+          if (deleteError) throw deleteError;
+        }
       }
 
-      // 4. Update withdrawal request status to pending
+      // Update withdrawal request status to pending
       const { error: updateError } = await supabase
         .from("WithDrawalRequests")
         .update({ Status: false })
@@ -310,15 +335,16 @@ const ManageWithDrawal = () => {
 
       if (updateError) throw updateError;
 
-      // 5. Send notification to broker about request reset
-      await sendResetNotification(request, archivedOrders?.length || 0);
+      // Send notification
+      await sendResetNotification(request, archivedOrders.length);
 
       toast.success(
         `🔄 Request restored to pending!\n` +
-          `📦 ${archivedOrders?.length || 0} orders reactivated\n` +
+          `📦 ${archivedOrders.length} orders reactivated\n` +
           `✨ Ready for processing again\n` +
           `📱 Notification sent to broker`
       );
+
       fetchWithdrawalRequests();
       fetchRequestCounts();
       setSelectedRequest(null);
@@ -373,13 +399,6 @@ const ManageWithDrawal = () => {
 
   const sendWithdrawalNotification = async (request, ordersCount) => {
     try {
-      console.log(
-        "Sending withdrawal notification for broker ID:",
-        request.brokerId,
-        "Type:",
-        typeof request.brokerId
-      );
-
       const notificationData = {
         title: "💰 Withdrawal Processed Successfully!",
         msg:
@@ -392,7 +411,7 @@ const ManageWithDrawal = () => {
               currency: "EGP",
             }
           )}\n` +
-          `• **Orders Processed:** ${ordersCount} completed orders (placed before request)\n` +
+          `• **Orders Processed:** ${ordersCount} completed orders\n` +
           `• **Status:** ✅ Completed\n\n` +
           `💳 **Payment Method:**\n` +
           `${
@@ -407,7 +426,6 @@ const ManageWithDrawal = () => {
           }\n\n` +
           `📱 **Withdrawal Phone:** ${request.withDrawalPhone}\n\n` +
           `✨ Your payment should arrive shortly. Thank you for your business!\n\n` +
-          `⏰ **Note:** Only orders placed before your withdrawal request were processed. Any new orders can be included in future withdrawal requests.\n\n` +
           `📞 If you have any questions, please contact our support team.`,
         isTemp: false,
         isAll: false,
@@ -422,12 +440,6 @@ const ManageWithDrawal = () => {
 
       if (error) {
         console.error("Error sending withdrawal notification:", error);
-        // Don't throw error here as it shouldn't break the withdrawal process
-      } else {
-        console.log(
-          "Withdrawal notification sent successfully to broker:",
-          request.brokerId
-        );
       }
     } catch (error) {
       console.error("Error in sendWithdrawalNotification:", error);
@@ -436,13 +448,6 @@ const ManageWithDrawal = () => {
 
   const sendResetNotification = async (request, ordersCount) => {
     try {
-      console.log(
-        "Sending reset notification for broker ID:",
-        request.brokerId,
-        "Type:",
-        typeof request.brokerId
-      );
-
       const notificationData = {
         title: "🔄 Withdrawal Request Reset to Pending",
         msg:
@@ -484,12 +489,6 @@ const ManageWithDrawal = () => {
 
       if (error) {
         console.error("Error sending reset notification:", error);
-        // Don't throw error here as it shouldn't break the reset process
-      } else {
-        console.log(
-          "Reset notification sent successfully to broker:",
-          request.brokerId
-        );
       }
     } catch (error) {
       console.error("Error in sendResetNotification:", error);
@@ -577,6 +576,13 @@ const ManageWithDrawal = () => {
                   <span className="label">Withdrawal Phone:</span>
                   <span className="value">
                     {request.withDrawalPhone || "N/A"}
+                  </span>
+                </div>
+
+                <div className="info-row">
+                  <span className="label">Orders Count:</span>
+                  <span className="value">
+                    {request.orders?.length || 0} orders
                   </span>
                 </div>
 
@@ -713,11 +719,11 @@ const ManageWithDrawal = () => {
                   </div>
                 )}
 
-                {/* Orders Section */}
+                {/* Orders Section for Pending */}
                 {activeTab === "pending" && brokerOrders.length > 0 && (
                   <div className="modal-section">
                     <h3 className="section-title">
-                      Completed Orders ({brokerOrders.length})
+                      Orders in this Request ({brokerOrders.length})
                     </h3>
                     <div className="orders-summary">
                       <div className="summary-item">
@@ -786,15 +792,15 @@ const ManageWithDrawal = () => {
 
                 {activeTab === "pending" && brokerOrders.length === 0 && (
                   <div className="empty-section">
-                    <p>No completed orders found for this broker</p>
+                    <p>No orders found in this withdrawal request</p>
                   </div>
                 )}
 
-                {/* Deleted Orders Section */}
+                {/* Archived Orders Section for Finished */}
                 {activeTab === "finished" && deletedOrders.length > 0 && (
                   <div className="modal-section">
                     <h3 className="section-title">
-                      Archived Orders ({deletedOrders.length})
+                      Archived Orders from this Request ({deletedOrders.length})
                     </h3>
                     <div className="orders-summary">
                       <div className="summary-item">
@@ -863,7 +869,7 @@ const ManageWithDrawal = () => {
 
                 {activeTab === "finished" && deletedOrders.length === 0 && (
                   <div className="empty-section">
-                    <p>No archived orders found for this broker</p>
+                    <p>No archived orders found for this request</p>
                   </div>
                 )}
               </>
