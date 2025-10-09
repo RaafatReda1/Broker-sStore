@@ -5,4 +5,3 @@ export const cartContext = createContext();
 export const sessionContext = createContext();
 export const userDataContext = createContext();
 export const staffContext = createContext();
-export const isLoadingUserDataContext = createContext();

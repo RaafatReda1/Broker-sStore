@@ -290,53 +290,54 @@ function App() {
               <staffContext.Provider
                 value={{ isAdmin, setIsAdmin, isModerator, setIsModerator }}
               >
-                {componentToShow === "admin" ||
-                componentToShow === "moderator" ? (
-                  <ManagingDashboard />
-                ) : (
-                  <>
+                <>
+                  {componentToShow === "admin" ||
+                  componentToShow === "moderator" ? (
+                    <ManagingDashboard />
+                  ) : (
                     <Header />
-                    <PageTransition>
-                      <Route path="/*" element={<UserTypeRouter />} />{" "}
-                      {/*This checks if the user Role inside UserTypeRouter.jsx first then renders the corresponding component if they're admin (<Admin />) or moderator (<Moderator />) or normal user (<Products />) */}
-                      <Route
-                        path="/profile"
-                        element={
-                          <ProtectedRoute requireSession={true}>
-                            <Profile />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/balance"
-                        element={
-                          <ProtectedRoute requireSession={true}>
-                            <Balance />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/notifications"
-                        element={
-                          <ProtectedRoute requireSession={true}>
-                            <ViewNotifications />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/cart"
-                        element={
-                          <ProtectedRoute blockBroker={true}>
-                            <Cart />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route path="/productPage/*" element={<ProductPage />} />
-                      <Route path="/signup" element={<SignUp />} />
-                      <Route path="/signin" element={<SignIn />} />
-                    </PageTransition>
-                  </>
-                )}
+                  )}
+                  <PageTransition>
+                    <Route path="/*" element={<UserTypeRouter />} />{" "}
+                    {/*This checks if the user Role inside UserTypeRouter.jsx first then renders the corresponding component if they're admin (<Admin />) or moderator (<Moderator />) or normal user (<Products />) */}
+                    <Route
+                      path="/profile"
+                      element={
+                        <ProtectedRoute requireSession={true}>
+                          <Profile />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/balance"
+                      element={
+                        <ProtectedRoute requireSession={true}>
+                          <Balance />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/notifications"
+                      element={
+                        <ProtectedRoute requireSession={true}>
+                          <ViewNotifications />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/cart"
+                      element={
+                        <ProtectedRoute blockBroker={true}>
+                          <Cart />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route path="/productPage/*" element={<ProductPage />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="/signin" element={<SignIn />} />
+                  </PageTransition>
+                </>
+
                 <ToastContainer
                   position="top-right"
                   autoClose={2000}
