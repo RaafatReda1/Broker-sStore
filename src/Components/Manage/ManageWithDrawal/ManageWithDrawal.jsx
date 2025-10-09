@@ -14,10 +14,13 @@ const ManageWithDrawal = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [finishedCount, setFinishedCount] = useState(0);
 
   // Fetch withdrawal requests
   useEffect(() => {
     fetchWithdrawalRequests();
+    fetchRequestCounts();
   }, [activeTab]);
 
   // Filter requests based on search
@@ -41,6 +44,30 @@ const ManageWithDrawal = () => {
       toast.error("Failed to fetch withdrawal requests");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchRequestCounts = async () => {
+    try {
+      // Fetch pending count
+      const { count: pendingCountData, error: pendingError } = await supabase
+        .from("WithDrawalRequests")
+        .select("*", { count: "exact", head: true })
+        .eq("Status", false);
+
+      if (pendingError) throw pendingError;
+      setPendingCount(pendingCountData || 0);
+
+      // Fetch finished count
+      const { count: finishedCountData, error: finishedError } = await supabase
+        .from("WithDrawalRequests")
+        .select("*", { count: "exact", head: true })
+        .eq("Status", true);
+
+      if (finishedError) throw finishedError;
+      setFinishedCount(finishedCountData || 0);
+    } catch (error) {
+      console.error("Error fetching request counts:", error);
     }
   };
 
@@ -112,7 +139,11 @@ const ManageWithDrawal = () => {
   };
 
   const handleFinishRequest = async (request) => {
-    if (!window.confirm("Are you sure you want to finish this withdrawal request? This will move all completed orders to deleted orders.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to finish this withdrawal request? This will move all completed orders to deleted orders."
+      )
+    ) {
       return;
     }
 
@@ -130,7 +161,7 @@ const ManageWithDrawal = () => {
 
       if (completedOrders && completedOrders.length > 0) {
         // 2. Copy orders to DeletedOrders table
-        const ordersToDelete = completedOrders.map(order => ({
+        const ordersToDelete = completedOrders.map((order) => ({
           name: order.name,
           phone: order.phone,
           address: order.address,
@@ -140,7 +171,7 @@ const ManageWithDrawal = () => {
           brokerId: order.brokerId,
           status: order.status,
           netProfit: order.netProfit,
-          created_at: order.created_at
+          created_at: order.created_at,
         }));
 
         const { error: insertError } = await supabase
@@ -150,7 +181,7 @@ const ManageWithDrawal = () => {
         if (insertError) throw insertError;
 
         // 3. Delete orders from Orders table
-        const orderIds = completedOrders.map(order => order.id);
+        const orderIds = completedOrders.map((order) => order.id);
         const { error: deleteError } = await supabase
           .from("Orders")
           .delete()
@@ -167,8 +198,13 @@ const ManageWithDrawal = () => {
 
       if (updateError) throw updateError;
 
-      toast.success(`Withdrawal request finished! ${completedOrders?.length || 0} orders moved to deleted orders.`);
+      toast.success(
+        `Withdrawal request finished! ${
+          completedOrders?.length || 0
+        } orders moved to deleted orders.`
+      );
       fetchWithdrawalRequests();
+      fetchRequestCounts();
       setSelectedRequest(null);
       setBrokerData(null);
       setBrokerOrders([]);
@@ -181,22 +217,71 @@ const ManageWithDrawal = () => {
   };
 
   const handleResetToPending = async (request) => {
-    if (!window.confirm("Are you sure you want to reset this request to pending?")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to reset this request to pending? This will restore all archived orders back to active orders."
+      )
+    ) {
       return;
     }
 
     setIsProcessing(true);
 
     try {
-      const { error } = await supabase
+      // 1. Fetch archived orders for this broker
+      const { data: archivedOrders, error: fetchError } = await supabase
+        .from("DeletedOrders")
+        .select("*")
+        .eq("brokerId", request.brokerId);
+
+      if (fetchError) throw fetchError;
+
+      if (archivedOrders && archivedOrders.length > 0) {
+        // 2. Copy orders back to Orders table
+        const ordersToRestore = archivedOrders.map((order) => ({
+          name: order.name,
+          phone: order.phone,
+          address: order.address,
+          cart: order.cart,
+          total: order.total,
+          notes: order.notes,
+          brokerId: order.brokerId,
+          status: order.status,
+          netProfit: order.netProfit,
+          created_at: order.created_at,
+        }));
+
+        const { error: insertError } = await supabase
+          .from("Orders")
+          .insert(ordersToRestore);
+
+        if (insertError) throw insertError;
+
+        // 3. Delete orders from DeletedOrders table
+        const orderIds = archivedOrders.map((order) => order.id);
+        const { error: deleteError } = await supabase
+          .from("DeletedOrders")
+          .delete()
+          .in("id", orderIds);
+
+        if (deleteError) throw deleteError;
+      }
+
+      // 4. Update withdrawal request status to pending
+      const { error: updateError } = await supabase
         .from("WithDrawalRequests")
         .update({ Status: false })
         .eq("id", request.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
-      toast.success("Request reset to pending successfully!");
+      toast.success(
+        `Request reset to pending successfully! ${
+          archivedOrders?.length || 0
+        } orders restored.`
+      );
       fetchWithdrawalRequests();
+      fetchRequestCounts();
       setSelectedRequest(null);
       setBrokerData(null);
       setDeletedOrders([]);
@@ -220,14 +305,17 @@ const ManageWithDrawal = () => {
   };
 
   const calculateTotalProfit = (orders) => {
-    return orders.reduce((sum, order) => sum + parseFloat(order.netProfit || 0), 0);
+    return orders.reduce(
+      (sum, order) => sum + parseFloat(order.netProfit || 0),
+      0
+    );
   };
 
   return (
     <div className="manage-withdrawal-container">
       <div className="manage-withdrawal-header">
         <h1 className="page-title">Manage Withdrawal Requests</h1>
-        
+
         <div className="header-controls">
           <div className="tab-switcher">
             <button
@@ -235,15 +323,14 @@ const ManageWithDrawal = () => {
               onClick={() => setActiveTab("pending")}
             >
               Pending
-              <span className="tab-badge">
-                {withdrawalRequests.length}
-              </span>
+              <span className="tab-badge">{pendingCount}</span>
             </button>
             <button
               className={`tab-btn ${activeTab === "finished" ? "active" : ""}`}
               onClick={() => setActiveTab("finished")}
             >
               Finished
+              <span className="tab-badge">{finishedCount}</span>
             </button>
           </div>
 
@@ -304,7 +391,9 @@ const ManageWithDrawal = () => {
 
                 <div className="info-row">
                   <span className="label">Withdrawal Phone:</span>
-                  <span className="value">{request.withDrawalPhone || "N/A"}</span>
+                  <span className="value">
+                    {request.withDrawalPhone || "N/A"}
+                  </span>
                 </div>
 
                 {request.isVodafone && (
@@ -312,7 +401,9 @@ const ManageWithDrawal = () => {
                     <span className="method-icon">📱</span>
                     <div>
                       <div className="method-name">Vodafone Cash</div>
-                      <div className="method-detail">{request.vodaCarrierName}</div>
+                      <div className="method-detail">
+                        {request.vodaCarrierName}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -393,11 +484,15 @@ const ManageWithDrawal = () => {
                     <div className="broker-details">
                       <div className="detail-item">
                         <span className="detail-label">Full Name:</span>
-                        <span className="detail-value">{brokerData.fullName}</span>
+                        <span className="detail-value">
+                          {brokerData.fullName}
+                        </span>
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">Nickname:</span>
-                        <span className="detail-value">{brokerData.nickName}</span>
+                        <span className="detail-value">
+                          {brokerData.nickName}
+                        </span>
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">Email:</span>
@@ -410,7 +505,9 @@ const ManageWithDrawal = () => {
                       <div className="detail-item">
                         <span className="detail-label">Actual Balance:</span>
                         <span className="detail-value highlight">
-                          {parseFloat(brokerData.actualBalance || 0).toLocaleString("en-US", {
+                          {parseFloat(
+                            brokerData.actualBalance || 0
+                          ).toLocaleString("en-US", {
                             style: "currency",
                             currency: "EGP",
                           })}
@@ -418,11 +515,15 @@ const ManageWithDrawal = () => {
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">Total Orders:</span>
-                        <span className="detail-value">{brokerData.totalOrders || 0}</span>
+                        <span className="detail-value">
+                          {brokerData.totalOrders || 0}
+                        </span>
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">Completed Orders:</span>
-                        <span className="detail-value">{brokerData.completedOrders || 0}</span>
+                        <span className="detail-value">
+                          {brokerData.completedOrders || 0}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -438,19 +539,25 @@ const ManageWithDrawal = () => {
                       <div className="summary-item">
                         <span className="summary-label">Total Revenue:</span>
                         <span className="summary-value">
-                          {calculateTotalRevenue(brokerOrders).toLocaleString("en-US", {
-                            style: "currency",
-                            currency: "EGP",
-                          })}
+                          {calculateTotalRevenue(brokerOrders).toLocaleString(
+                            "en-US",
+                            {
+                              style: "currency",
+                              currency: "EGP",
+                            }
+                          )}
                         </span>
                       </div>
                       <div className="summary-item">
                         <span className="summary-label">Total Profit:</span>
                         <span className="summary-value highlight">
-                          {calculateTotalProfit(brokerOrders).toLocaleString("en-US", {
-                            style: "currency",
-                            currency: "EGP",
-                          })}
+                          {calculateTotalProfit(brokerOrders).toLocaleString(
+                            "en-US",
+                            {
+                              style: "currency",
+                              currency: "EGP",
+                            }
+                          )}
                         </span>
                       </div>
                     </div>
@@ -472,13 +579,19 @@ const ManageWithDrawal = () => {
                             </div>
                             <div className="order-address">{order.address}</div>
                             {order.notes && (
-                              <div className="order-notes">Note: {order.notes}</div>
+                              <div className="order-notes">
+                                Note: {order.notes}
+                              </div>
                             )}
                             <div className="order-profit">
-                              Profit: {parseFloat(order.netProfit || 0).toLocaleString("en-US", {
-                                style: "currency",
-                                currency: "EGP",
-                              })}
+                              Profit:{" "}
+                              {parseFloat(order.netProfit || 0).toLocaleString(
+                                "en-US",
+                                {
+                                  style: "currency",
+                                  currency: "EGP",
+                                }
+                              )}
                             </div>
                           </div>
                         </div>
@@ -503,19 +616,25 @@ const ManageWithDrawal = () => {
                       <div className="summary-item">
                         <span className="summary-label">Total Revenue:</span>
                         <span className="summary-value">
-                          {calculateTotalRevenue(deletedOrders).toLocaleString("en-US", {
-                            style: "currency",
-                            currency: "EGP",
-                          })}
+                          {calculateTotalRevenue(deletedOrders).toLocaleString(
+                            "en-US",
+                            {
+                              style: "currency",
+                              currency: "EGP",
+                            }
+                          )}
                         </span>
                       </div>
                       <div className="summary-item">
                         <span className="summary-label">Total Profit:</span>
                         <span className="summary-value highlight">
-                          {calculateTotalProfit(deletedOrders).toLocaleString("en-US", {
-                            style: "currency",
-                            currency: "EGP",
-                          })}
+                          {calculateTotalProfit(deletedOrders).toLocaleString(
+                            "en-US",
+                            {
+                              style: "currency",
+                              currency: "EGP",
+                            }
+                          )}
                         </span>
                       </div>
                     </div>
@@ -537,13 +656,19 @@ const ManageWithDrawal = () => {
                             </div>
                             <div className="order-address">{order.address}</div>
                             {order.notes && (
-                              <div className="order-notes">Note: {order.notes}</div>
+                              <div className="order-notes">
+                                Note: {order.notes}
+                              </div>
                             )}
                             <div className="order-profit">
-                              Profit: {parseFloat(order.netProfit || 0).toLocaleString("en-US", {
-                                style: "currency",
-                                currency: "EGP",
-                              })}
+                              Profit:{" "}
+                              {parseFloat(order.netProfit || 0).toLocaleString(
+                                "en-US",
+                                {
+                                  style: "currency",
+                                  currency: "EGP",
+                                }
+                              )}
                             </div>
                           </div>
                         </div>
