@@ -860,6 +860,77 @@ html {
   }
 }
 
+/* Verification Alert Styles */
+.verification-alert {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.verification-alert .alert-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.verification-alert .alert-content {
+  flex: 1;
+}
+
+.verification-alert .alert-title {
+  color: #92400e;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.verification-alert .alert-message {
+  color: #a16207;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+}
+
+.verification-alert .alert-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.verification-alert .contact-support {
+  color: #92400e;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  background: rgba(146, 64, 14, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(146, 64, 14, 0.2);
+}
+
+/* Disabled Form Styles */
+.form-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  position: relative;
+}
+
+.form-disabled::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  z-index: 1;
+}
+
 /* ===========================
    Sign-In Modal Styles
    =========================== */

@@ -12,6 +12,8 @@ const WithDraw = () => {
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [pendingRequestInfo, setPendingRequestInfo] = useState(null);
   const [showCredentialModal, setShowCredentialModal] = useState(false);
+  const [brokerVerificationStatus, setBrokerVerificationStatus] =
+    useState(null);
 
   const [formData, setFormData] = useState({
     withDrawalPhone: userData?.phone || "",
@@ -22,12 +24,26 @@ const WithDraw = () => {
 
   const [errors, setErrors] = useState({});
 
-  // Check for pending withdrawal requests on component load
+  // Check broker verification status and pending withdrawal requests on component load
   useEffect(() => {
-    const checkPendingRequests = async () => {
+    const checkBrokerStatus = async () => {
       if (!userData?.id) return;
 
       try {
+        // Check broker verification status
+        const { data: brokerData, error: brokerError } = await supabase
+          .from("Brokers")
+          .select("isVerified")
+          .eq("id", userData.id)
+          .single();
+
+        if (brokerError) {
+          console.error("Error checking broker verification:", brokerError);
+        } else {
+          setBrokerVerificationStatus(brokerData?.isVerified || false);
+        }
+
+        // Check for pending withdrawal requests
         const { data: existingRequests, error } = await supabase
           .from("WithDrawalRequests")
           .select("id, created_at, actualBalance, Status")
@@ -49,11 +65,11 @@ const WithDraw = () => {
           setPendingRequestInfo(null);
         }
       } catch (error) {
-        console.error("Error checking pending requests:", error);
+        console.error("Error checking broker status:", error);
       }
     };
 
-    checkPendingRequests();
+    checkBrokerStatus();
 
     // Set up real-time subscription for withdrawal requests
     const withdrawalSubscription = supabase
@@ -173,6 +189,14 @@ const WithDraw = () => {
   };
 
   const handleSubmit = async () => {
+    // Check if broker is verified
+    if (brokerVerificationStatus === false) {
+      toast.error(
+        "❌ Your Account is Under REVIEW\n\nYou cannot submit withdrawal requests until your account is verified. Please contact support for more information."
+      );
+      return;
+    }
+
     if (!paymentMethod) {
       toast.warning("Please select a payment method");
       return;
@@ -320,6 +344,25 @@ const WithDraw = () => {
           </span>
         </div>
 
+        {/* Account Verification Status */}
+        {brokerVerificationStatus === false && (
+          <div className="verification-alert">
+            <div className="alert-icon">🔒</div>
+            <div className="alert-content">
+              <h3 className="alert-title">Account Under Review</h3>
+              <p className="alert-message">
+                Your account is currently under review. You cannot submit
+                withdrawal requests until your account is verified.
+              </p>
+              <div className="alert-actions">
+                <span className="contact-support">
+                  📞 Contact support for more information
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {hasPendingRequest && pendingRequestInfo && (
           <div className="pending-request-alert">
             <div className="alert-icon">⏳</div>
@@ -353,7 +396,11 @@ const WithDraw = () => {
           </div>
         )}
 
-        <div className="form-wrapper">
+        <div
+          className={`form-wrapper ${
+            brokerVerificationStatus === false ? "form-disabled" : ""
+          }`}
+        >
           <div className="withdraw-section">
             <label className="section-label">Select Payment Method</label>
             <div className="checkbox-group">
@@ -363,7 +410,9 @@ const WithDraw = () => {
                   className="checkbox-input"
                   checked={paymentMethod === "vodafone"}
                   onChange={() => handlePaymentMethodChange("vodafone")}
-                  disabled={hasPendingRequest}
+                  disabled={
+                    hasPendingRequest || brokerVerificationStatus === false
+                  }
                 />
                 <span className="checkbox-text">Vodafone Cash</span>
               </label>
@@ -373,7 +422,9 @@ const WithDraw = () => {
                   className="checkbox-input"
                   checked={paymentMethod === "instapay"}
                   onChange={() => handlePaymentMethodChange("instapay")}
-                  disabled={hasPendingRequest}
+                  disabled={
+                    hasPendingRequest || brokerVerificationStatus === false
+                  }
                 />
                 <span className="checkbox-text">InstaPay</span>
               </label>
@@ -471,9 +522,15 @@ const WithDraw = () => {
                 onClick={() => {
                   handleSubmit();
                 }}
-                disabled={isSubmitting || hasPendingRequest}
+                disabled={
+                  isSubmitting ||
+                  hasPendingRequest ||
+                  brokerVerificationStatus === false
+                }
                 className={`submit-button ${
-                  isSubmitting || hasPendingRequest
+                  isSubmitting ||
+                  hasPendingRequest ||
+                  brokerVerificationStatus === false
                     ? "submit-button-disabled loading"
                     : ""
                 }`}
@@ -482,6 +539,8 @@ const WithDraw = () => {
                   ? "Processing..."
                   : hasPendingRequest
                   ? "Request Pending"
+                  : brokerVerificationStatus === false
+                  ? "Account Under Review"
                   : "Submit Withdrawal Request"}
               </button>
             </div>
