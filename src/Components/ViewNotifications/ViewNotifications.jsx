@@ -284,7 +284,7 @@ const ViewNotifications = () => {
                     </div>
                     {canDelete && (
                       <button
-                        className="delete-btn"
+                        className="view-notifications-delete-btn"
                         onClick={(e) => {
                           e.stopPropagation();
                           deleteNotification(notification);

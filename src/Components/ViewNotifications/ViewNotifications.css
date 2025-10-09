@@ -336,7 +336,7 @@
   letter-spacing: -0.2px;
 }
 
-.delete-btn {
+.view-notifications-delete-btn {
   background: transparent;
   border: none;
   color: #f87171;
@@ -349,16 +349,16 @@
   opacity: 0;
 }
 
-.notification-item:hover .delete-btn {
+.notification-item:hover .view-notifications-delete-btn {
   opacity: 1;
 }
 
-.delete-btn:hover {
+.view-notifications-delete-btn:hover {
   background: rgba(248, 113, 113, 0.2);
   transform: scale(1.1);
 }
 
-.delete-btn:active {
+.view-notifications-delete-btn:active {
   transform: scale(0.95);
 }
 

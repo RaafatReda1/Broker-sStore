@@ -741,7 +741,7 @@
   font-size: 0.875rem;
 }
 
-.delete-btn {
+.notification-delete-btn {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #ef4444;
@@ -752,7 +752,7 @@
   transition: all 0.2s ease;
 }
 
-.delete-btn:hover {
+.notification-delete-btn:hover {
   background: rgba(239, 68, 68, 0.2);
   border-color: rgba(239, 68, 68, 0.5);
 }

@@ -517,7 +517,7 @@ The Cicada Team
 
                       <button
                         onClick={() => openDeleteModal(broker)}
-                        className="action-btn delete-btn"
+                        className="action-btn brokers-delete-btn"
                         title="Delete Broker"
                       >
                         <span className="btn-icon">🗑️</span>

@@ -553,7 +553,7 @@ const ManageNotifications = () => {
                               onClick={() =>
                                 deleteNotification(notification.id)
                               }
-                              className="delete-btn"
+                              className="notification-delete-btn"
                               title="Delete notification"
                             >
                               🗑️
