@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./ManageWithDrawal.css";
 import supabase from "../../../SupabaseClient";
 import { toast } from "react-toastify";
+import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
 
 const ManageWithDrawal = () => {
   const [withdrawalRequests, setWithdrawalRequests] = useState([]);
@@ -16,6 +17,15 @@ const ManageWithDrawal = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [finishedCount, setFinishedCount] = useState(0);
+  const [confirmationModal, setConfirmationModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "warning",
+    onConfirm: null,
+    confirmText: "Confirm",
+    cancelText: "Cancel",
+  });
 
   // Fetch withdrawal requests
   useEffect(() => {
@@ -41,7 +51,9 @@ const ManageWithDrawal = () => {
       setWithdrawalRequests(data || []);
     } catch (error) {
       console.error("Error fetching requests:", error);
-      toast.error("Failed to fetch withdrawal requests");
+      toast.error(
+        "❌ Couldn't load withdrawal requests. Please refresh the page."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -132,21 +144,27 @@ const ManageWithDrawal = () => {
       }
     } catch (error) {
       console.error("Error fetching details:", error);
-      toast.error("Failed to fetch broker details");
+      toast.error("❌ Couldn't load broker details. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleFinishRequest = async (request) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to finish this withdrawal request? This will move all completed orders to deleted orders."
-      )
-    ) {
-      return;
-    }
+    showConfirmationModal({
+      title: "Complete Withdrawal Request",
+      message:
+        "✨ Ready to complete this withdrawal?\n\n📋 This will:\n• Mark the request as finished\n• Archive all completed orders\n• Process the broker's payment\n\n💡 Don't worry - archived orders can be restored if needed!",
+      type: "success",
+      confirmText: "Complete Withdrawal",
+      cancelText: "Keep Pending",
+      onConfirm: async () => {
+        await processFinishRequest(request);
+      },
+    });
+  };
 
+  const processFinishRequest = async (request) => {
     setIsProcessing(true);
 
     try {
@@ -199,9 +217,9 @@ const ManageWithDrawal = () => {
       if (updateError) throw updateError;
 
       toast.success(
-        `Withdrawal request finished! ${
-          completedOrders?.length || 0
-        } orders moved to deleted orders.`
+        `Withdrawal completed successfully!\n` +
+          `📦 ${completedOrders?.length || 0} orders archived\n` +
+          `💰 Broker payment processed`
       );
       fetchWithdrawalRequests();
       fetchRequestCounts();
@@ -210,21 +228,29 @@ const ManageWithDrawal = () => {
       setBrokerOrders([]);
     } catch (error) {
       console.error("Error finishing request:", error);
-      toast.error("Failed to finish withdrawal request");
+      toast.error(
+        "❌ Oops! Couldn't complete the withdrawal. Please try again."
+      );
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleResetToPending = async (request) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to reset this request to pending? This will restore all archived orders back to active orders."
-      )
-    ) {
-      return;
-    }
+    showConfirmationModal({
+      title: "Restore Request to Pending",
+      message:
+        "🔄 Ready to restore this request?\n\n📋 This will:\n• Move the request back to pending\n• Restore all archived orders\n• Make orders active again\n\n💡 This is reversible - you can finish it again later!",
+      type: "info",
+      confirmText: "Restore Request",
+      cancelText: "Keep Finished",
+      onConfirm: async () => {
+        await processResetRequest(request);
+      },
+    });
+  };
 
+  const processResetRequest = async (request) => {
     setIsProcessing(true);
 
     try {
@@ -276,9 +302,9 @@ const ManageWithDrawal = () => {
       if (updateError) throw updateError;
 
       toast.success(
-        `Request reset to pending successfully! ${
-          archivedOrders?.length || 0
-        } orders restored.`
+        `🔄 Request restored to pending!\n` +
+          `📦 ${archivedOrders?.length || 0} orders reactivated\n` +
+          `✨ Ready for processing again`
       );
       fetchWithdrawalRequests();
       fetchRequestCounts();
@@ -287,7 +313,7 @@ const ManageWithDrawal = () => {
       setDeletedOrders([]);
     } catch (error) {
       console.error("Error resetting request:", error);
-      toast.error("Failed to reset request");
+      toast.error("❌ Oops! Couldn't restore the request. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -309,6 +335,27 @@ const ManageWithDrawal = () => {
       (sum, order) => sum + parseFloat(order.netProfit || 0),
       0
     );
+  };
+
+  const showConfirmationModal = (config) => {
+    setConfirmationModal({
+      isOpen: true,
+      ...config,
+    });
+  };
+
+  const closeConfirmationModal = () => {
+    setConfirmationModal((prev) => ({
+      ...prev,
+      isOpen: false,
+    }));
+  };
+
+  const handleModalConfirm = async () => {
+    if (confirmationModal.onConfirm) {
+      await confirmationModal.onConfirm();
+    }
+    closeConfirmationModal();
   };
 
   return (
@@ -342,7 +389,6 @@ const ManageWithDrawal = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
             />
-            <span className="search-icon">🔍</span>
           </div>
         </div>
       </div>
@@ -687,6 +733,19 @@ const ManageWithDrawal = () => {
           </div>
         </div>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        onClose={closeConfirmationModal}
+        onConfirm={handleModalConfirm}
+        title={confirmationModal.title}
+        message={confirmationModal.message}
+        type={confirmationModal.type}
+        confirmText={confirmationModal.confirmText}
+        cancelText={confirmationModal.cancelText}
+        isLoading={isProcessing}
+      />
     </div>
   );
 };
