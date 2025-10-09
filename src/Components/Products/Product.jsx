@@ -4,6 +4,7 @@ import "./Product.css";
 import { cartContext, userDataContext } from "../../AppContexts";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Eye, Share2, ShoppingCart } from "lucide-react";
 
 const Product = ({
   id,
@@ -49,24 +50,78 @@ const Product = ({
     toast.success("Added to cart!");
   };
 
+  const handleShare = async () => {
+    const productUrl = `${window.location.origin}/productPage/productId:${id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: name,
+          text: description,
+          url: productUrl,
+        });
+      } else {
+        await navigator.clipboard.writeText(productUrl);
+        toast.success("Product link copied to clipboard!");
+      }
+    } catch (err) {
+      console.error("Failed to share:", err);
+      toast.error("Failed to share product. Please try again.");
+    }
+  };
+
   return (
     <div className="card">
-      <Link to={`/productPage/productId:${id}`}>
-        <img src={src} alt="" />
-      </Link>
-      <h3>{name}</h3>
-      <h5>{description}</h5>
-      <h5 className="price">{price}$</h5>
+      <div className="card-image-container">
+        <Link to={`/productPage/productId:${id}`}>
+          <img src={src} alt={name} />
+        </Link>
+        <div className="card-overlay">
+          <Link
+            to={`/productPage/productId:${id}`}
+            className="overlay-btn view-btn"
+          >
+            <Eye size={20} />
+            <span>View</span>
+          </Link>
+          {!userData && (
+            <button className="overlay-btn cart-btn" onClick={handleAddToCart}>
+              <ShoppingCart size={20} />
+              <span>Add to Cart</span>
+            </button>
+          )}
+          <button className="overlay-btn share-btn" onClick={handleShare}>
+            <Share2 size={20} />
+            <span>Share</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="card-content">
+        <h3 className="product-name">{name}</h3>
+        <p className="product-description">{description}</p>
+        <div className="price-container">
+          <span className="price">${price}</span>
+          {userData && profit && (
+            <span className="profit">Profit: ${profit}</span>
+          )}
+        </div>
+      </div>
 
       <div className="productBtns">
         {!userData && (
-          <button type="button" onClick={handleAddToCart}>
+          <button
+            type="button"
+            className="add-to-cart-btn"
+            onClick={handleAddToCart}
+          >
+            <ShoppingCart size={16} />
             Add to cart
           </button>
         )}
         {userData && (
           <button
             type="button"
+            className="copy-link-btn"
             onClick={async () => {
               try {
                 const copiedTxt = await navigator.clipboard.writeText(
@@ -82,8 +137,9 @@ const Product = ({
                 toast.error("Failed to copy link. Please try again.");
               }
             }}
-            disabled = {userData.isVerified === false}
+            disabled={userData.isVerified === false}
           >
+            <Share2 size={16} />
             Copy Link
           </button>
         )}

@@ -2,13 +2,36 @@
   padding: 20px;
   display: flex;
   flex-direction: row;
-  gap: 10px;
+  gap: 20px;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   background: linear-gradient(
     135deg,
     var(--bg-gradient-start) 0%,
     var(--bg-gradient-end) 100%
   );
+  min-height: 100vh;
+}
+
+/* Enhanced responsive design for products container */
+@media (max-width: 1200px) {
+  .productsContainer {
+    gap: 15px;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .productsContainer {
+    gap: 10px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .productsContainer {
+    gap: 8px;
+    padding: 8px;
+  }
 }
