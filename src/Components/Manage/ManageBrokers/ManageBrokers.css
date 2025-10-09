@@ -394,7 +394,7 @@
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-.delete-btn:hover {
+.brokers-delete-btn:hover {
   background: rgba(239, 68, 68, 0.25);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);

@@ -472,7 +472,7 @@
   animation: slideUp 0.3s ease;
 }
 
-.close-btn-x {
+.manage-orders-close-btn-x {
   position: absolute;
   top: 15px;
   right: 15px;
@@ -493,7 +493,7 @@
   z-index: 10;
 }
 
-.close-btn-x:hover {
+.manage-orders-close-btn-x:hover {
   background: #ef4444;
   color: white;
   transform: rotate(90deg);

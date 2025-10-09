@@ -17,7 +17,7 @@ const DeletePopup = ({
       <div className="delete-modal">
         <div className="modal-header">
           <h3>Delete Broker: {selectedBroker.fullName}</h3>
-          <button onClick={onClose} className="close-btn">
+          <button onClick={onClose} className="delete-popup-close-btn">
             ✕
           </button>
         </div>

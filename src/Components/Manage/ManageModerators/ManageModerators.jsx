@@ -28,7 +28,7 @@ const ManageModerators = () => {
     if (!lastLogin) {
       return { text: "Never Logged In", class: "status-never", icon: "⭕" };
     }
-    
+
     const now = new Date();
     const loginDate = new Date(lastLogin);
     const hoursDiff = (now - loginDate) / (1000 * 60 * 60);
@@ -37,9 +37,17 @@ const ManageModerators = () => {
     if (hoursDiff < 24) {
       return { text: "Active Today", class: "status-active-today", icon: "🟢" };
     } else if (daysDiff < 7) {
-      return { text: "Active This Week", class: "status-active-week", icon: "🟡" };
+      return {
+        text: "Active This Week",
+        class: "status-active-week",
+        icon: "🟡",
+      };
     } else if (daysDiff < 30) {
-      return { text: "Active This Month", class: "status-active-month", icon: "🟠" };
+      return {
+        text: "Active This Month",
+        class: "status-active-month",
+        icon: "🟠",
+      };
     } else {
       return { text: "Inactive", class: "status-inactive", icon: "🔴" };
     }
@@ -48,7 +56,7 @@ const ManageModerators = () => {
   // Format relative time
   const getRelativeTime = (date) => {
     if (!date) return "Never";
-    
+
     const now = new Date();
     const loginDate = new Date(date);
     const diffMs = now - loginDate;
@@ -57,10 +65,11 @@ const ManageModerators = () => {
     const diffDays = Math.floor(diffHours / 24);
 
     if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays < 30) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    
+    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+    if (diffDays < 30) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+
     return loginDate.toLocaleDateString();
   };
 
@@ -73,7 +82,7 @@ const ManageModerators = () => {
         .select("*")
         .eq("authority", "moderator")
         .order("last_login", { ascending: false, nullsFirst: false });
-      
+
       if (error) throw error;
       setModerators(data || []);
     } catch (err) {
@@ -85,12 +94,12 @@ const ManageModerators = () => {
 
   useEffect(() => {
     fetchModerators();
-    
+
     // Auto-refresh every 60 seconds to keep activity status updated
     const interval = setInterval(() => {
       fetchModerators();
     }, 60000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -104,7 +113,7 @@ const ManageModerators = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       if (!form.name.trim() || !form.email.trim()) {
         toast.error("⚠️ Please fill in all fields");
@@ -127,7 +136,7 @@ const ManageModerators = () => {
             email: form.email.trim().toLowerCase(),
           })
           .eq("id", form.id);
-        
+
         if (error) throw error;
         toast.success("✅ Moderator updated successfully");
       } else {
@@ -152,11 +161,11 @@ const ManageModerators = () => {
             created_at: new Date().toISOString(),
           },
         ]);
-        
+
         if (error) throw error;
         toast.success("🎉 Moderator added successfully");
       }
-      
+
       await fetchModerators();
       resetForm();
     } catch (err) {
@@ -168,13 +177,17 @@ const ManageModerators = () => {
 
   // Delete moderator
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`⚠️ Are you sure you want to delete "${name}"?\n\nThis action cannot be undone.`))
+    if (
+      !window.confirm(
+        `⚠️ Are you sure you want to delete "${name}"?\n\nThis action cannot be undone.`
+      )
+    )
       return;
 
     setLoading(true);
     try {
       const { error } = await supabase.from("Staff").delete().eq("id", id);
-      
+
       if (error) throw error;
       toast.success("🗑️ Moderator deleted successfully");
       await fetchModerators();
@@ -209,31 +222,32 @@ const ManageModerators = () => {
   // Calculate stats
   const stats = {
     total: moderators.length,
-    activeToday: moderators.filter(m => {
+    activeToday: moderators.filter((m) => {
       if (!m.last_login) return false;
       const hours = (new Date() - new Date(m.last_login)) / (1000 * 60 * 60);
       return hours < 24;
     }).length,
-    activeThisWeek: moderators.filter(m => {
+    activeThisWeek: moderators.filter((m) => {
       if (!m.last_login) return false;
-      const days = (new Date() - new Date(m.last_login)) / (1000 * 60 * 60 * 24);
+      const days =
+        (new Date() - new Date(m.last_login)) / (1000 * 60 * 60 * 24);
       return days < 7;
     }).length,
-    neverLoggedIn: moderators.filter(m => !m.last_login).length,
+    neverLoggedIn: moderators.filter((m) => !m.last_login).length,
   };
 
   // Filter moderators based on search and activity
   const filteredModerators = moderators.filter((mod) => {
-    const matchesSearch = 
+    const matchesSearch =
       mod.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       mod.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       mod.id.toString().includes(searchTerm);
-    
-    const matchesFilter = 
+
+    const matchesFilter =
       filterActive === "all" ||
       (filterActive === "active" && isModeratorActive(mod.last_login)) ||
       (filterActive === "inactive" && !isModeratorActive(mod.last_login));
-    
+
     return matchesSearch && matchesFilter;
   });
 
@@ -245,7 +259,10 @@ const ManageModerators = () => {
             <span className="header-icon">👥</span>
             Manage Moderators
           </h1>
-          <p>Add, edit, and manage moderator accounts with real-time activity tracking</p>
+          <p>
+            Add, edit, and manage moderator accounts with real-time activity
+            tracking
+          </p>
         </div>
 
         <div className="moderators-content">
@@ -306,15 +323,22 @@ const ManageModerators = () => {
               </div>
             </div>
             <div className="form-actions">
-              <button 
-                onClick={handleSubmit} 
-                className="btn btn-primary" 
+              <button
+                onClick={handleSubmit}
+                className="manage-moderators-btn manage-moderators-btn-primary"
                 disabled={loading}
               >
-                {loading ? "⏳ Processing..." : form.id ? "💾 Update Moderator" : "➕ Add Moderator"}
+                {loading
+                  ? "⏳ Processing..."
+                  : form.id
+                  ? "💾 Update Moderator"
+                  : "➕ Add Moderator"}
               </button>
               {form.id && (
-                <button onClick={resetForm} className="btn btn-secondary">
+                <button
+                  onClick={resetForm}
+                  className="manage-moderators-btn manage-moderators-btn-secondary"
+                >
                   ❌ Cancel
                 </button>
               )}
@@ -333,7 +357,7 @@ const ManageModerators = () => {
                 className="search-input"
               />
               {searchTerm && (
-                <button 
+                <button
                   className="search-clear"
                   onClick={() => setSearchTerm("")}
                   title="Clear search"
@@ -344,22 +368,38 @@ const ManageModerators = () => {
             </div>
             <div className="filter-buttons">
               <button
-                className={`filter-btn ${filterActive === "all" ? "active" : ""}`}
+                className={`filter-btn ${
+                  filterActive === "all" ? "active" : ""
+                }`}
                 onClick={() => setFilterActive("all")}
               >
                 All ({moderators.length})
               </button>
               <button
-                className={`filter-btn ${filterActive === "active" ? "active" : ""}`}
+                className={`filter-btn ${
+                  filterActive === "active" ? "active" : ""
+                }`}
                 onClick={() => setFilterActive("active")}
               >
-                Active ({moderators.filter(m => isModeratorActive(m.last_login)).length})
+                Active (
+                {
+                  moderators.filter((m) => isModeratorActive(m.last_login))
+                    .length
+                }
+                )
               </button>
               <button
-                className={`filter-btn ${filterActive === "inactive" ? "active" : ""}`}
+                className={`filter-btn ${
+                  filterActive === "inactive" ? "active" : ""
+                }`}
                 onClick={() => setFilterActive("inactive")}
               >
-                Inactive ({moderators.filter(m => !isModeratorActive(m.last_login)).length})
+                Inactive (
+                {
+                  moderators.filter((m) => !isModeratorActive(m.last_login))
+                    .length
+                }
+                )
               </button>
             </div>
           </div>
@@ -400,7 +440,9 @@ const ManageModerators = () => {
                         </td>
                         <td>
                           <div className="time-cell">
-                            <div className="relative-time">{getRelativeTime(mod.last_login)}</div>
+                            <div className="relative-time">
+                              {getRelativeTime(mod.last_login)}
+                            </div>
                             {mod.last_login && (
                               <div className="absolute-time">
                                 {new Date(mod.last_login).toLocaleString()}
@@ -412,14 +454,14 @@ const ManageModerators = () => {
                           <div className="action-buttons">
                             <button
                               onClick={() => handleEdit(mod)}
-                              className="btn-edit"
+                              className="manage-moderators-btn-edit"
                               title="Edit moderator"
                             >
                               ✏️
                             </button>
                             <button
                               onClick={() => handleDelete(mod.id, mod.name)}
-                              className="btn-delete"
+                              className="manage-moderators-btn-delete"
                               title="Delete moderator"
                             >
                               🗑️

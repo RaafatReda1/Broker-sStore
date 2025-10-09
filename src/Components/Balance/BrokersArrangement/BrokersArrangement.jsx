@@ -116,7 +116,10 @@ const BrokersArrangement = () => {
                 <i className="fa-solid fa-trophy" />
                 Brokers Leaderboard
               </h2>
-              <button className="close-btn" onClick={handleClosePopup}>
+              <button
+                className="brokers-arrangement-close-btn"
+                onClick={handleClosePopup}
+              >
                 ✕
               </button>
             </div>

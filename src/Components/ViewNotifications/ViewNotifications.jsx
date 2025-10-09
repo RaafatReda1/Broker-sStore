@@ -329,7 +329,7 @@ const ViewNotifications = () => {
                 </p>
               </div>
               <button
-                className="close-btn"
+                className="view-notifications-close-btn"
                 onClick={() => setSelectedNotification(null)}
               >
                 <X size={20} />

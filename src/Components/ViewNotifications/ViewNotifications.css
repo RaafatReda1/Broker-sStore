@@ -484,7 +484,7 @@
   font-weight: 500;
 }
 
-.close-btn {
+.view-notifications-close-btn {
   background: rgba(248, 113, 113, 0.1);
   border: 1px solid rgba(248, 113, 113, 0.3);
   color: #fca5a5;
@@ -495,7 +495,7 @@
   transition: all 0.2s;
 }
 
-.close-btn:hover {
+.view-notifications-close-btn:hover {
   background: rgba(248, 113, 113, 0.2);
   border-color: #f87171;
   transform: rotate(90deg);

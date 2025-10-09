@@ -6,6 +6,7 @@ import ManageProducts from "../ManageProducts/ManageProducts";
 import ManageOrders from "../ManageOrders/ManageOrders";
 import "./Admin.css";
 import ManageNotifications from "../ManageNotifications/ManageNotifications";
+import ManageWithDrawal from "../ManageWithDrawal/ManageWithDrawal";
 const Admin = () => {
   console.log("🔑 Admin Component Rendered - User has ADMIN access");
 
@@ -17,6 +18,7 @@ const Admin = () => {
         <Route path="/manageProducts" element={<ManageProducts />} />
         <Route path="/manageOrders" element={<ManageOrders />} />
         <Route path="/manageNotifications" element={<ManageNotifications />} />
+        <Route path ="/manageWithdrawals" element={<ManageWithDrawal />} />
       </Routes>
     </div>
   );

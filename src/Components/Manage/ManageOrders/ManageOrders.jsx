@@ -130,7 +130,9 @@ const ManageOrders = () => {
 
         <div className="filter-buttons">
           <button
-            className={filterStatus === "all" ? "filter-btn active" : "filter-btn"}
+            className={
+              filterStatus === "all" ? "filter-btn active" : "filter-btn"
+            }
             onClick={() => setFilterStatus("all")}
           >
             All
@@ -144,7 +146,9 @@ const ManageOrders = () => {
             Completed
           </button>
           <button
-            className={filterStatus === "pending" ? "filter-btn active" : "filter-btn"}
+            className={
+              filterStatus === "pending" ? "filter-btn active" : "filter-btn"
+            }
             onClick={() => setFilterStatus("pending")}
           >
             Pending
@@ -167,16 +171,24 @@ const ManageOrders = () => {
                   <span className="id-value">#{order.id}</span>
                 </div>
                 <button
-                  className={order.status ? "status-badge completed" : "status-badge pending"}
+                  className={
+                    order.status
+                      ? "status-badge completed"
+                      : "status-badge pending"
+                  }
                   onClick={() => updateOrderStatus(order.id, !order.status)}
                 >
-                  <span className="status-icon">{order.status ? "✓" : "⏳"}</span>
+                  <span className="status-icon">
+                    {order.status ? "✓" : "⏳"}
+                  </span>
                   {order.status ? "Completed" : "Pending"}
                 </button>
               </div>
 
               <div className="order-customer">
-                <div className="customer-avatar">{order.name?.charAt(0).toUpperCase()}</div>
+                <div className="customer-avatar">
+                  {order.name?.charAt(0).toUpperCase()}
+                </div>
                 <div className="customer-info">
                   <h3 className="customer-name">{order.name}</h3>
                   <span className="customer-phone">📱 {order.phone}</span>
@@ -196,7 +208,9 @@ const ManageOrders = () => {
                   <span className="detail-icon">🛒</span>
                   <div className="detail-content">
                     <span className="detail-label">Items</span>
-                    <span className="detail-value">{order.cart?.length || 0} item(s)</span>
+                    <span className="detail-value">
+                      {order.cart?.length || 0} item(s)
+                    </span>
                   </div>
                 </div>
 
@@ -214,7 +228,9 @@ const ManageOrders = () => {
               <div className="order-financial">
                 <div className="financial-item">
                   <span className="financial-label">Total</span>
-                  <span className="financial-value total">{formatCurrency(order.total)}</span>
+                  <span className="financial-value total">
+                    {formatCurrency(order.total)}
+                  </span>
                 </div>
                 <div className="financial-item">
                   <span className="financial-label">Net Profit</span>
@@ -225,7 +241,9 @@ const ManageOrders = () => {
               </div>
 
               <div className="order-footer">
-                <span className="order-date">🕒 {formatDate(order.created_at)}</span>
+                <span className="order-date">
+                  🕒 {formatDate(order.created_at)}
+                </span>
                 <button
                   className="view-details-btn"
                   onClick={() => setSelectedOrder(order)}
@@ -242,7 +260,10 @@ const ManageOrders = () => {
       {selectedOrder && (
         <div className="order-modal" onClick={() => setSelectedOrder(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-btn-x" onClick={() => setSelectedOrder(null)}>
+            <button
+              className="manage-orders-close-btn-x"
+              onClick={() => setSelectedOrder(null)}
+            >
               ×
             </button>
 
@@ -275,8 +296,12 @@ const ManageOrders = () => {
                 {selectedOrder.cart?.map((item, index) => (
                   <div key={index} className="cart-item">
                     <div className="item-info">
-                      <span className="item-name">{item.name || `Item ${index + 1}`}</span>
-                      <span className="item-quantity">Qty: {item.quantity || 1}</span>
+                      <span className="item-name">
+                        {item.name || `Item ${index + 1}`}
+                      </span>
+                      <span className="item-quantity">
+                        Qty: {item.quantity || 1}
+                      </span>
                     </div>
                     <span className="item-price">
                       {formatCurrency(item.price || 0)}
@@ -303,7 +328,9 @@ const ManageOrders = () => {
                 </div>
                 <div className="summary-item">
                   <span className="summary-label">Broker ID</span>
-                  <span className="summary-value">#{selectedOrder.brokerId}</span>
+                  <span className="summary-value">
+                    #{selectedOrder.brokerId}
+                  </span>
                 </div>
                 <div className="summary-item">
                   <span className="summary-label">Order Date</span>

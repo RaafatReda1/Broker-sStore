@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
 import supabase from "../../../SupabaseClient";
 import { toast } from "react-toastify";
-import { 
-  Trash2, Edit, Image, Plus, X, Search, Package, 
-  DollarSign, TrendingUp, SortAsc 
+import {
+  Trash2,
+  Edit,
+  Image,
+  Plus,
+  X,
+  Search,
+  Package,
+  DollarSign,
+  TrendingUp,
+  SortAsc,
 } from "lucide-react";
-import "./ManageProducts.css"
+import "./ManageProducts.css";
 const BUCKET_NAME = "Products";
 
 const ProductsManager = () => {
@@ -19,7 +27,7 @@ const ProductsManager = () => {
     profit: "",
     images: [],
   });
-  
+
   const [imageFiles, setImageFiles] = useState([]);
   const [previewImages, setPreviewImages] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,7 +37,10 @@ const ProductsManager = () => {
 
   // Fetch all products from Supabase
   const fetchProducts = async () => {
-    const { data, error } = await supabase.from("Products").select("*").order("id");
+    const { data, error } = await supabase
+      .from("Products")
+      .select("*")
+      .order("id");
     if (error) toast.error(error.message);
     else setProducts(data || []);
   };
@@ -40,19 +51,24 @@ const ProductsManager = () => {
 
   // Filter and sort products
   const filteredProducts = products
-    .filter(p => 
-      p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(
+      (p) =>
+        p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
-      if (sortBy === "name-asc") return (a.name || "").localeCompare(b.name || "");
-      if (sortBy === "name-desc") return (b.name || "").localeCompare(a.name || "");
+      if (sortBy === "name-asc")
+        return (a.name || "").localeCompare(b.name || "");
+      if (sortBy === "name-desc")
+        return (b.name || "").localeCompare(a.name || "");
       if (sortBy === "price-asc") return (a.price || 0) - (b.price || 0);
       if (sortBy === "price-desc") return (b.price || 0) - (a.price || 0);
       if (sortBy === "profit-asc") return (a.profit || 0) - (b.profit || 0);
       if (sortBy === "profit-desc") return (b.profit || 0) - (a.profit || 0);
-      if (sortBy === "date-newest") return new Date(b.created_at || 0) - new Date(a.created_at || 0);
-      if (sortBy === "date-oldest") return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+      if (sortBy === "date-newest")
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      if (sortBy === "date-oldest")
+        return new Date(a.created_at || 0) - new Date(b.created_at || 0);
       return 0;
     });
 
@@ -75,8 +91,10 @@ const ProductsManager = () => {
 
     for (const file of imageFiles) {
       const fileExt = file.name.split(".").pop();
-      const uniqueName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-      
+      const uniqueName = `${Date.now()}_${Math.random()
+        .toString(36)
+        .substring(2)}.${fileExt}`;
+
       const { error: uploadError } = await supabase.storage
         .from(BUCKET_NAME)
         .upload(uniqueName, file);
@@ -86,7 +104,9 @@ const ProductsManager = () => {
         continue;
       }
 
-      const { data: { publicUrl } } = supabase.storage.from(BUCKET_NAME).getPublicUrl(uniqueName);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(BUCKET_NAME).getPublicUrl(uniqueName);
       uploadedURLs.push(publicUrl);
     }
 
@@ -124,9 +144,7 @@ const ProductsManager = () => {
         if (error) throw error;
         toast.success("✅ Product updated!");
       } else {
-        const { error } = await supabase
-          .from("Products")
-          .insert([payload]);
+        const { error } = await supabase.from("Products").insert([payload]);
 
         if (error) throw error;
         toast.success("✅ Product added!");
@@ -144,8 +162,9 @@ const ProductsManager = () => {
 
   // Delete product from Supabase
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
-    
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
+
     const { error } = await supabase.from("Products").delete().eq("id", id);
     if (error) toast.error(error.message);
     else {
@@ -158,7 +177,7 @@ const ProductsManager = () => {
   const handleEdit = (product) => {
     setForm(product);
     setShowForm(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Remove image from form
@@ -181,8 +200,14 @@ const ProductsManager = () => {
   };
 
   // Calculate statistics
-  const totalValue = products.reduce((sum, p) => sum + (Number(p.price) || 0), 0);
-  const totalProfit = products.reduce((sum, p) => sum + (Number(p.profit) || 0), 0);
+  const totalValue = products.reduce(
+    (sum, p) => sum + (Number(p.price) || 0),
+    0
+  );
+  const totalProfit = products.reduce(
+    (sum, p) => sum + (Number(p.profit) || 0),
+    0
+  );
 
   return (
     <div className="products-manager">
@@ -192,17 +217,22 @@ const ProductsManager = () => {
           <div className="header-main">
             <div className="header-left">
               <div className="header-title">
-                <Package size={36} style={{ color: 'var(--blue-600)' }} />
+                <Package size={36} style={{ color: "var(--blue-600)" }} />
                 <div>
                   <h1>Products Manager</h1>
-                  <p className="header-subtitle">Manage your product inventory efficiently</p>
+                  <p className="header-subtitle">
+                    Manage your product inventory efficiently
+                  </p>
                 </div>
               </div>
             </div>
             <div className="header-actions">
               <button
-                onClick={() => { resetForm(); setShowForm(!showForm); }}
-                className="btn btn-primary"
+                onClick={() => {
+                  resetForm();
+                  setShowForm(!showForm);
+                }}
+                className="manage-products-btn manage-products-btn-primary"
               >
                 <Plus size={20} />
                 {showForm ? "Cancel" : "Add Product"}
@@ -223,7 +253,7 @@ const ProductsManager = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="stat-card stat-card-green">
               <div className="stat-content">
                 <div className="stat-icon stat-icon-green">
@@ -235,7 +265,7 @@ const ProductsManager = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="stat-card stat-card-purple">
               <div className="stat-content">
                 <div className="stat-icon stat-icon-purple">
@@ -303,12 +333,17 @@ const ProductsManager = () => {
             {showForm && (
               <div className="form-card">
                 <div className="form-header">
-                  <h2 className="form-title">{form.id ? "Edit Product" : "Add New Product"}</h2>
-                  <button onClick={() => setShowForm(false)} className="close-btn">
+                  <h2 className="form-title">
+                    {form.id ? "Edit Product" : "Add New Product"}
+                  </h2>
+                  <button
+                    onClick={() => setShowForm(false)}
+                    className="manage-products-close-btn"
+                  >
                     <X size={24} />
                   </button>
                 </div>
-                
+
                 <div className="form-grid">
                   <div className="form-group">
                     <label className="form-label">Product Name *</label>
@@ -382,7 +417,7 @@ const ProductsManager = () => {
                     onChange={handleFilesChange}
                     className="file-input"
                   />
-                  
+
                   {form.images.length > 0 && (
                     <div className="image-preview-grid">
                       {form.images.map((img, i) => (
@@ -405,14 +440,22 @@ const ProductsManager = () => {
                   <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className={`btn ${loading ? "btn-secondary" : "btn-success"}`}
+                    className={`manage-products-btn ${
+                      loading
+                        ? "manage-products-btn-secondary"
+                        : "manage-products-btn-success"
+                    }`}
                   >
-                    {loading ? "Processing..." : form.id ? "Update Product" : "Add Product"}
+                    {loading
+                      ? "Processing..."
+                      : form.id
+                      ? "Update Product"
+                      : "Add Product"}
                   </button>
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="btn btn-secondary"
+                    className="manage-products-btn manage-products-btn-secondary"
                   >
                     Clear Form
                   </button>
@@ -430,35 +473,52 @@ const ProductsManager = () => {
                         <img src={product.images[0]} alt={product.name} />
                       </div>
                     )}
-                    
+
                     <div className="product-content">
                       <h3 className="product-title">{product.name}</h3>
-                      <p className="product-description">{product.description || "No description available"}</p>
-                      
+                      <p className="product-description">
+                        {product.description || "No description available"}
+                      </p>
+
                       <div className="product-details">
                         <div className="product-detail-row">
                           <span className="product-detail-label">Price:</span>
-                          <span className="product-price">{Number(product.price).toFixed(2)} EGP</span>
+                          <span className="product-price">
+                            {Number(product.price).toFixed(2)} EGP
+                          </span>
                         </div>
                         <div className="product-detail-row">
                           <span className="product-detail-label">Profit:</span>
-                          <span className="product-profit">{Number(product.profit || 0).toFixed(2)} EGP</span>
+                          <span className="product-profit">
+                            {Number(product.profit || 0).toFixed(2)} EGP
+                          </span>
                         </div>
                       </div>
 
                       <div className="product-actions">
-                        <button className="btn btn-edit" onClick={() => handleEdit(product)}>
+                        <button
+                          className="manage-products-btn manage-products-btn-edit"
+                          onClick={() => handleEdit(product)}
+                        >
                           <Edit size={16} />
                           Edit
                         </button>
-                        <button className="btn btn-delete" onClick={() => handleDelete(product.id)}>
+                        <button
+                          className="manage-products-btn manage-products-btn-delete"
+                          onClick={() => handleDelete(product.id)}
+                        >
                           <Trash2 size={16} />
                           Delete
                         </button>
                         {product.images?.length > 0 && (
-                          <button className="btn btn-images" onClick={() => setPreviewImages(product.images)}>
+                          <button
+                            className="manage-products-btn manage-products-btn-images"
+                            onClick={() => setPreviewImages(product.images)}
+                          >
                             <Image size={16} />
-                            <span className="image-count-badge">{product.images.length}</span>
+                            <span className="image-count-badge">
+                              {product.images.length}
+                            </span>
                           </button>
                         )}
                       </div>
@@ -470,7 +530,10 @@ const ProductsManager = () => {
               <div className="empty-state">
                 <Package size={64} className="empty-icon" />
                 <h3>No products found</h3>
-                <p>Try adjusting your search or filters, or add a new product to get started</p>
+                <p>
+                  Try adjusting your search or filters, or add a new product to
+                  get started
+                </p>
               </div>
             )}
           </main>
@@ -483,7 +546,10 @@ const ProductsManager = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">Product Images</h3>
-              <button onClick={() => setPreviewImages(false)} className="modal-close">
+              <button
+                onClick={() => setPreviewImages(false)}
+                className="modal-close"
+              >
                 <X size={24} />
               </button>
             </div>

@@ -26,9 +26,8 @@
   animation: slideUp 0.3s ease;
 }
 
-
 /* Close Button - Top Right */
-.close-btn-x {
+.view-statistics-close-btn-x {
   position: absolute;
   top: 15px;
   right: 15px;
@@ -50,7 +49,7 @@
   z-index: 10;
 }
 
-.close-btn-x:hover {
+.view-statistics-close-btn-x:hover {
   background: #ef4444;
   color: white;
   transform: scale(1.1);
@@ -96,7 +95,7 @@
 }
 
 .stat-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;

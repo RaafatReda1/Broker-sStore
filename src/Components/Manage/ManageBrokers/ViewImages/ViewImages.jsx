@@ -12,7 +12,7 @@ const ViewImages = ({ broker, show, onClose }) => {
   const images = [
     { src: broker.idCardFront, alt: "Front ID" },
     { src: broker.idCardBack, alt: "Back ID" },
-    { src: broker.selfieWithIdCard, alt: "Selfie with ID" }
+    { src: broker.selfieWithIdCard, alt: "Selfie with ID" },
   ];
 
   const handleClose = () => {
@@ -32,15 +32,24 @@ const ViewImages = ({ broker, show, onClose }) => {
     <>
       <div className="popup-overlay" onClick={handleClose}>
         <div className="popup-container" onClick={(e) => e.stopPropagation()}>
-          <button className="close-btn-x" onClick={handleClose}>X</button>
+          <button className="view-images-close-btn-x" onClick={handleClose}>
+            X
+          </button>
           <h2>ID Card Images - {broker.fullName}</h2>
           <div className="images-grid">
             {images.map((img, idx) => (
-              <div key={idx} className="img-wrapper" onMouseMove={handleMouseMove}>
-                <img 
-                  src={img.src} 
+              <div
+                key={idx}
+                className="img-wrapper"
+                onMouseMove={handleMouseMove}
+              >
+                <img
+                  src={img.src}
                   alt={img.alt}
-                  style={{'--mouse-x': `${zoomPos.x}%`, '--mouse-y': `${zoomPos.y}%`}}
+                  style={{
+                    "--mouse-x": `${zoomPos.x}%`,
+                    "--mouse-y": `${zoomPos.y}%`,
+                  }}
                   onClick={() => setSelectedImg(idx)}
                 />
                 <span className="img-label">{img.alt}</span>
@@ -52,14 +61,28 @@ const ViewImages = ({ broker, show, onClose }) => {
 
       {selectedImg !== null && (
         <div className="lightbox-overlay" onClick={() => setSelectedImg(null)}>
-          <button className="lightbox-close" onClick={() => setSelectedImg(null)}>X</button>
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <div className="lightbox-main-wrapper" onMouseMove={handleMouseMove}>
-              <img 
-                src={images[selectedImg].src} 
-                alt={images[selectedImg].alt} 
+          <button
+            className="lightbox-close"
+            onClick={() => setSelectedImg(null)}
+          >
+            X
+          </button>
+          <div
+            className="lightbox-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              className="lightbox-main-wrapper"
+              onMouseMove={handleMouseMove}
+            >
+              <img
+                src={images[selectedImg].src}
+                alt={images[selectedImg].alt}
                 className="lightbox-main"
-                style={{'--mouse-x': `${zoomPos.x}%`, '--mouse-y': `${zoomPos.y}%`}}
+                style={{
+                  "--mouse-x": `${zoomPos.x}%`,
+                  "--mouse-y": `${zoomPos.y}%`,
+                }}
               />
             </div>
             <div className="lightbox-thumbnails">

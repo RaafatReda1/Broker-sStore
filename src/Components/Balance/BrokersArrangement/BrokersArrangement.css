@@ -102,7 +102,7 @@
   font-size: 22px;
 }
 
-.close-btn {
+.brokers-arrangement-close-btn {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
@@ -116,7 +116,7 @@
   transition: all 0.2s ease;
 }
 
-.close-btn:hover {
+.brokers-arrangement-close-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: scale(1.1);
 }
@@ -432,9 +432,3 @@
     text-align: center;
   }
 }
-
-
-
-
-
-

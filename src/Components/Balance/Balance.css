@@ -272,7 +272,7 @@
   color: #444;
 }
 
-.close-btn {
+.balance-close-btn {
   margin-top: 15px;
   padding: 8px 15px;
   border: none;
@@ -283,7 +283,7 @@
   transition: 0.2s;
 }
 
-.close-btn:hover {
+.balance-close-btn:hover {
   background: #e04343;
 }
 

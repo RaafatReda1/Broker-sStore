@@ -11,7 +11,9 @@ import {
   faCubes,
   faUsersGear,
   faRightFromBracket,
-  faBell, // logout icon
+  faBell,
+  faMoneyBill,
+  faMoneyBillTransfer, // logout icon
 } from "@fortawesome/free-solid-svg-icons";
 import supabase from "../../../SupabaseClient";
 import { faComment } from "@fortawesome/free-solid-svg-icons/faComment";
@@ -51,6 +53,10 @@ const ManagingDashboard = () => {
           <Link to="/manageModerators" className="dashboard-item">
             <FontAwesomeIcon icon={faUsersGear} className="icon" />
             <span>Moderators</span>
+          </Link>
+          <Link to = "/manageWithdrawals" className="dashboard-item">
+            <FontAwesomeIcon icon={faMoneyBillTransfer} className="icon" />
+            <span>Withdrawals</span>
           </Link>
         </>
       )}

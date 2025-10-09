@@ -412,7 +412,7 @@
   margin: 0;
 }
 
-.close-btn {
+.manage-products-close-btn {
   background: var(--bg-secondary);
   border: none;
   color: var(--text-secondary);
@@ -424,7 +424,7 @@
   transition: all 0.3s ease;
 }
 
-.close-btn:hover {
+.manage-products-close-btn:hover {
   background: var(--red-500);
   color: white;
 }
@@ -570,7 +570,7 @@
 }
 
 /* Buttons */
-.btn {
+.manage-products-btn {
   padding: 0.875rem 1.75rem;
   border-radius: 0.75rem;
   font-weight: 600;
@@ -585,17 +585,17 @@
   box-shadow: var(--shadow-md);
 }
 
-.btn-primary {
+.manage-products-btn-primary {
   background: linear-gradient(135deg, var(--blue-600) 0%, var(--blue-700) 100%);
   color: white;
 }
 
-.btn-primary:hover {
+.manage-products-btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-xl);
 }
 
-.btn-success {
+.manage-products-btn-success {
   background: linear-gradient(
     135deg,
     var(--green-600) 0%,
@@ -605,58 +605,58 @@
   flex: 1;
 }
 
-.btn-success:hover {
+.manage-products-btn-success:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-xl);
 }
 
-.btn-success:disabled {
+.manage-products-btn-success:disabled {
   background: var(--text-tertiary);
   cursor: not-allowed;
   transform: none;
 }
 
-.btn-secondary {
+.manage-products-btn-secondary {
   background: var(--bg-secondary);
   color: var(--text-primary);
   border: 2px solid var(--border-color);
 }
 
-.btn-secondary:hover {
+.manage-products-btn-secondary:hover {
   background: var(--bg-tertiary);
   border-color: var(--border-hover);
 }
 
-.btn-edit {
+.manage-products-btn-edit {
   background: var(--blue-600);
   color: white;
   padding: 0.625rem 1rem;
   flex: 1;
 }
 
-.btn-edit:hover {
+.manage-products-btn-edit:hover {
   background: var(--blue-700);
 }
 
-.btn-delete {
+.manage-products-btn-delete {
   background: var(--red-600);
   color: white;
   padding: 0.625rem 1rem;
   flex: 1;
 }
 
-.btn-delete:hover {
+.manage-products-btn-delete:hover {
   background: var(--red-700);
 }
 
-.btn-images {
+.manage-products-btn-images {
   background: var(--bg-secondary);
   color: var(--text-primary);
   padding: 0.625rem;
   border: 2px solid var(--border-color);
 }
 
-.btn-images:hover {
+.manage-products-btn-images:hover {
   background: var(--bg-tertiary);
   border-color: var(--blue-500);
 }

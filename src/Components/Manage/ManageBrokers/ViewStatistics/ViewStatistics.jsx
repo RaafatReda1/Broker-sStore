@@ -21,8 +21,10 @@ const ViewStatistics = ({ broker, show, onClose }) => {
   return (
     <div className="statistics-modal" onClick={handleClose}>
       <div className="statistics-content" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn-x" onClick={handleClose}>X</button>
-        
+        <button className="view-statistics-close-btn-x" onClick={handleClose}>
+          X
+        </button>
+
         <h2 className="statistics-title">
           <span className="stats-icon">📊</span>
           Statistics for {broker.fullName}

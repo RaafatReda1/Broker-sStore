@@ -25,7 +25,7 @@
 }
 
 /* Close Button (X) - Top Right */
-.close-btn-x {
+.view-images-close-btn-x {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -46,7 +46,7 @@
   line-height: 1;
 }
 
-.close-btn-x:hover {
+.view-images-close-btn-x:hover {
   background: #ef4444;
   color: white;
   transform: scale(1.1);
