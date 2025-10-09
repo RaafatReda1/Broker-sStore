@@ -154,7 +154,7 @@ const ManageWithDrawal = () => {
     showConfirmationModal({
       title: "Complete Withdrawal Request",
       message:
-        "✨ Ready to complete this withdrawal?\n\n📋 This will:\n• Mark the request as finished\n• Archive all completed orders\n• Process the broker's payment\n\n💡 Don't worry - archived orders can be restored if needed!",
+        "✨ Ready to complete this withdrawal?\n\n📋 This will:\n• Mark the request as finished\n• Archive completed orders (placed before request)\n• Process the broker's payment\n• Keep new orders available for future withdrawals\n\n💡 Don't worry - archived orders can be restored if needed!",
       type: "success",
       confirmText: "Complete Withdrawal",
       cancelText: "Keep Pending",
@@ -168,12 +168,14 @@ const ManageWithDrawal = () => {
     setIsProcessing(true);
 
     try {
-      // 1. Fetch completed orders
+      // 1. Fetch completed orders that were placed BEFORE the withdrawal request
       const { data: completedOrders, error: fetchError } = await supabase
         .from("Orders")
         .select("*")
         .eq("brokerId", request.brokerId)
-        .eq("status", true);
+        .eq("status", true)
+        .lt("created_at", request.created_at) // Only orders created BEFORE the withdrawal request
+        .order("created_at", { ascending: false });
 
       if (fetchError) throw fetchError;
 
@@ -221,9 +223,12 @@ const ManageWithDrawal = () => {
 
       toast.success(
         `🎉 Withdrawal completed successfully!\n` +
-          `📦 ${completedOrders?.length || 0} orders archived\n` +
+          `📦 ${
+            completedOrders?.length || 0
+          } orders archived (placed before request)\n` +
           `💰 Broker payment processed\n` +
-          `📱 Notification sent to broker`
+          `📱 Notification sent to broker\n` +
+          `⏰ New orders after request remain available for future withdrawals`
       );
       fetchWithdrawalRequests();
       fetchRequestCounts();
@@ -387,7 +392,7 @@ const ManageWithDrawal = () => {
               currency: "EGP",
             }
           )}\n` +
-          `• **Orders Processed:** ${ordersCount} completed orders\n` +
+          `• **Orders Processed:** ${ordersCount} completed orders (placed before request)\n` +
           `• **Status:** ✅ Completed\n\n` +
           `💳 **Payment Method:**\n` +
           `${
@@ -402,6 +407,7 @@ const ManageWithDrawal = () => {
           }\n\n` +
           `📱 **Withdrawal Phone:** ${request.withDrawalPhone}\n\n` +
           `✨ Your payment should arrive shortly. Thank you for your business!\n\n` +
+          `⏰ **Note:** Only orders placed before your withdrawal request were processed. Any new orders can be included in future withdrawal requests.\n\n` +
           `📞 If you have any questions, please contact our support team.`,
         isTemp: false,
         isAll: false,
