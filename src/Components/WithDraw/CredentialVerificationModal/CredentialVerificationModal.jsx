@@ -96,8 +96,8 @@ const CredentialVerificationModal = ({
           <p>{message}</p>
         </div>
 
-        <form 
-          className="credential-form" 
+        <form
+          className="credential-form"
           onSubmit={handleVerify}
           autoComplete="off"
         >
