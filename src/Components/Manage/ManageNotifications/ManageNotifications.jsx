@@ -5,6 +5,8 @@ import MDEditor from "@uiw/react-md-editor";
 import "./ManageNotifications.css";
 import supabase from "../../../SupabaseClient";
 import { toast } from "react-toastify";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 const ManageNotifications = () => {
   const location = useLocation();
@@ -219,7 +221,7 @@ const ManageNotifications = () => {
                   {!showHistory ? "Show History" : "Hide History"}
                 </span>
                 <span className="btn-text">
-                  {showHistory ? "Hide History" : "Show History"}
+                  {showHistory ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
                 </span>
               </button>
             </div>

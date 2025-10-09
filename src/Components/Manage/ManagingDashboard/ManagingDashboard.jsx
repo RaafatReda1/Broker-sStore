@@ -52,12 +52,12 @@ const ManagingDashboard = () => {
             <FontAwesomeIcon icon={faUsersGear} className="icon" />
             <span>Moderators</span>
           </Link>
-          <Link to="/manageNotifications" className="dashboard-item">
-            <FontAwesomeIcon icon={faComment} className="icon" />
-            <span>Notifications</span>
-          </Link>
         </>
       )}
+      <Link to="/manageNotifications" className="dashboard-item">
+        <FontAwesomeIcon icon={faComment} className="icon" />
+        <span>Notifications</span>
+      </Link>
 
       <a className="dashboard-logout dashboard-item" onClick={handleLogout}>
         <FontAwesomeIcon

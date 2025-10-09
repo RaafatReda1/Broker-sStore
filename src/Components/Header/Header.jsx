@@ -28,6 +28,9 @@ const Header = () => {
         )}
         {userData && (
           <>
+            <Link to="withdraw">
+              <h4>Withdraw</h4>
+            </Link>
             <Link to="/notifications">
               <h4>Notifications</h4>
             </Link>
