@@ -3,7 +3,7 @@ import "./WithDraw.css";
 import { userDataContext } from "../../AppContexts";
 import supabase from "../../SupabaseClient";
 import { toast } from "react-toastify";
-import "./WithDraw.css"
+
 const WithDraw = () => {
   const { userData } = useContext(userDataContext);
   const [paymentMethod, setPaymentMethod] = useState(""); // 'vodafone' or 'instapay'
@@ -96,18 +96,16 @@ const WithDraw = () => {
     try {
       const withdrawalData = {
         brokerId: userData.id,
-        brokerName: userData.fullName,
-        brokerPhone: userData.phone,
         brokerEmail: userData.email,
-        actualBalance: userData.actualBalance,
-        withDrawalPhone: formData.withDrawalPhone.trim(),
+        brokerPhone: userData.phone,
+        brokerName: userData.fullName,
+        withDrawalPhone: formData.withDrawalPhone.trim() || null,
         isVodafone: paymentMethod === "vodafone",
         vodaCarrierName: paymentMethod === "vodafone" ? formData.vodaCarrierName.trim() : null,
         isInstaPay: paymentMethod === "instapay",
-        instaEmail: paymentMethod === "instapay" ? formData.instaEmail.trim() : null,
-        instaAccountName: paymentMethod === "instapay" ? formData.instaAccountName.trim() : null,
-        requestDate: new Date().toISOString(),
-        status: "pending"
+        instaEmail: paymentMethod === "instapay" && formData.instaEmail.trim() ? formData.instaEmail.trim() : null,
+        instaAccountName: paymentMethod === "instapay" && formData.instaAccountName.trim() ? formData.instaAccountName.trim() : null,
+        actualBalance: userData.actualBalance
       };
 
       const { error } = await supabase
@@ -244,9 +242,7 @@ const WithDraw = () => {
                   </div>
 
                   <div className="info-box">
-                    <p className="info-text">
-                      Providing both email and account name is recommended for faster processing
-                    </p>
+
                     <p className="info-text">
                       Either phone or email is required for InstaPay transactions
                     </p>
