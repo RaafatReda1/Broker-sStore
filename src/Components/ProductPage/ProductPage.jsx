@@ -9,6 +9,14 @@ import {
 import PDF from "../PDF/PDF";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import {
+  Share2,
+  ShoppingCart,
+  Eye,
+  ArrowLeft,
+  Heart,
+  Download,
+} from "lucide-react";
 
 const ProductPage = () => {
   const { products } = useContext(productsContext);
@@ -68,94 +76,182 @@ const ProductPage = () => {
     toast.success("Added to cart!");
   };
 
+  const handleShare = async () => {
+    const productUrl = `${window.location.origin}/productPage/productId:${productId}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: currentProduct.name,
+          text: currentProduct.description,
+          url: productUrl,
+        });
+      } else {
+        await navigator.clipboard.writeText(productUrl);
+        toast.success("Product link copied to clipboard!");
+      }
+    } catch (err) {
+      console.error("Failed to share:", err);
+      toast.error("Failed to share product. Please try again.");
+    }
+  };
+
+  const handleQuantityChange = (change) => {
+    setQuantity((prev) => Math.max(1, prev + change));
+  };
+
   return (
     <div className="product-page">
       <div className="product-card">
+        {/* Back Button */}
+        <div className="back-button-container">
+          <Link to="/products" className="back-button">
+            <ArrowLeft size={20} />
+            <span>Back to Products</span>
+          </Link>
+        </div>
+
         {/* Left: Images */}
         <div className="product-images">
-          <img
-            src={currentImage}
-            alt={currentProduct.name}
-            className="main-image"
-          />
-          <div className="thumbnails">
-            {currentProduct.images?.map((img, i) => (
-              <img
-                key={i}
-                src={img}
-                alt={currentProduct.name}
-                className="thumbnail"
-                onClick={() => setCurrentImage(img)}
-                style={{ cursor: "pointer" }}
-              />
-            ))}
+          <div className="main-image-container">
+            <img
+              src={currentImage}
+              alt={currentProduct.name}
+              className="main-image"
+            />
+            <div className="image-overlay">
+              <button className="overlay-action-btn" onClick={handleShare}>
+                <Share2 size={20} />
+                <span>Share</span>
+              </button>
+            </div>
           </div>
+
+          {currentProduct.images?.length > 1 && (
+            <div className="thumbnails">
+              {currentProduct.images?.map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  alt={currentProduct.name}
+                  className={`thumbnail ${
+                    currentImage === img ? "active" : ""
+                  }`}
+                  onClick={() => setCurrentImage(img)}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Right: Details */}
         <div className="product-details">
-          <h2>{currentProduct.name}</h2>
-          <p className="description">{currentProduct.description}</p>
-          <p className="price">{currentProduct.price}$</p>
-          {userData && <p>Profit: {currentProduct.profit}$</p>}
+          <div className="product-header">
+            <h1 className="product-title">{currentProduct.name}</h1>
+            <div className="product-badges">
+              {userData && (
+                <span className="badge broker-badge">Broker View</span>
+              )}
+              <span className="badge available-badge">Available</span>
+            </div>
+          </div>
+
+          <p className="product-description">{currentProduct.description}</p>
+
+          <div className="price-section">
+            <div className="price-container">
+              <span className="price-label">Price</span>
+              <span className="price-value">${currentProduct.price}</span>
+            </div>
+            {userData && currentProduct.profit && (
+              <div className="profit-container">
+                <span className="profit-label">Your Profit</span>
+                <span className="profit-value">${currentProduct.profit}</span>
+              </div>
+            )}
+          </div>
 
           {!userData && (
-            <div className="quantity">
-              <label>Quantity:</label>
-              <input
-                type="number"
-                value={quantity}
-                min="1"
-                onChange={(e) =>
-                  setQuantity(Math.max(1, Number(e.target.value)))
-                }
-              />
-            </div>
-          )}
-
-          {userData ? (
-            <div className="buttons">
-              <PDF
-                name={currentProduct.name}
-                fullDescription={currentProduct.fullDescription}
-                Images={currentProduct.images}
-                price={currentProduct.price}
-                profit={currentProduct.profit}
-              ></PDF>
-              <button
-                className="btn copy-link"
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(
-                      window.location.href + "?brokerId=" + userData.id
-                    );
-                    toast.success("Link copied to clipboard!");
-                  } catch (err) {
-                    console.error("Failed to copy: ", err);
-                    toast.error("Failed to copy link. Please try again.");
-                  }
-                }}
-                            disabled = {userData.isVerified === false}
-
-              >
-                Copy Link
-              </button>
-            </div>
-          ) : (
-            <div className="buttons">
-              <button
-                className="btn add-to-cart"
-                onClick={() => handleAddToCart(currentProduct, quantity)}
-              >
-                Add to Cart
-              </button>
-              <Link to="/cart">
-                <button className="btn checkout" onClick={() => {}}>
-                  Go to Checkout
+            <div className="quantity-section">
+              <label className="quantity-label">Quantity</label>
+              <div className="quantity-controls">
+                <button
+                  className="quantity-btn minus"
+                  onClick={() => handleQuantityChange(-1)}
+                  disabled={quantity <= 1}
+                >
+                  -
                 </button>
-              </Link>
+                <input
+                  type="number"
+                  value={quantity}
+                  min="1"
+                  onChange={(e) =>
+                    setQuantity(Math.max(1, Number(e.target.value)))
+                  }
+                  className="quantity-input"
+                />
+                <button
+                  className="quantity-btn plus"
+                  onClick={() => handleQuantityChange(1)}
+                >
+                  +
+                </button>
+              </div>
             </div>
           )}
+
+          <div className="action-buttons">
+            {userData ? (
+              <>
+                <PDF
+                  name={currentProduct.name}
+                  fullDescription={currentProduct.fullDescription}
+                  Images={currentProduct.images}
+                  price={currentProduct.price}
+                  profit={currentProduct.profit}
+                >
+                  <button className="action-btn pdf-btn">
+                    <Download size={20} />
+                    <span>Download PDF</span>
+                  </button>
+                </PDF>
+                <button
+                  className="action-btn copy-link-btn"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
+                        window.location.href + "?brokerId=" + userData.id
+                      );
+                      toast.success("Link copied to clipboard!");
+                    } catch (err) {
+                      console.error("Failed to copy: ", err);
+                      toast.error("Failed to copy link. Please try again.");
+                    }
+                  }}
+                  disabled={userData.isVerified === false}
+                >
+                  <Share2 size={20} />
+                  <span>Copy Link</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className="action-btn add-to-cart-btn"
+                  onClick={() => handleAddToCart(currentProduct, quantity)}
+                >
+                  <ShoppingCart size={20} />
+                  <span>Add to Cart</span>
+                </button>
+                <Link to="/cart">
+                  <button className="action-btn checkout-btn">
+                    <Eye size={20} />
+                    <span>View Cart</span>
+                  </button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
