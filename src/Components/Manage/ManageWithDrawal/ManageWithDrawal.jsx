@@ -832,7 +832,7 @@ const ManageWithDrawal = () => {
                       {deletedOrders.map((order) => (
                         <div key={order.id} className="order-item archived">
                           <div className="order-header">
-                            <span className="order-id">Order #{order.id}</span>
+                            <span className="order-id">Order #{order.orderPrevId}</span>
                             <span className="order-total">
                               {parseFloat(order.total).toLocaleString("en-US", {
                                 style: "currency",

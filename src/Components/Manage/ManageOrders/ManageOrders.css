@@ -273,6 +273,48 @@
   font-size: 0.95rem;
 }
 
+/* Order Badges Container */
+.order-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Verification Badge */
+.verification-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.verification-badge.verified {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.verification-badge.verified:hover {
+  background: rgba(16, 185, 129, 0.25);
+  transform: scale(1.05);
+}
+
+.verification-icon {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.verification-text {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
 /* Order Customer */
 .order-customer {
   display: flex;
@@ -631,6 +673,28 @@
 
 .summary-value.profit {
   color: #10b981;
+}
+
+/* Modal Verification Badge */
+.modal-verification-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.modal-verification-icon {
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 /* Notes Content */

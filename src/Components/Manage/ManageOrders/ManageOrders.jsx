@@ -9,12 +9,20 @@ const ManageOrders = () => {
   const [filterStatus, setFilterStatus] = useState("all");
 
   const fetchOrders = async () => {
-    const { data, error } = await supabase.from("Orders").select("*");
+    const { data, error } = await supabase.from("Orders").select(`
+        *,
+        Brokers!inner(isVerified)
+      `);
     if (error) {
       console.error("Error fetching orders:", error);
     } else if (data) {
-      setOrders(data);
-      console.log("Fetched orders:", data);
+      // Transform the data to include broker verification status
+      const ordersWithBrokerStatus = data.map((order) => ({
+        ...order,
+        brokerVerified: order.Brokers?.isVerified || false,
+      }));
+      setOrders(ordersWithBrokerStatus);
+      console.log("Fetched orders with broker status:", ordersWithBrokerStatus);
     }
   };
 
@@ -84,7 +92,6 @@ const ManageOrders = () => {
     (sum, order) => sum + parseFloat(order.netProfit || 0),
     0
   );
-
   return (
     <div className="manage-orders-container">
       <div className="header-section">
@@ -170,19 +177,28 @@ const ManageOrders = () => {
                   <span className="id-label">Order</span>
                   <span className="id-value">#{order.id}</span>
                 </div>
-                <button
-                  className={
-                    order.status
-                      ? "status-badge completed"
-                      : "status-badge pending"
-                  }
-                  onClick={() => updateOrderStatus(order.id, !order.status)}
-                >
-                  <span className="status-icon">
-                    {order.status ? "✓" : "⏳"}
-                  </span>
-                  {order.status ? "Completed" : "Pending"}
-                </button>
+                <div className="order-badges">
+                  <button
+                    className={
+                      order.status
+                        ? "status-badge completed"
+                        : "status-badge pending"
+                    }
+                    onClick={() => updateOrderStatus(order.id, !order.status)}
+                  >
+                    <span className="status-icon">
+                      {order.status ? "✓" : "⏳"}
+                    </span>
+                    {order.status ? "Completed" : "Pending"}
+                  </button>
+
+                  {order.brokerVerified && (
+                    <div className="verification-badge verified">
+                      <span className="verification-icon">✓</span>
+                      <span className="verification-text">Verified Broker</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="order-customer">
@@ -262,7 +278,10 @@ const ManageOrders = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button
               className="manage-orders-close-btn-x"
-              onClick={() => setSelectedOrder(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedOrder(null);
+              }}
             >
               ×
             </button>
@@ -330,6 +349,12 @@ const ManageOrders = () => {
                   <span className="summary-label">Broker ID</span>
                   <span className="summary-value">
                     #{selectedOrder.brokerId}
+                    {selectedOrder.brokerVerified && (
+                      <span className="modal-verification-badge">
+                        <span className="modal-verification-icon">✓</span>
+                        Verified
+                      </span>
+                    )}
                   </span>
                 </div>
                 <div className="summary-item">

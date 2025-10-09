@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import amiriFont from "../../../fontBase64";
-
+import React from "react";
+// eslint-disable-next-line react/prop-types
 const PDF = ({ name, fullDescription, Images, price, profit }) => {
   const generatePDF = () => {
     const doc = new jsPDF({ unit: "mm", format: "a4" });
@@ -14,7 +15,7 @@ const PDF = ({ name, fullDescription, Images, price, profit }) => {
 
     // ===== بيانات مثال =====
     const title = name;
-    const description = fullDescription.repeat(50);
+    const description = fullDescription
     const images = Images;
     const pdfPrice = String(price);
     const pdfProfit = String(profit);
