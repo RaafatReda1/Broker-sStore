@@ -131,10 +131,10 @@ const ViewNotifications = () => {
   // Check if notification can be deleted (only for single user notifications)
   const canDeleteNotification = (notification) => {
     return (
-      notification.brokerEmail === userData.email &&
+      (notification.brokerEmail === userData.email ||
+        notification.brokerIdTo === userData.id) &&
       !notification.isAll &&
-      !notification.brokerIdFrom &&
-      !notification.brokerIdTo
+      !notification.brokerIdFrom
     );
   };
 
@@ -180,7 +180,9 @@ const ViewNotifications = () => {
   const getNotificationType = (notification) => {
     if (notification.isAll) return "All Users";
     if (notification.brokerEmail) return "Direct";
-    return "Group";
+    if (notification.brokerIdTo && !notification.brokerIdFrom) return "Direct";
+    if (notification.brokerIdFrom && notification.brokerIdTo) return "Group";
+    return "Direct";
   };
 
   useEffect(() => {

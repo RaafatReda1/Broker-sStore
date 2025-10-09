@@ -216,10 +216,14 @@ const ManageWithDrawal = () => {
 
       if (updateError) throw updateError;
 
+      // 5. Send notification to broker about successful withdrawal
+      await sendWithdrawalNotification(request, completedOrders?.length || 0);
+
       toast.success(
-        `Withdrawal completed successfully!\n` +
+        `🎉 Withdrawal completed successfully!\n` +
           `📦 ${completedOrders?.length || 0} orders archived\n` +
-          `💰 Broker payment processed`
+          `💰 Broker payment processed\n` +
+          `📱 Notification sent to broker`
       );
       fetchWithdrawalRequests();
       fetchRequestCounts();
@@ -301,10 +305,14 @@ const ManageWithDrawal = () => {
 
       if (updateError) throw updateError;
 
+      // 5. Send notification to broker about request reset
+      await sendResetNotification(request, archivedOrders?.length || 0);
+
       toast.success(
         `🔄 Request restored to pending!\n` +
           `📦 ${archivedOrders?.length || 0} orders reactivated\n` +
-          `✨ Ready for processing again`
+          `✨ Ready for processing again\n` +
+          `📱 Notification sent to broker`
       );
       fetchWithdrawalRequests();
       fetchRequestCounts();
@@ -356,6 +364,130 @@ const ManageWithDrawal = () => {
       await confirmationModal.onConfirm();
     }
     closeConfirmationModal();
+  };
+
+  const sendWithdrawalNotification = async (request, ordersCount) => {
+    try {
+      console.log(
+        "Sending withdrawal notification for broker ID:",
+        request.brokerId,
+        "Type:",
+        typeof request.brokerId
+      );
+
+      const notificationData = {
+        title: "💰 Withdrawal Processed Successfully!",
+        msg:
+          `🎉 Great news! Your withdrawal request has been processed successfully.\n\n` +
+          `📊 **Details:**\n` +
+          `• **Amount:** ${parseFloat(request.actualBalance).toLocaleString(
+            "en-US",
+            {
+              style: "currency",
+              currency: "EGP",
+            }
+          )}\n` +
+          `• **Orders Processed:** ${ordersCount} completed orders\n` +
+          `• **Status:** ✅ Completed\n\n` +
+          `💳 **Payment Method:**\n` +
+          `${
+            request.isVodafone
+              ? `📱 Vodafone Cash: ${request.vodaCarrierName}`
+              : ""
+          }` +
+          `${
+            request.isInstaPay
+              ? `💳 InstaPay: ${request.instaEmail || request.instaAccountName}`
+              : ""
+          }\n\n` +
+          `📱 **Withdrawal Phone:** ${request.withDrawalPhone}\n\n` +
+          `✨ Your payment should arrive shortly. Thank you for your business!\n\n` +
+          `📞 If you have any questions, please contact our support team.`,
+        isTemp: false,
+        isAll: false,
+        brokerIdFrom: null,
+        brokerIdTo: parseInt(request.brokerId),
+        brokerEmail: null,
+      };
+
+      const { error } = await supabase
+        .from("Notifications")
+        .insert(notificationData);
+
+      if (error) {
+        console.error("Error sending withdrawal notification:", error);
+        // Don't throw error here as it shouldn't break the withdrawal process
+      } else {
+        console.log(
+          "Withdrawal notification sent successfully to broker:",
+          request.brokerId
+        );
+      }
+    } catch (error) {
+      console.error("Error in sendWithdrawalNotification:", error);
+    }
+  };
+
+  const sendResetNotification = async (request, ordersCount) => {
+    try {
+      console.log(
+        "Sending reset notification for broker ID:",
+        request.brokerId,
+        "Type:",
+        typeof request.brokerId
+      );
+
+      const notificationData = {
+        title: "🔄 Withdrawal Request Reset to Pending",
+        msg:
+          `📋 Your withdrawal request has been reset to pending status.\n\n` +
+          `📊 **Details:**\n` +
+          `• **Amount:** ${parseFloat(request.actualBalance).toLocaleString(
+            "en-US",
+            {
+              style: "currency",
+              currency: "EGP",
+            }
+          )}\n` +
+          `• **Orders Restored:** ${ordersCount} orders reactivated\n` +
+          `• **Status:** ⏳ Pending Review\n\n` +
+          `💳 **Payment Method:**\n` +
+          `${
+            request.isVodafone
+              ? `📱 Vodafone Cash: ${request.vodaCarrierName}`
+              : ""
+          }` +
+          `${
+            request.isInstaPay
+              ? `💳 InstaPay: ${request.instaEmail || request.instaAccountName}`
+              : ""
+          }\n\n` +
+          `📱 **Withdrawal Phone:** ${request.withDrawalPhone}\n\n` +
+          `🔄 Your request is now back in the processing queue and will be reviewed again.\n\n` +
+          `📞 If you have any questions, please contact our support team.`,
+        isTemp: false,
+        isAll: false,
+        brokerIdFrom: null,
+        brokerIdTo: parseInt(request.brokerId),
+        brokerEmail: null,
+      };
+
+      const { error } = await supabase
+        .from("Notifications")
+        .insert(notificationData);
+
+      if (error) {
+        console.error("Error sending reset notification:", error);
+        // Don't throw error here as it shouldn't break the reset process
+      } else {
+        console.log(
+          "Reset notification sent successfully to broker:",
+          request.brokerId
+        );
+      }
+    } catch (error) {
+      console.error("Error in sendResetNotification:", error);
+    }
   };
 
   return (
