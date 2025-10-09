@@ -37,6 +37,23 @@ const ManageNotifications = () => {
     }
   };
 
+  // Delete notification
+  const deleteNotification = async (id) => {
+    try {
+      const { error } = await supabase
+        .from("Notifications")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+      toast.success("Notification deleted successfully");
+      fetchSentNotifications();
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      toast.error("Failed to delete notification");
+    }
+  };
+
   // Handle navigation state from broker deletion
   useEffect(() => {
     if (location.state) {
@@ -532,14 +549,21 @@ const ManageNotifications = () => {
                                 ? `To ID: ${notification.brokerIdTo}`
                                 : "Range"}
                             </span>
+                            <button
+                              onClick={() =>
+                                deleteNotification(notification.id)
+                              }
+                              className="delete-btn"
+                              title="Delete notification"
+                            >
+                              🗑️
+                            </button>
                           </div>
                         </div>
                         <div className="notification-content">
-                          <div
-                            className="notification-html-content"
-                            dangerouslySetInnerHTML={{
-                              __html: notification.msg,
-                            }}
+                          <MDEditor.Markdown
+                            source={notification.msg}
+                            style={{ backgroundColor: "transparent" }}
                           />
                         </div>
                       </div>

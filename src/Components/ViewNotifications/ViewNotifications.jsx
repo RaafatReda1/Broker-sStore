@@ -256,7 +256,7 @@ const ViewNotifications = () => {
             <div className="empty-state">
               <Bell size={48} className="empty-icon" />
               <p className="empty-text">No notifications yet</p>
-              <p className="empty-subtext">You're all caught up!</p>
+              <p className="empty-subtext">You&apos;re all caught up!</p>
             </div>
           ) : (
             filteredNotifications.map((notification) => {
