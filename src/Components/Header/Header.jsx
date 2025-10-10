@@ -335,13 +335,15 @@ const Header = () => {
   }, []);
 
   return (
+    
     <header className={scrolled ? "scrolled" : ""}>
+    
       <div className="header-container">
         {/* Logo */}
         <div className="logo">
           <h2>
             <Link to="/" aria-label="Cicada Home">
-              Cicada
+              <img src="./CicadaHorizentalWhite.png" style={{ width: "fit-content" , height: "110px", margin: "30px"}}></img>
             </Link>
           </h2>
         </div>
