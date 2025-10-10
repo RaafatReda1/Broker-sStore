@@ -3,6 +3,16 @@ import "./BrokersDataForm.css";
 import supabase from "../../../SupabaseClient";
 import { userContext, sessionContext } from "../../../AppContexts";
 import { toast } from "react-toastify";
+import {
+  User,
+  Phone,
+  Camera,
+  Upload,
+  CheckCircle,
+  AlertCircle,
+  FileImage,
+  UserCheck,
+} from "lucide-react";
 // id_card_back
 // eslint-disable-next-line react/prop-types
 const BrokersDataForm = ({ setRefresh }) => {
@@ -201,56 +211,95 @@ const BrokersDataForm = ({ setRefresh }) => {
 
   return (
     <div className="broker-parent">
+      <div className="broker-header">
+        <div className="broker-icon">
+          <UserCheck size={32} />
+        </div>
+        <h1 className="broker-title">Broker Registration</h1>
+        <p className="broker-subtitle">
+          Complete your broker profile to get started
+        </p>
+      </div>
+
       <form className="broker-form" onSubmit={handleSubmit}>
-        <h1 className="broker-title">Broker Information</h1>
+        <div className="form-section">
+          <h3 className="section-title">
+            <User size={20} />
+            Personal Information
+          </h3>
 
-        <div className="names">
-          <label className="broker-label name-field">
-            <input
-              className="broker-input"
-              type="text"
-              name="fullName"
-              value={brokerData.fullName}
-              onChange={handleChange}
-              required
-              placeholder=" "
-            />
-            <span className="floating-label">Full Name</span>
-          </label>
+          <div className="names">
+            <div className="input-group">
+              <label className="broker-label name-field">
+                <div className="input-container">
+                  <User className="input-icon" size={20} />
+                  <input
+                    className="broker-input"
+                    type="text"
+                    name="fullName"
+                    value={brokerData.fullName}
+                    onChange={handleChange}
+                    required
+                    placeholder=" "
+                    disabled={isUploading}
+                  />
+                  <span className="floating-label">Full Name</span>
+                </div>
+              </label>
+            </div>
 
-          <label className="broker-label name-field nickname-field">
-            <input
-              className="broker-input"
-              type="text"
-              name="nickName"
-              value={brokerData.nickName}
-              onChange={handleChange}
-              required
-              placeholder=" "
-            />
-            <span className="floating-label">Nickname</span>
-          </label>
+            <div className="input-group">
+              <label className="broker-label name-field nickname-field">
+                <div className="input-container">
+                  <User className="input-icon" size={20} />
+                  <input
+                    className="broker-input"
+                    type="text"
+                    name="nickName"
+                    value={brokerData.nickName}
+                    onChange={handleChange}
+                    required
+                    placeholder=" "
+                    disabled={isUploading}
+                  />
+                  <span className="floating-label">Nickname</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label className="broker-label">
+              <div className="input-container">
+                <Phone className="input-icon" size={20} />
+                <input
+                  className="broker-input"
+                  type="tel"
+                  name="phone"
+                  value={brokerData.phone}
+                  onChange={handleChange}
+                  required
+                  placeholder=" "
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  onKeyDown={handlePhoneKeyDown}
+                  maxLength={11}
+                  disabled={isUploading}
+                />
+                <span className="floating-label">Phone Number</span>
+              </div>
+            </label>
+          </div>
         </div>
 
-        <label className="broker-label">
-          <input
-            className="broker-input"
-            type="tel"
-            name="phone"
-            value={brokerData.phone}
-            onChange={handleChange}
-            required
-            placeholder=" "
-            inputMode="numeric"
-            pattern="[0-9]*"
-            onKeyDown={handlePhoneKeyDown}
-            maxLength={11}
-          />
-          <span className="floating-label">Phone Number</span>
-        </label>
-
-        <div className="id-card-upload-section">
-          <h3 className="upload-section-title">ID Card Photos</h3>
+        <div className="form-section">
+          <h3 className="section-title">
+            <Camera size={20} />
+            Identity Verification
+          </h3>
+          <p className="section-description">
+            Upload clear photos of your ID card and a selfie for verification
+          </p>
 
           <div className="id-card-uploads">
             <div className="id-card-upload-item">
@@ -264,21 +313,27 @@ const BrokersDataForm = ({ setRefresh }) => {
                     accept="image/*"
                     onChange={handleChange}
                     required
+                    disabled={isUploading}
                   />
                   <div className="file-input-display">
                     {brokerData.idCardFront ? (
                       <div className="file-selected">
-                        <span className="file-name">
-                          {brokerData.idCardFront.name}
-                        </span>
-                        <span className="file-size">
-                          {getFileSize(brokerData.idCardFront)}
-                        </span>
+                        <FileImage className="file-icon" size={24} />
+                        <div className="file-info">
+                          <span className="file-name">
+                            {brokerData.idCardFront.name}
+                          </span>
+                          <span className="file-size">
+                            {getFileSize(brokerData.idCardFront)}
+                          </span>
+                        </div>
+                        <CheckCircle className="check-icon" size={20} />
                       </div>
                     ) : (
                       <div className="file-placeholder">
-                        <span className="upload-icon">📷</span>
-                        <span>ID Card Front Photo</span>
+                        <Camera className="upload-icon" size={32} />
+                        <span className="upload-text">ID Card Front Photo</span>
+                        <span className="upload-hint">Click to upload</span>
                       </div>
                     )}
                   </div>
@@ -310,21 +365,27 @@ const BrokersDataForm = ({ setRefresh }) => {
                     accept="image/*"
                     onChange={handleChange}
                     required
+                    disabled={isUploading}
                   />
                   <div className="file-input-display">
                     {brokerData.idCardBack ? (
                       <div className="file-selected">
-                        <span className="file-name">
-                          {brokerData.idCardBack.name}
-                        </span>
-                        <span className="file-size">
-                          {getFileSize(brokerData.idCardBack)}
-                        </span>
+                        <FileImage className="file-icon" size={24} />
+                        <div className="file-info">
+                          <span className="file-name">
+                            {brokerData.idCardBack.name}
+                          </span>
+                          <span className="file-size">
+                            {getFileSize(brokerData.idCardBack)}
+                          </span>
+                        </div>
+                        <CheckCircle className="check-icon" size={20} />
                       </div>
                     ) : (
                       <div className="file-placeholder">
-                        <span className="upload-icon">📷</span>
-                        <span>ID Card Back Photo</span>
+                        <Camera className="upload-icon" size={32} />
+                        <span className="upload-text">ID Card Back Photo</span>
+                        <span className="upload-hint">Click to upload</span>
                       </div>
                     )}
                   </div>
@@ -356,21 +417,27 @@ const BrokersDataForm = ({ setRefresh }) => {
                     accept="image/*"
                     onChange={handleChange}
                     required
+                    disabled={isUploading}
                   />
                   <div className="file-input-display">
                     {brokerData.selfieWithIdCard ? (
                       <div className="file-selected">
-                        <span className="file-name">
-                          {brokerData.selfieWithIdCard.name}
-                        </span>
-                        <span className="file-size">
-                          {getFileSize(brokerData.selfieWithIdCard)}
-                        </span>
+                        <FileImage className="file-icon" size={24} />
+                        <div className="file-info">
+                          <span className="file-name">
+                            {brokerData.selfieWithIdCard.name}
+                          </span>
+                          <span className="file-size">
+                            {getFileSize(brokerData.selfieWithIdCard)}
+                          </span>
+                        </div>
+                        <CheckCircle className="check-icon" size={20} />
                       </div>
                     ) : (
                       <div className="file-placeholder">
-                        <span className="upload-icon">📷</span>
-                        <span>Selfie with ID Card</span>
+                        <Camera className="upload-icon" size={32} />
+                        <span className="upload-text">Selfie with ID Card</span>
+                        <span className="upload-hint">Click to upload</span>
                       </div>
                     )}
                   </div>
@@ -394,11 +461,21 @@ const BrokersDataForm = ({ setRefresh }) => {
         </div>
 
         <button
-          className="broker-submit-btn"
+          className={`broker-submit-btn ${isUploading ? "loading" : ""}`}
           type="submit"
           disabled={isUploading}
         >
-          {isUploading ? "Uploading..." : "Submit Broker Data"}
+          {isUploading ? (
+            <>
+              <div className="spinner"></div>
+              Uploading & Submitting...
+            </>
+          ) : (
+            <>
+              <Upload size={20} />
+              Submit Broker Data
+            </>
+          )}
         </button>
       </form>
     </div>
