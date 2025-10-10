@@ -19,6 +19,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { fetchUserData } from "./utils/userDataService";
 import RequestReset from "./Components/SignIn/ResetPassword/RequestReset/RequestReset";
 import DoReset from "./Components/SignIn/ResetPassword/DoReset/DoReset";
+import AboutUs from "./Components/AboutUs/AboutUs";
 
 import {
   userContext,
@@ -382,6 +383,7 @@ function App() {
                       }
                     />
                     <Route path="/productPage/*" element={<ProductPage />} />
+                    <Route path="/about" element={<AboutUs />} />
                     <Route path="/signup" element={<SignUp />} />
                     <Route path="/signin" element={<SignIn />} />
                     <Route path="/requestreset" element={<RequestReset />} />

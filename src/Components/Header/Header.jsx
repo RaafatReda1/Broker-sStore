@@ -17,9 +17,14 @@ import {
   faSearch,
   faBars,
   faTimes,
+  faInfoCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { userDataContext, productsContext, sessionContext } from "../../AppContexts";
+import {
+  userDataContext,
+  productsContext,
+  sessionContext,
+} from "../../AppContexts";
 import DropMenu from "../DropMenu/DropMenu";
 import "./Header.css";
 import supabase from "../../SupabaseClient";
@@ -336,44 +341,55 @@ const Header = () => {
   }, []);
 
   return (
-    
     <header className={scrolled ? "scrolled" : ""}>
-    
       <div className="header-container">
         {/* Logo */}
         <div className="logo">
           <h2>
             <Link to="/" aria-label="Cicada Home">
-              <img src="./CicadaHorizentalWhite.png" style={{ width: "fit-content" , height: "110px", margin: "30px"}}></img>
+              <img
+                src="./CicadaHorizentalWhite.png"
+                style={{
+                  width: "fit-content",
+                  height: "110px",
+                  margin: "30px",
+                }}
+              ></img>
             </Link>
           </h2>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="desktop-nav" aria-label="Main navigation">
+          <Link to="/about" className="nav-link" aria-label="About Cicada">
+            <FontAwesomeIcon icon={faInfoCircle} aria-hidden="true" />
+            <span>About Us</span>
+          </Link>
           {!userData && (
             <Link to="/cart" className="nav-link" aria-label="Shopping cart">
               <FontAwesomeIcon icon={faShoppingCart} aria-hidden="true" />
               <span>Cart</span>
             </Link>
           )}
-          {session && (<Link
-                to="/notifications"
-                className="nav-link"
-                aria-label={`Notifications (${unreadCount} unread)`}
-                onClick={refreshNotificationCount}
-              >
-                <FontAwesomeIcon icon={faBell} aria-hidden="true" />
-                <span>Notifications</span>
-                {unreadCount > 0 && (
-                  <span
-                    className={`notification-badge ${badgeAnimation}`}
-                    aria-label={`${unreadCount} unread notifications`}
-                  >
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                )}
-              </Link>)}
+          {session && (
+            <Link
+              to="/notifications"
+              className="nav-link"
+              aria-label={`Notifications (${unreadCount} unread)`}
+              onClick={refreshNotificationCount}
+            >
+              <FontAwesomeIcon icon={faBell} aria-hidden="true" />
+              <span>Notifications</span>
+              {unreadCount > 0 && (
+                <span
+                  className={`notification-badge ${badgeAnimation}`}
+                  aria-label={`${unreadCount} unread notifications`}
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </Link>
+          )}
           {userData && (
             <>
               <Link
@@ -617,6 +633,16 @@ const Header = () => {
             </Link>
           </>
         )}
+
+        <Link
+          to="/about"
+          className="mobile-nav-link"
+          onClick={closeMobileMenu}
+          aria-label="About Cicada"
+        >
+          <FontAwesomeIcon icon={faInfoCircle} aria-hidden="true" />
+          <span>About Us</span>
+        </Link>
 
         <Link
           to="/"
