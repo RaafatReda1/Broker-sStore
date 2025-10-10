@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 import "./App.css";
 import Header from "./Components/Header/Header";
@@ -53,7 +53,7 @@ function App() {
   });
 
   // Check if all required data is loaded
-  const isAllDataLoaded = () => {
+  const isAllDataLoaded = useMemo(() => {
     const {
       products: productsLoaded,
       session: sessionLoaded,
@@ -94,11 +94,11 @@ function App() {
 
     console.log("✅ All data loaded successfully!");
     return true;
-  };
+  }, [dataLoadingStates, session, userData]);
 
   // Check what component should be shown based on loaded data
   const getComponentToShow = () => {
-    if (!isAllDataLoaded()) {
+    if (!isAllDataLoaded) {
       return "loading";
     }
 
@@ -133,9 +133,22 @@ function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Auth state changed:", _event);
+      console.log("Auth state changed:", _event, "Session:", !!session);
 
-      setSession(session); // ✅ دايماً يحدث الـ session محليًا
+      // Only update session if it's actually different to prevent unnecessary re-renders
+      setSession((prevSession) => {
+        // Check if session actually changed
+        if (
+          prevSession?.user?.id === session?.user?.id &&
+          prevSession?.access_token === session?.access_token
+        ) {
+          console.log("Session unchanged, skipping update");
+          return prevSession;
+        }
+
+        console.log("Session changed, updating...");
+        return session;
+      });
 
       if (_event === "SIGNED_OUT") {
         console.log("User logged out → reloading...");
@@ -241,6 +254,8 @@ function App() {
         setUserData(null);
         setIsAdmin(false);
         setIsModerator(false);
+        // Mark userData as loaded when there's no session
+        setDataLoadingStates((prev) => ({ ...prev, userData: true }));
       }
     }
   }, [session, isAppInitialized]);
@@ -262,8 +277,30 @@ function App() {
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
+
+  // ✅ Prevent unnecessary re-initialization on tab focus/visibility changes
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && isAppInitialized) {
+        console.log("Tab became visible, checking session validity...");
+        // Only refresh session if needed, don't reinitialize everything
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session?.access_token !== session?.access_token) {
+            console.log("Session token changed, updating...");
+            setSession(session);
+          } else {
+            console.log("Session still valid, no update needed");
+          }
+        });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [isAppInitialized]);
   const componentToShow = getComponentToShow();
-  const allDataLoaded = isAllDataLoaded();
+  const allDataLoaded = isAllDataLoaded;
 
   console.log("App State:", {
     isAppInitialized,
