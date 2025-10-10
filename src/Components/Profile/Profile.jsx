@@ -5,6 +5,8 @@ import supabase from "../../SupabaseClient";
 import { sessionContext, userDataContext } from "../../AppContexts";
 import { toast } from "react-toastify";
 import { fetchBrokerData } from "../../utils/userDataService";
+import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
+import "./Profile.css";
 
 const Profile = () => {
   const [brokerExists, setBrokerExists] = useState(null);
@@ -47,18 +49,31 @@ const Profile = () => {
   }, [session, refresh]);
 
   return (
-    <>
-      {checkDataIsLoading && <p>Loading...</p>}
+    <div className="profile-page-container">
+      {checkDataIsLoading && (
+        <div className="loading-state">
+          <div className="loading-content">
+            <Loader2 className="spinner" size={32} />
+            <h3>Loading Profile...</h3>
+            <p>Please wait while we fetch your data</p>
+          </div>
+        </div>
+      )}
 
       {!checkDataIsLoading && !responded && (
-        <div>
-          <p>Error fetching data</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="retry-button"
-          >
-            Retry
-          </button>
+        <div className="error-state">
+          <div className="error-content">
+            <AlertCircle className="error-icon" size={48} />
+            <h3>Error Loading Profile</h3>
+            <p>There was an issue fetching your profile data</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="retry-button"
+            >
+              <RefreshCw size={16} />
+              Retry
+            </button>
+          </div>
         </div>
       )}
 
@@ -69,7 +84,7 @@ const Profile = () => {
       {!checkDataIsLoading && responded && brokerExists && userData && (
         <PreviewData />
       )}
-    </>
+    </div>
   );
 };
 

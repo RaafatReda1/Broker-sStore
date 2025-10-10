@@ -3,13 +3,18 @@ import "./PreviewData.css";
 import { sessionContext, userDataContext } from "../../../AppContexts";
 import supabase from "../../../SupabaseClient";
 import { fetchBrokerData } from "../../../utils/userDataService";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUserTie,
-  faCheckCircle,
-  faExclamationTriangle,
-  faCircleCheck,
-} from "@fortawesome/free-solid-svg-icons";
+  User,
+  Phone,
+  Edit3,
+  Save,
+  X,
+  Camera,
+  CheckCircle,
+  AlertTriangle,
+  UserCheck,
+  Mail,
+} from "lucide-react";
 import { toast } from "react-toastify";
 
 const PreviewData = () => {
@@ -167,149 +172,196 @@ const PreviewData = () => {
   };
 
   return (
-    <>
-      <div className="dataContainer">
-        <h1>
-          Profile{" "}
-          {userData?.isVerified && (
-            <>
-              <FontAwesomeIcon
-                icon={faCircleCheck}
-                style={{
-                  color: "#00C853",
-                  marginLeft: "8px",
-                  filter: "drop-shadow(0 0 4px rgba(0, 200, 83, 0.6))",
-                  fontSize: "1.1rem",
-                }}
-              />
-              <span
-                style={{
-                  color: "#00C853",
-                  fontSize: "1.2rem",
-                  filter: "drop-shadow(0 0 4px rgba(0, 200, 83, 0.6))",
-                }}
-              >
-                {" "}
-                Verified
+    <div className="preview-data-container">
+      <div className="profile-header">
+        <div className="profile-header-icon">
+          <UserCheck size={32} />
+        </div>
+        <div className="profile-title-section">
+          <h1 className="profile-title">
+            Profile
+            {userData?.isVerified && (
+              <span className="verified-badge" >
+                <CheckCircle size={20} />
               </span>
-            </>
-          )}
-        </h1>
+            )}
+          </h1>
+          <p className="profile-subtitle">
+            Manage your broker profile information
+          </p>
+        </div>
+      </div>
 
-        {userData && !userData.isVerified && (
-          <div
-            style={{
-              background: "#fff3cd",
-              border: "1px solid #ffeaa7",
-              borderRadius: "8px",
-              padding: "12px",
-              marginBottom: "20px",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <FontAwesomeIcon
-              icon={faExclamationTriangle}
-              style={{ color: "#856404" }}
-            />
-            <span style={{ color: "#856404", fontSize: "14px" }}>
+      {userData && !userData.isVerified && (
+        <div className="verification-warning">
+          <AlertTriangle className="warning-icon" size={20} />
+          <div className="warning-content">
+            <h4>Account Under Review</h4>
+            <p>
               Your account is under review. You cannot work until verification
               is complete.
-            </span>
+            </p>
           </div>
-        )}
+        </div>
+      )}
 
-        <div className="profileContent">
-          <div className="profileLeft">
-            <div
-              className={`avatarCard ${isEditing && "avatarCard2"}`}
-              onClick={() => {
-                {
-                  isEditing && document.getElementById("fileInput").click();
-                }
-              }}
-            >
-              {previewUrl && isEditing ? (
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  style={{ width: "150px", height: "150px" }}
-                />
-              ) : userData?.avatar_url ? (
-                <img
-                  src={userData.avatar_url}
-                  alt="Profile"
-                  style={{ width: "150px", height: "150px" }}
-                />
-              ) : (
-                <FontAwesomeIcon
-                  icon={faUserTie}
-                  style={{ width: "150px", height: "150px" }}
-                />
-              )}
-
-              <input
-                type="file"
-                accept="image/*"
-                id="fileInput"
-                style={{ display: "none" }}
-                onChange={handleFile}
-              />
-            </div>
-          </div>
-
-          <div className="profileRight">
-            <form className="profileForm">
-              <label htmlFor="fullName">Full Name</label>
-              <input
-                value={userDataForm.fullName}
-                name="fullName"
-                onChange={handleChange}
-                disabled={!isEditing}
-                id="fullName"
-              />
-
-              <label htmlFor="nickName">Nickname</label>
-              <input
-                value={userDataForm.nickName}
-                name="nickName"
-                onChange={handleChange}
-                disabled={!isEditing}
-                id="nickName"
-              />
-
-              <label htmlFor="phone">Phone</label>
-              <input
-                value={userDataForm.phone}
-                name="phone"
-                type="tel"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                onChange={handleChange}
-                onKeyDown={(e) => {
-                  // لو المفتاح مش رقم ومش Backspace/Arrow → منع الكتابة
-                  if (
-                    !/[0-9]/.test(e.key) &&
-                    e.key !== "Backspace" &&
-                    e.key !== "ArrowLeft" &&
-                    e.key !== "ArrowRight"
-                  ) {
-                    e.preventDefault();
-                  }
+      <div className="profile-content">
+        <div className="profile-left">
+          <div
+            className={`avatar-card ${isEditing ? "editing" : ""}`}
+            onClick={() => {
+              if (isEditing) {
+                document.getElementById("fileInput").click();
+              }
+            }}
+          >
+            {previewUrl && isEditing ? (
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="avatar-image"
+                onError={(e) => {
+                  console.error("❌ Failed to load preview image");
+                  e.target.style.display = "none";
                 }}
-                maxLength={11}
-                disabled={!isEditing}
-                id="phone"
               />
+            ) : userData?.avatar_url ? (
+              <img
+                src={userData.avatar_url}
+                alt="Profile"
+                className="avatar-image"
+                onError={(e) => {
+                  console.error(
+                    "❌ Failed to load profile image:",
+                    userData.avatar_url
+                  );
+                  e.target.style.display = "none";
+                }}
+              />
+            ) : (
+              <div className="avatar-placeholder">
+                <User size={48} />
+              </div>
+            )}
+
+            {isEditing && (
+              <div className="avatar-overlay">
+                <Camera size={24} />
+                <span>Change Photo</span>
+              </div>
+            )}
+
+            <input
+              type="file"
+              accept="image/*"
+              id="fileInput"
+              style={{ display: "none" }}
+              onChange={handleFile}
+            />
+          </div>
+        </div>
+
+        <div className="profile-right">
+          <div className="profile-form-section">
+            <h3 className="form-section-title">
+              <User size={20} />
+              Personal Information
+            </h3>
+
+            <form className="profile-form">
+              <div className="input-group">
+                <label className="profile-label" htmlFor="fullName">
+                  <div className="input-container">
+                    <User className="input-icon" size={20} />
+                    <input
+                      className="profile-input"
+                      value={userDataForm.fullName}
+                      name="fullName"
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      id="fullName"
+                      placeholder=" "
+                    />
+                    <span className="floating-label">Full Name</span>
+                  </div>
+                </label>
+              </div>
+
+              <div className="input-group">
+                <label className="profile-label" htmlFor="nickName">
+                  <div className="input-container">
+                    <User className="input-icon" size={20} />
+                    <input
+                      className="profile-input"
+                      value={userDataForm.nickName}
+                      name="nickName"
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      id="nickName"
+                      placeholder=" "
+                    />
+                    <span className="floating-label">Nickname</span>
+                  </div>
+                </label>
+              </div>
+
+              <div className="input-group">
+                <label className="profile-label" htmlFor="phone">
+                  <div className="input-container">
+                    <Phone className="input-icon" size={20} />
+                    <input
+                      className="profile-input"
+                      value={userDataForm.phone}
+                      name="phone"
+                      type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      onChange={handleChange}
+                      onKeyDown={(e) => {
+                        if (
+                          !/[0-9]/.test(e.key) &&
+                          e.key !== "Backspace" &&
+                          e.key !== "ArrowLeft" &&
+                          e.key !== "ArrowRight"
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                      maxLength={11}
+                      disabled={!isEditing}
+                      id="phone"
+                      placeholder=" "
+                    />
+                    <span className="floating-label">Phone Number</span>
+                  </div>
+                </label>
+              </div>
+
+              <div className="input-group">
+                <label className="profile-label" htmlFor="email">
+                  <div className="input-container">
+                    <Mail className="input-icon" size={20} />
+                    <input
+                      className="profile-input"
+                      value={userData?.email || session?.user?.email || ""}
+                      disabled={true}
+                      id="email"
+                      placeholder=" "
+                    />
+                    <span className="floating-label">Email Address</span>
+                  </div>
+                </label>
+              </div>
             </form>
           </div>
         </div>
       </div>
 
-      <div className="btns">
+      <div className="profile-actions">
         <button
-          className="savingBtn"
+          className={`profile-action-btn primary ${
+            isEditing ? "save" : "edit"
+          }`}
           onClick={() => {
             if (isEditing) {
               handleUpdate();
@@ -320,26 +372,39 @@ const PreviewData = () => {
             }
           }}
         >
-          {isEditing ? "Save Changes" : "Edit Data"}
+          {isEditing ? (
+            <>
+              <Save size={20} />
+              Save Changes
+            </>
+          ) : (
+            <>
+              <Edit3 size={20} />
+              Edit Profile
+            </>
+          )}
         </button>
 
         {isEditing && (
           <button
-            className="cancelBtn"
+            className="profile-action-btn secondary"
             onClick={() => {
               setIsEditing(false);
               setUserDataForm({
                 fullName: userData?.fullName || "",
                 nickName: userData?.nickName || "",
                 phone: userData?.phone || "",
-              }); // رجّع القيم القديمة
+              });
+              setPreviewUrl(null);
+              setSelectedFile(null);
             }}
           >
+            <X size={20} />
             Cancel
           </button>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

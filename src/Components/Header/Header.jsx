@@ -500,9 +500,19 @@ const Header = () => {
               {userData?.avatar_url ? (
                 <img
                   src={userData.avatar_url}
-                  alt={`${userData.name || "User"}'s avatar`}
+                  alt={`${
+                    userData.fullName || userData.nickName || "User"
+                  }'s avatar`}
                   className="profile-avatar"
                   loading="lazy"
+                  onError={(e) => {
+                    console.error(
+                      "❌ Failed to load avatar image:",
+                      userData.avatar_url
+                    );
+                    e.target.style.display = "none";
+                    e.target.nextElementSibling.style.display = "flex";
+                  }}
                 />
               ) : (
                 <div className="profile-icon">
@@ -510,7 +520,9 @@ const Header = () => {
                 </div>
               )}
               {userData && (
-                <span className="user-name">{userData.name || "User"}</span>
+                <span className="user-name">
+                  {userData.fullName || userData.nickName || "User"}
+                </span>
               )}
             </div>
             <DropMenu isOpen={isDropdownOpen} onClose={closeDropdown} />
