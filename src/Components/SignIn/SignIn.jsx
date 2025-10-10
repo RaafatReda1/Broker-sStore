@@ -122,9 +122,12 @@ const SignIn = () => {
             </>
           )}
         </button>
-        <Link to={"/requestreset"}>
-          <p className="signin-forgot-password">Forgot Password?</p>
-        </Link>
+        <div className="signin-footer">
+          <Link to={"/requestreset"} className="forgot-password-link">
+            <span className="forgot-password-text">Forgot Password?</span>
+            <span className="forgot-password-icon">→</span>
+          </Link>
+        </div>
       </form>
     </div>
   );
