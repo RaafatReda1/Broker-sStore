@@ -4,6 +4,7 @@ import supabase from "../../../SupabaseClient";
 import { userContext, sessionContext } from "../../../AppContexts";
 import { toast } from "react-toastify";
 import FileValidationService from "../../../utils/fileValidationService";
+import StorageOrganizationService from "../../../utils/storageOrganizationService";
 import {
   User,
   Phone,
@@ -137,44 +138,40 @@ const BrokersDataForm = ({ setRefresh }) => {
       setUploadProgress({ front: 0, back: 0, selfie: 0 });
 
       try {
-        // Generate unique file names
-        const timestamp = Date.now();
-        const frontFileName = `${user.id}/id_front_${timestamp}.jpg`;
-        const backFileName = `${user.id}/id_back_${timestamp}.jpg`;
-        const selfieFileName = `${user.id}/selfie_with_id_${timestamp}.jpg`;
+        // Upload broker ID card images with organized folder structure
+        console.log(`📁 Uploading ID cards for broker: ${brokerData.fullName}`);
 
-        // Upload all images with progress tracking
-        const [frontUrl, backUrl, selfieUrl] = await Promise.all([
-          uploadWithProgress(brokerData.idCardFront, frontFileName, "front"),
-          uploadWithProgress(brokerData.idCardBack, backFileName, "back"),
-          uploadWithProgress(
-            brokerData.selfieWithIdCard,
-            selfieFileName,
-            "selfie"
-          ),
-        ]);
+        const uploadResult = await StorageOrganizationService.uploadBrokerCards(
+          brokerData,
+          brokerData.fullName
+        );
 
-        // Insert broker data into database
+        if (!uploadResult.success) {
+          throw new Error(
+            `Failed to upload images: ${uploadResult.errors.join(", ")}`
+          );
+        }
+
+        // Insert broker data into database with organized image URLs
         const { data, error } = await supabase.from("Brokers").insert({
           fullName: brokerData.fullName,
           nickName: brokerData.nickName,
           phone: brokerData.phone,
           email: user.email,
           auth_id: user.id,
-          idCardFront: frontUrl,
-          idCardBack: backUrl,
-          selfieWithIdCard: selfieUrl,
+          idCardFront: uploadResult.urls.idCardFront,
+          idCardBack: uploadResult.urls.idCardBack,
+          selfieWithIdCard: uploadResult.urls.selfieWithIdCard,
         });
 
         if (error) {
           throw error;
         }
-        toast.success("Broker data submitted successfully!");
-        console.log("Broker data saved:", {
-          ...brokerData,
-          frontUrl,
-          backUrl,
-          selfieUrl,
+
+        toast.success("✅ Broker data submitted successfully!");
+        console.log("✅ Broker data saved with organized storage:", {
+          brokerName: brokerData.fullName,
+          imageUrls: uploadResult.urls,
         });
 
         // Reset form

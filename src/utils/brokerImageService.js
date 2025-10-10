@@ -318,6 +318,85 @@ class BrokerImageService {
 
     return summary;
   }
+
+  /**
+   * Delete entire broker folder (organized structure)
+   * @param {string} folderPath - Path of the broker folder
+   * @returns {Object} - Deletion result
+   */
+  static async deleteBrokerFolderOrganized(folderPath) {
+    const result = {
+      success: false,
+      deletedFiles: [],
+      error: null,
+    };
+
+    try {
+      // List all files in the folder
+      const { data: files, error: listError } = await supabase.storage
+        .from("BrokersCards")
+        .list(folderPath);
+
+      if (listError) {
+        result.error = listError.message;
+        console.warn(
+          `⚠️ Could not list files in broker folder ${folderPath}:`,
+          listError
+        );
+        return result;
+      }
+
+      if (!files || files.length === 0) {
+        result.success = true;
+        console.log(`ℹ️ Broker folder ${folderPath} is empty or doesn't exist`);
+        return result;
+      }
+
+      // Delete all files in the folder
+      const filePaths = files.map((file) => `${folderPath}/${file.name}`);
+      const { error: deleteError } = await supabase.storage
+        .from("BrokersCards")
+        .remove(filePaths);
+
+      if (deleteError) {
+        result.error = deleteError.message;
+        console.error(
+          `❌ Error deleting broker folder ${folderPath}:`,
+          deleteError
+        );
+        return result;
+      }
+
+      result.success = true;
+      result.deletedFiles = filePaths;
+
+      console.log(
+        `✅ Successfully deleted broker folder: ${folderPath} (${filePaths.length} files)`
+      );
+      return result;
+    } catch (error) {
+      result.error = error.message;
+      console.error(`❌ Error deleting broker folder ${folderPath}:`, error);
+      return result;
+    }
+  }
+
+  /**
+   * Get broker folder path (organized structure)
+   * @param {Object} broker - Broker object
+   * @returns {string} - Sanitized folder path
+   */
+  static getBrokerFolderPathOrganized(broker) {
+    if (!broker || !broker.fullName) {
+      return "unknown";
+    }
+
+    return broker.fullName
+      .replace(/[^a-zA-Z0-9\s\-_]/g, "") // Remove special characters
+      .replace(/\s+/g, "_") // Replace spaces with underscores
+      .toLowerCase()
+      .substring(0, 50); // Limit length
+  }
 }
 
 export default BrokerImageService;

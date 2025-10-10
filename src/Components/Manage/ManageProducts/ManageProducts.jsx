@@ -3,6 +3,7 @@ import supabase from "../../../SupabaseClient";
 import { toast } from "react-toastify";
 import FileValidationService from "../../../utils/fileValidationService";
 import ProductImageService from "../../../utils/productImageService";
+import StorageOrganizationService from "../../../utils/storageOrganizationService";
 import {
   Trash2,
   Edit,
@@ -108,34 +109,39 @@ const ProductsManager = () => {
     }
   };
 
-  // Upload all selected images to Supabase Storage
+  // Upload all selected images to Supabase Storage with organized folder structure
   const uploadImages = async () => {
     if (!imageFiles.length) return [];
 
-    const uploadedURLs = [];
+    try {
+      console.log(
+        `📁 Uploading ${imageFiles.length} images for product: ${form.name}`
+      );
 
-    for (const file of imageFiles) {
-      const fileExt = file.name.split(".").pop();
-      const uniqueName = `${Date.now()}_${Math.random()
-        .toString(36)
-        .substring(2)}.${fileExt}`;
+      const uploadResult = await StorageOrganizationService.uploadProductImages(
+        imageFiles,
+        form.name
+      );
 
-      const { error: uploadError } = await supabase.storage
-        .from(BUCKET_NAME)
-        .upload(uniqueName, file);
-
-      if (uploadError) {
-        toast.error(`Failed to upload ${file.name}`);
-        continue;
+      if (!uploadResult.success) {
+        toast.error(
+          `Failed to upload images: ${uploadResult.errors.join(", ")}`
+        );
+        return [];
       }
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from(BUCKET_NAME).getPublicUrl(uniqueName);
-      uploadedURLs.push(publicUrl);
-    }
+      toast.success(`✅ Uploaded ${uploadResult.urls.length} product images`);
+      console.log(
+        "✅ Product images uploaded with organized storage:",
+        uploadResult.urls
+      );
 
-    return uploadedURLs;
+      return uploadResult.urls;
+    } catch (error) {
+      console.error("❌ Error uploading product images:", error);
+      toast.error(`Failed to upload images: ${error.message}`);
+      return [];
+    }
   };
 
   // Create or Update product in Supabase

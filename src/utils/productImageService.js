@@ -119,7 +119,7 @@ class ProductImageService {
   }
 
   /**
-   * Delete all images for a product
+   * Delete all images for a product (organized folder structure)
    * @param {Object} product - Product object with images array
    * @returns {Object} - Deletion results summary
    */
@@ -143,7 +143,29 @@ class ProductImageService {
         `🗑️ Starting deletion of ${product.images.length} images for product: ${product.name}`
       );
 
-      // Delete each image
+      // Try to delete the entire product folder first (more efficient)
+      const folderPath = this.getProductFolderPath(product.name);
+      const folderDeletionResult = await this.deleteProductFolder(folderPath);
+
+      if (folderDeletionResult.success) {
+        results.totalDeleted = folderDeletionResult.deletedFiles.length;
+        results.deletedImages = folderDeletionResult.deletedFiles.map(
+          (filePath) => ({
+            fileName: filePath.split("/").pop(),
+            url: `folder:${folderPath}`,
+          })
+        );
+        console.log(
+          `✅ Successfully deleted entire product folder: ${folderPath}`
+        );
+        return results;
+      }
+
+      // Fallback: Delete individual images if folder deletion fails
+      console.log(
+        `⚠️ Folder deletion failed, falling back to individual image deletion`
+      );
+
       for (const imageUrl of product.images) {
         // Skip non-Supabase URLs
         if (!this.isValidSupabaseUrl(imageUrl)) {
@@ -190,6 +212,82 @@ class ProductImageService {
       });
       return results;
     }
+  }
+
+  /**
+   * Delete entire product folder
+   * @param {string} folderPath - Path of the product folder
+   * @returns {Object} - Deletion result
+   */
+  static async deleteProductFolder(folderPath) {
+    const result = {
+      success: false,
+      deletedFiles: [],
+      error: null,
+    };
+
+    try {
+      // List all files in the folder
+      const { data: files, error: listError } = await supabase.storage
+        .from(this.BUCKET_NAME)
+        .list(folderPath);
+
+      if (listError) {
+        result.error = listError.message;
+        console.warn(
+          `⚠️ Could not list files in folder ${folderPath}:`,
+          listError
+        );
+        return result;
+      }
+
+      if (!files || files.length === 0) {
+        result.success = true;
+        console.log(`ℹ️ Folder ${folderPath} is empty or doesn't exist`);
+        return result;
+      }
+
+      // Delete all files in the folder
+      const filePaths = files.map((file) => `${folderPath}/${file.name}`);
+      const { error: deleteError } = await supabase.storage
+        .from(this.BUCKET_NAME)
+        .remove(filePaths);
+
+      if (deleteError) {
+        result.error = deleteError.message;
+        console.error(`❌ Error deleting folder ${folderPath}:`, deleteError);
+        return result;
+      }
+
+      result.success = true;
+      result.deletedFiles = filePaths;
+
+      console.log(
+        `✅ Successfully deleted product folder: ${folderPath} (${filePaths.length} files)`
+      );
+      return result;
+    } catch (error) {
+      result.error = error.message;
+      console.error(`❌ Error deleting product folder ${folderPath}:`, error);
+      return result;
+    }
+  }
+
+  /**
+   * Get product folder path
+   * @param {string} productName - Product name
+   * @returns {string} - Sanitized folder path
+   */
+  static getProductFolderPath(productName) {
+    if (!productName || typeof productName !== "string") {
+      return "unknown";
+    }
+
+    return productName
+      .replace(/[^a-zA-Z0-9\s\-_]/g, "") // Remove special characters
+      .replace(/\s+/g, "_") // Replace spaces with underscores
+      .toLowerCase()
+      .substring(0, 50); // Limit length
   }
 
   /**
