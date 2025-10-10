@@ -133,8 +133,7 @@ export class NotificationService {
       `💵 **Your Profit:** $${orderProfit.toFixed(2)}\n` +
       `📊 **Status:** ${statusEmoji} ${statusText}\n` +
       `📅 **Date:** ${new Date().toLocaleDateString()}\n\n` +
-      `🎯 **Order placed with your broker ID: ${brokerId}**\n\n` ;
-      
+      `🎯 **Order placed with your broker ID: ${brokerId}**\n\n`;
 
     console.log("🔔 Sending notification to brokerId:", brokerId);
     console.log("🔔 Notification message:", message);
@@ -318,6 +317,44 @@ export class NotificationService {
       title,
       message,
       isTemp,
+    });
+  }
+
+  /**
+   * Send order deletion notification to broker
+   * @param {Object} order - Order object
+   * @param {string} staffComment - Optional staff comment about deletion
+   * @returns {Promise<boolean>} - Success status
+   */
+  static async notifyOrderDeletion(order, staffComment = "") {
+    const { brokerId, name, id, total, netProfit } = order;
+
+    // Convert total and netProfit to numbers and validate
+    const orderTotal = parseFloat(total) || 0;
+    const orderProfit = parseFloat(netProfit) || 0;
+
+    const title = "🗑️ Order Deleted";
+    const message =
+      `**Order #${id} Has Been Deleted**\n\n` +
+      `👤 **Customer:** ${name}\n` +
+      `💰 **Order Total:** $${orderTotal.toFixed(2)}\n` +
+      `💵 **Your Profit:** $${orderProfit.toFixed(2)}\n` +
+      `📅 **Deleted On:** ${new Date().toLocaleDateString()}\n\n` +
+      `🎯 **Order was placed with your broker ID: ${brokerId}**\n\n` +
+      `${staffComment ? `📝 **Staff Comment:** ${staffComment}\n\n` : ""}` +
+      `⚠️ **Note:** This order has been permanently removed from the system. ` +
+      `Any pending profit from this order will not be added to your balance.`;
+
+    console.log(
+      "🗑️ Sending order deletion notification to brokerId:",
+      brokerId
+    );
+
+    return await this.sendBrokerNotification({
+      brokerId,
+      title,
+      message,
+      isTemp: false,
     });
   }
 

@@ -2,12 +2,16 @@ import React, { useEffect, useState } from "react";
 import supabase from "../../../SupabaseClient";
 import "./ManageOrders.css";
 import NotificationService from "../../../utils/notificationService";
+import DeleteOrderModal from "./DeleteOrderModal";
+import { toast } from "react-toastify";
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
 
   const fetchOrders = async () => {
     const { data, error } = await supabase.from("Orders").select(`
@@ -107,6 +111,66 @@ const ManageOrders = () => {
     } catch (error) {
       console.error("Error updating bulk order status:", error);
     }
+  };
+
+  // Handle order deletion
+  const handleDeleteOrder = (order) => {
+    setOrderToDelete(order);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteOrder = async (orderId, staffComment) => {
+    try {
+      // Find the order to get broker information
+      const order = orders.find((o) => o.id === orderId);
+      if (!order) {
+        console.error("Order not found:", orderId);
+        toast.error("Order not found!");
+        return;
+      }
+
+      // Delete the order from database
+      const { error } = await supabase
+        .from("Orders")
+        .delete()
+        .eq("id", orderId);
+
+      if (error) throw error;
+
+      // Remove from local state
+      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+
+      // Close any open order details if this order was selected
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder(null);
+      }
+
+      console.log("Order deleted successfully");
+
+      // Send notification to broker about deletion
+      try {
+        await NotificationService.notifyOrderDeletion(order, staffComment);
+        console.log("Order deletion notification sent to broker");
+        toast.success("Order deleted successfully and broker notified!");
+      } catch (notificationError) {
+        console.error(
+          "Failed to send deletion notification:",
+          notificationError
+        );
+        toast.success(
+          "Order deleted successfully, but failed to notify broker."
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      toast.error("Failed to delete order. Please try again.");
+      throw error; // Re-throw to let the modal handle the error state
+    }
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setOrderToDelete(null);
   };
 
   useEffect(() => {
@@ -321,12 +385,21 @@ const ManageOrders = () => {
                 <span className="order-date">
                   🕒 {formatDate(order.created_at)}
                 </span>
-                <button
-                  className="view-details-btn"
-                  onClick={() => setSelectedOrder(order)}
-                >
-                  View Details
-                </button>
+                <div className="order-actions">
+                  <button
+                    className="view-details-btn"
+                    onClick={() => setSelectedOrder(order)}
+                  >
+                    View Details
+                  </button>
+                  <button
+                    className="delete-order-btn"
+                    onClick={() => handleDeleteOrder(order)}
+                    title="Delete Order"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
             </div>
           ))
@@ -436,6 +509,14 @@ const ManageOrders = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Order Modal */}
+      <DeleteOrderModal
+        isOpen={showDeleteModal}
+        onClose={closeDeleteModal}
+        order={orderToDelete}
+        onConfirmDelete={confirmDeleteOrder}
+      />
     </div>
   );
 };
