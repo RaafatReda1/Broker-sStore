@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import supabase from "../../../SupabaseClient";
 import "./ManageOrders.css";
+import NotificationService from "../../../utils/notificationService";
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -28,6 +29,13 @@ const ManageOrders = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
+      // Find the order to get broker information
+      const order = orders.find((o) => o.id === orderId);
+      if (!order) {
+        console.error("Order not found:", orderId);
+        return;
+      }
+
       const { error } = await supabase
         .from("Orders")
         .update({ status: newStatus })
@@ -42,8 +50,62 @@ const ManageOrders = () => {
       );
 
       console.log("Order status updated successfully");
+
+      // Send notification to broker about status change
+      try {
+        await NotificationService.notifyOrderStatusChange(order, newStatus);
+        console.log("Order status change notification sent to broker");
+      } catch (notificationError) {
+        console.error(
+          "Failed to send status change notification:",
+          notificationError
+        );
+        // Don't show error to user as order status was updated successfully
+      }
     } catch (error) {
       console.error("Error updating order status:", error);
+    }
+  };
+
+  // Bulk status update function
+  const updateBulkOrderStatus = async (orderIds, newStatus) => {
+    try {
+      const { error } = await supabase
+        .from("Orders")
+        .update({ status: newStatus })
+        .in("id", orderIds);
+
+      if (error) throw error;
+
+      // Update local state
+      setOrders((prev) =>
+        prev.map((order) =>
+          orderIds.includes(order.id) ? { ...order, status: newStatus } : order
+        )
+      );
+
+      console.log("Bulk order status updated successfully");
+
+      // Get orders for notification
+      const updatedOrders = orders.filter((order) =>
+        orderIds.includes(order.id)
+      );
+
+      // Send bulk notification
+      try {
+        await NotificationService.notifyBulkOrderStatusChange(
+          updatedOrders,
+          newStatus
+        );
+        console.log("Bulk order status change notification sent to brokers");
+      } catch (notificationError) {
+        console.error(
+          "Failed to send bulk status change notification:",
+          notificationError
+        );
+      }
+    } catch (error) {
+      console.error("Error updating bulk order status:", error);
     }
   };
 

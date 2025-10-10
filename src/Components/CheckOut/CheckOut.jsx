@@ -13,6 +13,7 @@ import {
   ArrowRight,
   CheckCircle,
 } from "lucide-react";
+import NotificationService from "../../utils/notificationService";
 
 const CheckOut = () => {
   const [visible, setVisible] = useState(false);
@@ -88,6 +89,28 @@ const CheckOut = () => {
       } else if (data && data.length > 0) {
         setOrderSuccess(true);
         toast.success("Order placed successfully!");
+
+        // Send notification to broker about new order
+        const newOrder = data[0];
+        console.log("🛒 Order created successfully:", newOrder);
+        console.log("🛒 BrokerId from order:", newOrder.brokerId);
+
+        try {
+          const notificationResult = await NotificationService.notifyNewOrder(
+            newOrder
+          );
+          console.log("🔔 Notification result:", notificationResult);
+          if (notificationResult) {
+            console.log(
+              "✅ New order notification sent to broker successfully"
+            );
+          } else {
+            console.log("❌ Failed to send new order notification");
+          }
+        } catch (error) {
+          console.error("❌ Error sending new order notification:", error);
+          // Don't show error to user as order was successful
+        }
 
         // Reset form after success
         setTimeout(() => {
@@ -166,7 +189,9 @@ const CheckOut = () => {
                 <div className="success-state">
                   <CheckCircle className="success-icon" size={64} />
                   <h3>Order Placed Successfully!</h3>
-                  <p>Thank you for your order. We'll process it shortly.</p>
+                  <p>
+                    Thank you for your order. We&apos;ll process it shortly.
+                  </p>
                 </div>
               ) : (
                 <form onSubmit={(e) => e.preventDefault()}>
