@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useContext, useMemo } from "react";
 import React from "react";
 
@@ -431,7 +432,7 @@ const Balance = () => {
                 <div className="stat-visual">
                   <DonutChart
                     completed={stats.completedOrders}
-                    pending={stats.pendingOrders - stats.completedOrders}
+                    pending={stats.pendingOrders - stats.completedOrders} 
                   />
                 </div>
                 <div className="stat-subtitle">Completed vs Pending</div>
