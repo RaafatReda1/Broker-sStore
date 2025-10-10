@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import supabase from "../../../SupabaseClient";
 import { toast } from "react-toastify";
 import FileValidationService from "../../../utils/fileValidationService";
+import ProductImageService from "../../../utils/productImageService";
 import {
   Trash2,
   Edit,
@@ -184,16 +185,63 @@ const ProductsManager = () => {
     }
   };
 
-  // Delete product from Supabase
-  const handleDelete = async (id) => {
+  // Delete product from Supabase with image cleanup
+  const handleDelete = async (productId) => {
     if (!window.confirm("Are you sure you want to delete this product?"))
       return;
 
-    const { error } = await supabase.from("Products").delete().eq("id", id);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("🗑️ Product deleted!");
+    try {
+      // Find the product to get its images
+      const product = products.find((p) => p.id === productId);
+
+      if (!product) {
+        toast.error("Product not found");
+        return;
+      }
+
+      // Delete images from storage first
+      if (product.images && product.images.length > 0) {
+        console.log(
+          `🗑️ Deleting ${product.images.length} images for product: ${product.name}`
+        );
+
+        const imageDeletionResult =
+          await ProductImageService.deleteProductImages(product);
+
+        if (imageDeletionResult.success) {
+          toast.success(
+            `✅ Deleted ${imageDeletionResult.totalDeleted} product images`
+          );
+        } else {
+          const message =
+            imageDeletionResult.totalSkipped > 0
+              ? `⚠️ Deleted ${imageDeletionResult.totalDeleted} images, ${imageDeletionResult.totalSkipped} skipped, ${imageDeletionResult.errors.length} failed`
+              : `⚠️ Deleted ${imageDeletionResult.totalDeleted} images, ${imageDeletionResult.errors.length} failed`;
+
+          toast.warning(message);
+          console.warn("Image deletion errors:", imageDeletionResult.errors);
+          if (imageDeletionResult.skippedUrls.length > 0) {
+            console.log("Skipped URLs:", imageDeletionResult.skippedUrls);
+          }
+        }
+      }
+
+      // Delete product from database
+      const { error } = await supabase
+        .from("Products")
+        .delete()
+        .eq("id", productId);
+
+      if (error) {
+        toast.error(`Failed to delete product: ${error.message}`);
+        return;
+      }
+
+      toast.success("🗑️ Product deleted successfully!");
       fetchProducts();
+    } catch (error) {
+      console.error("❌ Error deleting product:", error);
+      toast.error(`Failed to delete product: ${error.message}`);
     }
   };
 
@@ -204,8 +252,31 @@ const ProductsManager = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Remove image from form
-  const removeImage = (index) => {
+  // Remove image from form and storage
+  const removeImage = async (index) => {
+    const imageToRemove = form.images[index];
+
+    if (imageToRemove) {
+      // Delete from storage
+      try {
+        const deleteResult = await ProductImageService.deleteProductImage(
+          imageToRemove
+        );
+
+        if (deleteResult.success) {
+          toast.success(`✅ Removed image: ${deleteResult.fileName}`);
+        } else {
+          toast.warning(
+            `⚠️ Failed to delete image from storage: ${deleteResult.error}`
+          );
+        }
+      } catch (error) {
+        console.error("❌ Error deleting image:", error);
+        toast.warning("⚠️ Failed to delete image from storage");
+      }
+    }
+
+    // Remove from form
     setForm({ ...form, images: form.images.filter((_, i) => i !== index) });
   };
 
