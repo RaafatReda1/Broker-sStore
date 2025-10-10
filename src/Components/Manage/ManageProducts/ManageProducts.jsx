@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import supabase from "../../../SupabaseClient";
 import { toast } from "react-toastify";
+import FileValidationService from "../../../utils/fileValidationService";
 import {
   Trash2,
   Edit,
@@ -78,9 +79,32 @@ const ProductsManager = () => {
     setForm({ ...form, [name]: value });
   };
 
-  // Handle file input (multiple images)
+  // Handle file input (multiple images) with validation
   const handleFilesChange = (e) => {
-    setImageFiles([...e.target.files]);
+    const files = e.target.files;
+
+    if (!files || files.length === 0) {
+      setImageFiles([]);
+      return;
+    }
+
+    const validation = FileValidationService.validateFiles(files);
+
+    if (validation.errors.length > 0) {
+      FileValidationService.showValidationErrors(validation.errors, toast);
+    }
+
+    if (validation.validFiles.length > 0) {
+      FileValidationService.showValidationSuccess(
+        validation.validCount,
+        validation.totalSize,
+        toast
+      );
+      setImageFiles(validation.validFiles);
+    } else {
+      setImageFiles([]);
+      e.target.value = ""; // Clear input if no valid files
+    }
   };
 
   // Upload all selected images to Supabase Storage
@@ -410,6 +434,14 @@ const ProductsManager = () => {
 
                 <div className="file-input-wrapper">
                   <label className="form-label">Product Images</label>
+                  <div className="file-input-info">
+                    <span className="file-size-limit">
+                      {FileValidationService.getSizeLimitMessage()}
+                    </span>
+                    <span className="file-types-info">
+                      {FileValidationService.getSupportedTypesMessage()}
+                    </span>
+                  </div>
                   <input
                     type="file"
                     multiple

@@ -3,6 +3,7 @@ import "./BrokersDataForm.css";
 import supabase from "../../../SupabaseClient";
 import { userContext, sessionContext } from "../../../AppContexts";
 import { toast } from "react-toastify";
+import FileValidationService from "../../../utils/fileValidationService";
 import {
   User,
   Phone,
@@ -38,7 +39,20 @@ const BrokersDataForm = ({ setRefresh }) => {
   const handleChange = useCallback((e) => {
     const { name, value, files } = e.target;
     if (files) {
-      setBrokerData((prev) => ({ ...prev, [name]: files[0] }));
+      const file = files[0];
+      if (file) {
+        const validation = FileValidationService.validateFile(file);
+
+        if (validation.success) {
+          setBrokerData((prev) => ({ ...prev, [name]: file }));
+          toast.success(
+            `${file.name} selected (${validation.fileInfo.sizeFormatted})`
+          );
+        } else {
+          toast.error(`${file.name}: ${validation.error}`);
+          e.target.value = ""; // Clear the input
+        }
+      }
     } else {
       setBrokerData((prev) => ({ ...prev, [name]: value }));
     }
@@ -300,6 +314,14 @@ const BrokersDataForm = ({ setRefresh }) => {
           <p className="section-description">
             Upload clear photos of your ID card and a selfie for verification
           </p>
+          <div className="file-validation-info">
+            <span className="file-size-limit">
+              {FileValidationService.getSizeLimitMessage()}
+            </span>
+            <span className="file-types-info">
+              {FileValidationService.getSupportedTypesMessage()}
+            </span>
+          </div>
 
           <div className="id-card-uploads">
             <div className="id-card-upload-item">

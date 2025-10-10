@@ -298,6 +298,45 @@
   flex-shrink: 0;
 }
 
+/* File Validation Info Styles */
+.file-validation-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 10px;
+  font-size: 0.875rem;
+}
+
+.file-size-limit {
+  color: #22c55e;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.file-size-limit::before {
+  content: "📏";
+  font-size: 0.875rem;
+}
+
+.file-types-info {
+  color: #64748b;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.file-types-info::before {
+  content: "🖼️";
+  font-size: 0.8rem;
+}
+
 /* Upload Progress */
 .upload-progress {
   margin-top: 12px;

@@ -3,6 +3,7 @@ import "./PreviewData.css";
 import { sessionContext, userDataContext } from "../../../AppContexts";
 import supabase from "../../../SupabaseClient";
 import { fetchBrokerData } from "../../../utils/userDataService";
+import FileValidationService from "../../../utils/fileValidationService";
 import {
   User,
   Phone,
@@ -101,12 +102,23 @@ const PreviewData = () => {
       toast.error("Failed to update data.");
     }
   };
-  //handling the profile img temporary storage
+  //handling the profile img temporary storage with validation
   const handleFile = (e) => {
     const file = e.target.files[0];
-    if (!file) return; // لو مفيش فايل يخرج على طول
-    setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file)); // يعمل preview
+    if (!file) return;
+
+    const validation = FileValidationService.validateFile(file);
+
+    if (validation.success) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      toast.success(
+        `${file.name} selected (${validation.fileInfo.sizeFormatted})`
+      );
+    } else {
+      toast.error(`${file.name}: ${validation.error}`);
+      e.target.value = ""; // Clear the input
+    }
   };
   //handle updating the profile pic with removing the older one in the DB
   const handleUploadingAvatar = async () => {
@@ -181,7 +193,7 @@ const PreviewData = () => {
           <h1 className="profile-title">
             Profile
             {userData?.isVerified && (
-              <span className="verified-badge" >
+              <span className="verified-badge">
                 <CheckCircle size={20} />
               </span>
             )}
@@ -259,6 +271,17 @@ const PreviewData = () => {
               onChange={handleFile}
             />
           </div>
+
+          {isEditing && (
+            <div className="file-validation-info">
+              <span className="file-size-limit">
+                {FileValidationService.getSizeLimitMessage()}
+              </span>
+              <span className="file-types-info">
+                {FileValidationService.getSupportedTypesMessage()}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="profile-right">

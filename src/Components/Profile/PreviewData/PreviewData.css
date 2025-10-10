@@ -512,3 +512,42 @@
     left: 48px;
   }
 }
+
+/* File Validation Info Styles */
+.file-validation-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.file-size-limit {
+  color: #3b82f6;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.file-size-limit::before {
+  content: "📏";
+  font-size: 0.875rem;
+}
+
+.file-types-info {
+  color: #64748b;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.file-types-info::before {
+  content: "🖼️";
+  font-size: 0.8rem;
+}
