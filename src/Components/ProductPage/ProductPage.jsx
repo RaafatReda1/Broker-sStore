@@ -79,6 +79,10 @@ const ProductPage = () => {
     toast.success("Added to cart!");
   };
 
+  const handleQuantityChange = (change) => {
+    setQuantity((prevQuantity) => Math.max(1, prevQuantity + change));
+  };
+
   const handleShare = async () => {
     const productUrl = `${window.location.origin}/productPage/productId:${productId}`;
     try {

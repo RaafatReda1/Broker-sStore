@@ -3,16 +3,28 @@ import "./CheckOut.css";
 import { cartContext } from "../../AppContexts";
 import supabase from "../../SupabaseClient";
 import { toast } from "react-toastify";
+import {
+  CreditCard,
+  User,
+  MapPin,
+  Phone,
+  FileText,
+  ShoppingBag,
+  ArrowRight,
+  CheckCircle,
+} from "lucide-react";
 
 const CheckOut = () => {
   const [visible, setVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
   // ✅ Use cart context instead of local state
   const { cart } = useContext(cartContext);
 
   // ✅ form state
   const [form, setForm] = useState({
-    brokerId: JSON.parse(localStorage.getItem("brokerId") || "null") || 35,
+    brokerId: JSON.parse(localStorage.getItem("brokerId") || "null") || 45,
     name: "",
     address: "",
     phone: "",
@@ -58,6 +70,12 @@ const CheckOut = () => {
 
   // ✅ handle form submit
   const handleSubmit = async () => {
+    if (!form.name || !form.address || !form.phone) {
+      toast.error("Please fill in all required fields!");
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       const { data, error } = await supabase
         .from("Orders")
@@ -68,32 +86,35 @@ const CheckOut = () => {
         toast.error(`Error: ${error.message}`);
         return;
       } else if (data && data.length > 0) {
+        setOrderSuccess(true);
         toast.success("Order placed successfully!");
-        //Clearing the submission form
-        setForm({
-          brokerId:
-            JSON.parse(localStorage.getItem("brokerId") || "null") || "" || 35,
-          name: "",
-          address: "",
-          phone: "",
-          notes: "",
-          // date: "", this feild is deleted at the DB for now
-          cart: cart,
-          total: cart.reduce(
-            (sum, item) => sum + item.price * item.quantity,
-            0
-          ),
-          //adding the net profit logic
-          netProfit: cart.reduce((sum, product) => {
-            return sum + product.profit * product.quantity;
-          }, 0),
-        });
-        //closing the checkout
-        document.querySelector(".checkout-toggle-btnactive")?.click();
+
+        // Reset form after success
+        setTimeout(() => {
+          setForm({
+            brokerId: JSON.parse(localStorage.getItem("brokerId")),
+            name: "",
+            address: "",
+            phone: "",
+            notes: "",
+            cart: cart,
+            total: cart.reduce(
+              (sum, item) => sum + item.price * item.quantity,
+              0
+            ),
+            netProfit: cart.reduce((sum, product) => {
+              return sum + product.profit * product.quantity;
+            }, 0),
+          });
+          setOrderSuccess(false);
+          setVisible(false);
+        }, 2000);
       }
     } catch (err) {
       console.error(err);
       toast.error("Unexpected error occurred! " + err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -102,7 +123,7 @@ const CheckOut = () => {
       {cart.length > 0 && (
         <>
           <button
-            className={"checkout-toggle-btn" + (visible ? "active" : "")}
+            className={`checkout-toggle-btn ${visible ? "active" : ""}`}
             onClick={() => {
               setVisible((v) => !v);
               visible
@@ -115,72 +136,140 @@ const CheckOut = () => {
                   }, 200);
             }}
           >
-            {visible ? "Still shopping?" : "Let's Checkout"}
+            <ShoppingBag size={20} />
+            {visible ? "Still shopping?" : "Proceed to Checkout"}
+            <ArrowRight size={16} />
           </button>
 
           <div className={`checkout-parent ${visible ? "show" : ""}`}>
-            <form className={`checkout-form${visible ? "" : " hide"}`}>
-              <h2 className="checkout-title">Checkout</h2>
+            <div className="checkout-form">
+              <div className="checkout-header">
+                <h2 className="checkout-title">
+                  <CreditCard size={28} />
+                  Checkout
+                </h2>
+                <div className="order-summary">
+                  <div className="summary-item">
+                    <span>Items:</span>
+                    <span>{cart.length}</span>
+                  </div>
+                  <div className="summary-item">
+                    <span>Total:</span>
+                    <span className="total-price">
+                      ${form.total.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-              <label className="checkout-label">
-                <input
-                  className="checkout-input"
-                  type="text"
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  required
-                  placeholder=" "
-                />
-                <span className="floating-label">Name</span>
-              </label>
+              {orderSuccess ? (
+                <div className="success-state">
+                  <CheckCircle className="success-icon" size={64} />
+                  <h3>Order Placed Successfully!</h3>
+                  <p>Thank you for your order. We'll process it shortly.</p>
+                </div>
+              ) : (
+                <form onSubmit={(e) => e.preventDefault()}>
+                  <div className="form-section">
+                    <h3 className="section-title">
+                      <User size={20} />
+                      Personal Information
+                    </h3>
 
-              <label className="checkout-label">
-                <input
-                  className="checkout-input"
-                  type="text"
-                  name="address"
-                  value={form.address}
-                  onChange={handleChange}
-                  required
-                  placeholder=" "
-                />
-                <span className="floating-label">Address</span>
-              </label>
+                    <label className="checkout-label">
+                      <input
+                        className="checkout-input"
+                        type="text"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        required
+                        placeholder=" "
+                        disabled={isSubmitting}
+                      />
+                      <span className="floating-label">Full Name *</span>
+                    </label>
 
-              <label className="checkout-label">
-                <input
-                  className="checkout-input"
-                  type="tel"
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
-                  required
-                  placeholder=" "
-                  pattern="[0-9]{10,15}"
-                />
-                <span className="floating-label">Phone</span>
-              </label>
+                    <label className="checkout-label">
+                      <input
+                        className="checkout-input"
+                        type="tel"
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleChange}
+                        required
+                        placeholder=" "
+                        pattern="[0-9]{10,15}"
+                        disabled={isSubmitting}
+                      />
+                      <span className="floating-label">Phone Number *</span>
+                    </label>
+                  </div>
 
-              <label className="checkout-label">
-                <textarea
-                  className="checkout-input checkout-notes"
-                  name="notes"
-                  value={form.notes}
-                  onChange={handleChange}
-                  placeholder=" "
-                />
-                <span className="floating-label">Notes</span>
-              </label>
+                  <div className="form-section">
+                    <h3 className="section-title">
+                      <MapPin size={20} />
+                      Delivery Information
+                    </h3>
 
-              <button
-                className="checkout-submit-btn"
-                type="button"
-                onClick={handleSubmit}
-              >
-                Submit Order
-              </button>
-            </form>
+                    <label className="checkout-label">
+                      <input
+                        className="checkout-input"
+                        type="text"
+                        name="address"
+                        value={form.address}
+                        onChange={handleChange}
+                        required
+                        placeholder=" "
+                        disabled={isSubmitting}
+                      />
+                      <span className="floating-label">Delivery Address *</span>
+                    </label>
+                  </div>
+
+                  <div className="form-section">
+                    <h3 className="section-title">
+                      <FileText size={20} />
+                      Additional Information
+                    </h3>
+
+                    <label className="checkout-label">
+                      <textarea
+                        className="checkout-input checkout-notes"
+                        name="notes"
+                        value={form.notes}
+                        onChange={handleChange}
+                        placeholder=" "
+                        disabled={isSubmitting}
+                      />
+                      <span className="floating-label">
+                        Order Notes (Optional)
+                      </span>
+                    </label>
+                  </div>
+
+                  <button
+                    className="checkout-submit-btn"
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                  >
+                    <span className="button-content">
+                      {isSubmitting ? (
+                        <span className="loading-content">
+                          Processing Order...
+                        </span>
+                      ) : (
+                        <span className="normal-content">
+                          <CreditCard size={20} />
+                          Place Order
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
         </>
       )}

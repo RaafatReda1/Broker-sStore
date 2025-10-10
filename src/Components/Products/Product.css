@@ -5,17 +5,17 @@
     rgba(255, 255, 255, 0.15),
     rgba(255, 255, 255, 0.05)
   );
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   padding: 0;
   margin: 15px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   backdrop-filter: blur(8px);
   transition: all 0.2s ease;
-  width: 400px;
-  height: 580px;
+    width: 400px;
+    height: 580px;
   overflow: hidden;
   position: relative;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -48,7 +48,7 @@
 }
 
 .productsContainer .card img {
-  min-width: 100px;
+    min-width: 100px;
   max-width: 100%;
   width: 100%;
   height: 100%;
