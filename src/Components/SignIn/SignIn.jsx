@@ -4,6 +4,7 @@ import supabase from "../../SupabaseClient";
 import { sessionContext } from "../../AppContexts";
 import { toast } from "react-toastify";
 import { Mail, Lock, Eye, EyeOff, LogIn, User } from "lucide-react";
+import { Link } from "react-router-dom";
 const SignIn = () => {
   const [signInForm, setSignInForm] = useState({
     email: "",
@@ -121,6 +122,9 @@ const SignIn = () => {
             </>
           )}
         </button>
+        <Link to={"/requestreset"}>
+          <p className="signin-forgot-password">Forgot Password?</p>
+        </Link>
       </form>
     </div>
   );
