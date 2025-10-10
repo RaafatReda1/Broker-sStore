@@ -19,7 +19,7 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { userDataContext, productsContext } from "../../AppContexts";
+import { userDataContext, productsContext, sessionContext } from "../../AppContexts";
 import DropMenu from "../DropMenu/DropMenu";
 import "./Header.css";
 import supabase from "../../SupabaseClient";
@@ -30,6 +30,7 @@ const SCROLL_THRESHOLD = 20;
 const Header = () => {
   const { userData } = useContext(userDataContext);
   const { products } = useContext(productsContext);
+  const { session } = useContext(sessionContext);
   const navigate = useNavigate();
 
   // State management
@@ -356,19 +357,7 @@ const Header = () => {
               <span>Cart</span>
             </Link>
           )}
-
-          {userData && (
-            <>
-              <Link
-                to="/withdraw"
-                className="nav-link"
-                aria-label="Withdraw funds"
-              >
-                <FontAwesomeIcon icon={faMoneyBillWave} aria-hidden="true" />
-                <span>Withdraw</span>
-              </Link>
-
-              <Link
+          {session && (<Link
                 to="/notifications"
                 className="nav-link"
                 aria-label={`Notifications (${unreadCount} unread)`}
@@ -384,8 +373,17 @@ const Header = () => {
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
+              </Link>)}
+          {userData && (
+            <>
+              <Link
+                to="/withdraw"
+                className="nav-link"
+                aria-label="Withdraw funds"
+              >
+                <FontAwesomeIcon icon={faMoneyBillWave} aria-hidden="true" />
+                <span>Withdraw</span>
               </Link>
-
               <Link
                 to="/balance"
                 className="nav-link"
