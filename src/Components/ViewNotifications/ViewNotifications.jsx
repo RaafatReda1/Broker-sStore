@@ -1,5 +1,6 @@
 // ViewNotifications.jsx
 import React, { useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import supabase from "../../SupabaseClient";
 import { userDataContext } from "../../AppContexts";
 import { toast } from "react-toastify";
@@ -8,6 +9,7 @@ import MDEditor from "@uiw/react-md-editor";
 import "./ViewNotifications.css";
 
 const ViewNotifications = () => {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const { userData } = useContext(userDataContext);
@@ -103,7 +105,7 @@ const ViewNotifications = () => {
     );
 
     if (unreadNotifications.length === 0) {
-      toast.info("All notifications are already read");
+      toast.info(t("notifications.allAlreadyRead"));
       return;
     }
 
@@ -133,7 +135,7 @@ const ViewNotifications = () => {
         })
       );
 
-      toast.success("All notifications marked as read");
+      toast.success(t("notifications.allMarkedAsRead"));
 
       // Dispatch custom event to notify Header component
       const event = new CustomEvent("notificationRead", {
@@ -147,7 +149,7 @@ const ViewNotifications = () => {
       window.dispatchEvent(event);
       console.log("ViewNotifications: Dispatched mark all read event");
     } catch (error) {
-      toast.error("Failed to mark all as read");
+      toast.error(t("notifications.failedToMarkAllAsRead"));
     }
   };
 
@@ -164,7 +166,7 @@ const ViewNotifications = () => {
   // Delete notification
   const deleteNotification = async (notification) => {
     if (!canDeleteNotification(notification)) {
-      toast.error("You can only delete notifications sent directly to you");
+      toast.error(t("notifications.canOnlyDeleteDirect"));
       return;
     }
 
@@ -174,10 +176,10 @@ const ViewNotifications = () => {
       .eq("id", notification.id);
 
     if (error) {
-      toast.error("Failed to delete notification");
+      toast.error(t("notifications.failedToDelete"));
     } else {
       setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
-      toast.success("Notification deleted");
+      toast.success(t("notifications.deleted"));
       if (selectedNotification?.id === notification.id) {
         setSelectedNotification(null);
       }
@@ -192,20 +194,22 @@ const ViewNotifications = () => {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffMins < 1) return t("notifications.justNow");
+    if (diffMins < 60) return `${diffMins} ${t("notifications.minutesAgo")}`;
+    if (diffHours < 24) return `${diffHours} ${t("notifications.hoursAgo")}`;
+    if (diffDays < 7) return `${diffDays} ${t("notifications.daysAgo")}`;
 
     return date.toLocaleDateString();
   };
 
   const getNotificationType = (notification) => {
-    if (notification.isAll) return "All Users";
-    if (notification.brokerEmail) return "Direct";
-    if (notification.brokerIdTo && !notification.brokerIdFrom) return "Direct";
-    if (notification.brokerIdFrom && notification.brokerIdTo) return "Group";
-    return "Direct";
+    if (notification.isAll) return t("notifications.allUsers");
+    if (notification.brokerEmail) return t("notifications.direct");
+    if (notification.brokerIdTo && !notification.brokerIdFrom)
+      return t("notifications.direct");
+    if (notification.brokerIdFrom && notification.brokerIdTo)
+      return t("notifications.group");
+    return t("notifications.direct");
   };
 
   useEffect(() => {
@@ -227,7 +231,7 @@ const ViewNotifications = () => {
           if (payload.eventType === "INSERT") {
             // New notification added
             setNotifications((prev) => [payload.new, ...prev]);
-            toast.info("New notification received!");
+            toast.info(t("notifications.newNotificationReceived"));
           } else if (payload.eventType === "UPDATE") {
             // Notification updated (e.g., read status)
             setNotifications((prev) =>
@@ -262,7 +266,7 @@ const ViewNotifications = () => {
       <div className="notifications-header">
         <div className="header-left">
           <Bell size={24} className="bell-icon" />
-          <h2 className="notifications-title">Notifications</h2>
+          <h2 className="notifications-title">{t("notifications.title")}</h2>
           {unreadCount > 0 && (
             <span className="unread-badge">{unreadCount}</span>
           )}
@@ -270,7 +274,7 @@ const ViewNotifications = () => {
         {filteredNotifications.length > 0 && (
           <button className="mark-all-btn" onClick={markAllAsRead}>
             <CheckCheck size={16} />
-            Mark all read
+            {t("notifications.markAllRead")}
           </button>
         )}
       </div>
@@ -280,8 +284,8 @@ const ViewNotifications = () => {
           {filteredNotifications.length === 0 ? (
             <div className="empty-state">
               <Bell size={48} className="empty-icon" />
-              <p className="empty-text">No notifications yet</p>
-              <p className="empty-subtext">You&apos;re all caught up!</p>
+              <p className="empty-text">{t("notifications.noNotifications")}</p>
+              <p className="empty-subtext">{t("notifications.allCaughtUp")}</p>
             </div>
           ) : (
             filteredNotifications.map((notification) => {
@@ -314,7 +318,7 @@ const ViewNotifications = () => {
                           e.stopPropagation();
                           deleteNotification(notification);
                         }}
-                        title="Delete notification"
+                        title={t("notifications.deleteNotification")}
                       >
                         <Trash2 size={16} />
                       </button>
@@ -364,13 +368,17 @@ const ViewNotifications = () => {
             <div className="preview-meta">
               <div className="meta-row">
                 <User size={14} />
-                <span className="meta-label">Recipient:</span>
+                <span className="meta-label">
+                  {t("notifications.recipient")}:
+                </span>
                 <span className="meta-value">
                   {selectedNotification.isAll
-                    ? "All Users"
+                    ? t("notifications.allUsers")
                     : selectedNotification.brokerEmail
                     ? selectedNotification.brokerEmail
-                    : `Brokers ${selectedNotification.brokerIdFrom} - ${selectedNotification.brokerIdTo}`}
+                    : `${t("notifications.brokers")} ${
+                        selectedNotification.brokerIdFrom
+                      } - ${selectedNotification.brokerIdTo}`}
                 </span>
               </div>
             </div>
@@ -378,7 +386,9 @@ const ViewNotifications = () => {
             <div className="preview-divider" />
 
             <div className="preview-message-container">
-              <h4 className="preview-message-title">📦 Message Preview:</h4>
+              <h4 className="preview-message-title">
+                📦 {t("notifications.messagePreview")}:
+              </h4>
               <div className="preview-content">
                 <MDEditor.Markdown
                   source={selectedNotification.msg}
@@ -396,7 +406,9 @@ const ViewNotifications = () => {
         {!selectedNotification && filteredNotifications.length > 0 && (
           <div className="placeholder-container">
             <Bell size={64} className="placeholder-icon" />
-            <p className="placeholder-text">Select a notification to view</p>
+            <p className="placeholder-text">
+              {t("notifications.selectToView")}
+            </p>
           </div>
         )}
       </div>

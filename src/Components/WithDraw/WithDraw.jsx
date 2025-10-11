@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import "./WithDraw.css";
 import { userDataContext } from "../../AppContexts";
 import supabase from "../../SupabaseClient";
@@ -6,6 +7,7 @@ import { toast } from "react-toastify";
 import CredentialVerificationModal from "./CredentialVerificationModal/CredentialVerificationModal";
 
 const WithDraw = () => {
+  const { t } = useTranslation();
   const { userData } = useContext(userDataContext);
   const [paymentMethod, setPaymentMethod] = useState(""); // 'vodafone' or 'instapay'
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -89,7 +91,7 @@ const WithDraw = () => {
             // Check if the request status changed to finished (true)
             if (payload.new.Status === true && payload.old.Status === false) {
               console.log("Withdrawal request completed!");
-              toast.success("🎉 Your withdrawal request has been processed!");
+              toast.success(t("withdraw.requestProcessed"));
 
               // Update local state to remove pending request
               setHasPendingRequest(false);
@@ -156,31 +158,31 @@ const WithDraw = () => {
 
     // Phone validation
     if (!formData.withDrawalPhone.trim()) {
-      newErrors.withDrawalPhone = "Phone number is required";
+      newErrors.withDrawalPhone = t("withdraw.phoneRequired");
     } else if (
       !/^[0-9]{10,15}$/.test(formData.withDrawalPhone.replace(/\s/g, ""))
     ) {
-      newErrors.withDrawalPhone = "Please enter a valid phone number";
+      newErrors.withDrawalPhone = t("withdraw.phoneInvalid");
     }
 
     // Vodafone specific validation
     if (paymentMethod === "vodafone") {
       if (!formData.vodaCarrierName.trim()) {
-        newErrors.vodaCarrierName = "Carrier name is required";
+        newErrors.vodaCarrierName = t("withdraw.carrierRequired");
       }
     }
 
     // InstaPay specific validation
     if (paymentMethod === "instapay") {
       if (!formData.instaEmail.trim() && !formData.instaAccountName.trim()) {
-        newErrors.instaEmail = "Please provide either email or account name";
+        newErrors.instaEmail = t("withdraw.emailOrAccountRequired");
       }
 
       if (
         formData.instaEmail.trim() &&
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.instaEmail)
       ) {
-        newErrors.instaEmail = "Please enter a valid email address";
+        newErrors.instaEmail = t("withdraw.emailInvalid");
       }
     }
 
@@ -191,24 +193,22 @@ const WithDraw = () => {
   const handleSubmit = async () => {
     // Check if broker is verified
     if (brokerVerificationStatus === false) {
-      toast.error(
-        "❌ Your Account is Under REVIEW\n\nYou cannot submit withdrawal requests until your account is verified. Please contact support for more information."
-      );
+      toast.error(t("withdraw.accountUnderReview"));
       return;
     }
 
     if (!paymentMethod) {
-      toast.warning("Please select a payment method");
+      toast.warning(t("withdraw.selectPaymentMethod"));
       return;
     }
 
     if (!validateForm()) {
-      toast.error("Please fix the errors in the form");
+      toast.error(t("withdraw.fixFormErrors"));
       return;
     }
 
     if (!userData?.actualBalance || userData.actualBalance <= 0) {
-      toast.error("Insufficient balance for withdrawal");
+      toast.error(t("withdraw.insufficientBalance"));
       return;
     }
 
@@ -222,7 +222,7 @@ const WithDraw = () => {
 
       if (checkError) {
         console.error("Error checking existing requests:", checkError);
-        toast.error("Unable to verify existing requests. Please try again.");
+        toast.error(t("withdraw.unableToVerifyRequests"));
         return;
       }
 
@@ -238,14 +238,7 @@ const WithDraw = () => {
           currency: "EGP",
         });
 
-        toast.error(
-          `❌ You already have a pending withdrawal request!\n\n` +
-            `📋 **Existing Request:**\n` +
-            `• Amount: ${requestAmount}\n` +
-            `• Date: ${requestDate}\n` +
-            `• Status: ⏳ Pending Review\n\n` +
-            `⏳ Please wait for your current request to be processed before submitting a new one.`
-        );
+        toast.error(t("withdraw.pendingRequestExists"));
         return;
       }
     } catch (error) {
@@ -271,7 +264,7 @@ const WithDraw = () => {
 
       if (ordersError) {
         console.error("Error fetching orders:", ordersError);
-        toast.error("Error fetching orders. Please try again.");
+        toast.error(t("withdraw.errorFetchingOrders"));
         setIsSubmitting(false);
         return;
       }
@@ -307,11 +300,9 @@ const WithDraw = () => {
 
       if (error) {
         console.error("Error:", error);
-        toast.error("Error sending request. Please try again.");
+        toast.error(t("withdraw.errorSendingRequest"));
       } else {
-        toast.success(
-          "✅ Withdrawal request submitted successfully!\n\n📱 You'll be notified in real-time when it's processed."
-        );
+        toast.success(t("withdraw.requestSubmittedSuccessfully"));
         // Reset form
         setPaymentMethod("");
         setFormData({
@@ -323,7 +314,7 @@ const WithDraw = () => {
       }
     } catch (err) {
       console.error("Unexpected error:", err);
-      toast.error("An unexpected error occurred. Please try again.");
+      toast.error(t("withdraw.unexpectedError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -332,10 +323,12 @@ const WithDraw = () => {
   return (
     <div className="withdraw-container">
       <div className="withdraw-card">
-        <h2 className="withdraw-title">Request Withdrawal</h2>
+        <h2 className="withdraw-title">{t("withdraw.title")}</h2>
 
         <div className="balance-info">
-          <span className="balance-label">Available Balance:</span>
+          <span className="balance-label">
+            {t("withdraw.availableBalance")}:
+          </span>
           <span className="balance-amount">
             {userData?.actualBalance?.toLocaleString("en-US", {
               style: "currency",
@@ -349,10 +342,11 @@ const WithDraw = () => {
           <div className="verification-alert">
             <div className="alert-icon">🔒</div>
             <div className="alert-content">
-              <h3 className="alert-title">Account Under Review</h3>
+              <h3 className="alert-title">
+                {t("withdraw.accountUnderReviewTitle")}
+              </h3>
               <p className="alert-message">
-                Your account is currently under review. You cannot submit
-                withdrawal requests until your account is verified.
+                {t("withdraw.accountUnderReviewMessage")}
               </p>
               <div className="alert-actions">
                 <span className="contact-support">
@@ -367,10 +361,12 @@ const WithDraw = () => {
           <div className="pending-request-alert">
             <div className="alert-icon">⏳</div>
             <div className="alert-content">
-              <h3 className="alert-title">Pending Withdrawal Request</h3>
+              <h3 className="alert-title">
+                {t("withdraw.pendingRequestTitle")}
+              </h3>
               <div className="alert-details">
                 <p>
-                  <strong>Amount:</strong>{" "}
+                  <strong>{t("withdraw.amount")}:</strong>{" "}
                   {parseFloat(pendingRequestInfo.actualBalance).toLocaleString(
                     "en-US",
                     {
@@ -380,17 +376,16 @@ const WithDraw = () => {
                   )}
                 </p>
                 <p>
-                  <strong>Date:</strong>{" "}
+                  <strong>{t("withdraw.date")}:</strong>{" "}
                   {new Date(pendingRequestInfo.created_at).toLocaleDateString()}
                 </p>
                 <p>
-                  <strong>Status:</strong> ⏳ Under Review
+                  <strong>{t("withdraw.status")}:</strong> ⏳{" "}
+                  {t("withdraw.underReview")}
                 </p>
               </div>
               <p className="alert-message">
-                You already have a withdrawal request pending. Please wait for
-                it to be processed before submitting a new one. You'll be
-                notified instantly when it's completed!
+                {t("withdraw.pendingRequestMessage")}
               </p>
             </div>
           </div>
@@ -402,7 +397,9 @@ const WithDraw = () => {
           }`}
         >
           <div className="withdraw-section">
-            <label className="section-label">Select Payment Method</label>
+            <label className="section-label">
+              {t("withdraw.selectPaymentMethod")}
+            </label>
             <div className="checkbox-group">
               <label className="checkbox-label">
                 <input
@@ -414,7 +411,9 @@ const WithDraw = () => {
                     hasPendingRequest || brokerVerificationStatus === false
                   }
                 />
-                <span className="checkbox-text">Vodafone Cash</span>
+                <span className="checkbox-text">
+                  {t("withdraw.vodafoneCash")}
+                </span>
               </label>
               <label className="checkbox-label">
                 <input
@@ -426,7 +425,7 @@ const WithDraw = () => {
                     hasPendingRequest || brokerVerificationStatus === false
                   }
                 />
-                <span className="checkbox-text">InstaPay</span>
+                <span className="checkbox-text">{t("withdraw.instapay")}</span>
               </label>
             </div>
           </div>
@@ -435,7 +434,8 @@ const WithDraw = () => {
             <div className="payment-form">
               <div className="input-group">
                 <label className="input-label">
-                  Phone Number <span className="required">*</span>
+                  {t("withdraw.phoneNumber")}{" "}
+                  <span className="required">*</span>
                 </label>
                 <input
                   type="tel"
@@ -443,8 +443,10 @@ const WithDraw = () => {
                   value={formData.withDrawalPhone}
                   onChange={handleInputChange}
                   placeholder={`${
-                    paymentMethod === "instapay" ? "InstaPay" : "Vodafone Cash"
-                  } Phone Number`}
+                    paymentMethod === "instapay"
+                      ? t("withdraw.instapay")
+                      : t("withdraw.vodafoneCash")
+                  } ${t("withdraw.phoneNumber")}`}
                   className={`withdraw-input ${
                     errors.withDrawalPhone ? "input-error" : ""
                   }`}
@@ -457,14 +459,15 @@ const WithDraw = () => {
               {paymentMethod === "vodafone" && (
                 <div className="input-group">
                   <label className="input-label">
-                    Carrier Name <span className="required">*</span>
+                    {t("withdraw.carrierName")}{" "}
+                    <span className="required">*</span>
                   </label>
                   <input
                     type="text"
                     name="vodaCarrierName"
                     value={formData.vodaCarrierName}
                     onChange={handleInputChange}
-                    placeholder="Full name on Vodafone Cash account"
+                    placeholder={t("withdraw.vodafoneAccountPlaceholder")}
                     className={`withdraw-input ${
                       errors.vodaCarrierName ? "input-error" : ""
                     }`}
@@ -479,7 +482,7 @@ const WithDraw = () => {
                 <>
                   <div className="input-group">
                     <label className="input-label">
-                      InstaPay Account Email
+                      {t("withdraw.instapayEmail")}
                     </label>
                     <input
                       type="email"
@@ -497,22 +500,21 @@ const WithDraw = () => {
                   </div>
 
                   <div className="input-group">
-                    <label className="input-label">InstaPay Account Name</label>
+                    <label className="input-label">
+                      {t("withdraw.instapayAccountName")}
+                    </label>
                     <input
                       type="text"
                       name="instaAccountName"
                       value={formData.instaAccountName}
                       onChange={handleInputChange}
-                      placeholder="Full name on InstaPay account"
+                      placeholder={t("withdraw.instapayAccountPlaceholder")}
                       className="withdraw-input"
                     />
                   </div>
 
                   <div className="info-box">
-                    <p className="info-text">
-                      Either phone or email is required for InstaPay
-                      transactions
-                    </p>
+                    <p className="info-text">{t("withdraw.instapayInfo")}</p>
                   </div>
                 </>
               )}
@@ -536,12 +538,12 @@ const WithDraw = () => {
                 }`}
               >
                 {isSubmitting
-                  ? "Processing..."
+                  ? t("withdraw.processing")
                   : hasPendingRequest
-                  ? "Request Pending"
+                  ? t("withdraw.requestPending")
                   : brokerVerificationStatus === false
-                  ? "Account Under Review"
-                  : "Submit Withdrawal Request"}
+                  ? t("withdraw.accountUnderReview")
+                  : t("withdraw.submitRequest")}
               </button>
             </div>
           )}
@@ -554,8 +556,8 @@ const WithDraw = () => {
         onClose={closeCredentialModal}
         onVerified={handleCredentialVerified}
         brokerEmail={userData?.email}
-        title="🔐 Verify Your Identity"
-        message="Please confirm your credentials to proceed with this withdrawal request."
+        title={t("withdraw.verifyIdentity")}
+        message={t("withdraw.verifyMessage")}
       />
     </div>
   );

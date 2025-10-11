@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useContext } from "react";
+import { useTranslation } from "react-i18next";
 import "./DropMenu.css";
 import { sessionContext } from "../../AppContexts";
 import supabase from "../../SupabaseClient";
@@ -6,6 +7,7 @@ import { Link } from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
 const DropMenu = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const dropdownRef = useRef(null);
   const { session } = useContext(sessionContext);
 
@@ -36,7 +38,6 @@ const DropMenu = ({ isOpen, onClose }) => {
     onClose();
   };
 
-
   if (!isOpen) return null;
 
   return (
@@ -45,12 +46,12 @@ const DropMenu = ({ isOpen, onClose }) => {
         <>
           <Link to="/signup">
             <button className="dropdown-btn" onClick={onClose}>
-              Sign Up
+              {t("auth.signup.signUpButton")}
             </button>
           </Link>
           <Link to="/signin">
             <button className="dropdown-btn" onClick={onClose}>
-              Sign In
+              {t("auth.signin.signInButton")}
             </button>
           </Link>
         </>
@@ -59,11 +60,11 @@ const DropMenu = ({ isOpen, onClose }) => {
         <>
           <Link to="/profile">
             <button className="dropdown-btn" onClick={onClose}>
-              Profile
+              {t("navigation.profile")}
             </button>
           </Link>
           <button className="dropdown-btn logout-btn" onClick={handleLogOut}>
-            Log Out
+            {t("navigation.logout")}
           </button>
         </>
       )}

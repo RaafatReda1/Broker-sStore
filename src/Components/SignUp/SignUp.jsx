@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import "./SignUp.css";
 import supabase from "../../SupabaseClient";
 import { toast } from "react-toastify";
 import { Mail, Lock, Eye, EyeOff, UserPlus, CheckCircle } from "lucide-react";
 const SignUp = () => {
+  const { t } = useTranslation();
   const [signUpForm, setSignUpForm] = useState({
     email: "",
     password: "",
@@ -48,13 +50,13 @@ const SignUp = () => {
     setIsLoading(true);
 
     if (signUpForm.password !== signUpForm.confirmPassword) {
-      toast.error("Passwords do not match.");
+      toast.error(t("errors.passwordMismatch"));
       setIsLoading(false);
       return;
     }
 
     if (passwordStrength < 3) {
-      toast.error("Password is too weak. Please use a stronger password.");
+      toast.error(t("errors.passwordWeak"));
       setIsLoading(false);
       return;
     }
@@ -67,14 +69,11 @@ const SignUp = () => {
 
       if (error) {
         console.error("Error during sign up:", error);
-        toast.error("Sign up failed. Please try again.");
+        toast.error(t("errors.signUpFailed"));
       } else if (data) {
-        toast.success(
-          "Sign up successful! Check your email for verification.",
-          {
-            autoClose: 5000,
-          }
-        );
+        toast.success(t("success.signUpSuccess"), {
+          autoClose: 5000,
+        });
         // Reset form
         setSignUpForm({
           email: "",
@@ -85,15 +84,24 @@ const SignUp = () => {
       }
     } catch (error) {
       console.error("Unexpected error:", error);
-      toast.error("An unexpected error occurred. Please try again.");
+      toast.error(t("errors.generic"));
     } finally {
       setIsLoading(false);
     }
   };
 
   const getPasswordStrengthText = () => {
-    const strengthTexts = ["Very Weak", "Weak", "Fair", "Good", "Strong"];
-    return strengthTexts[passwordStrength] || "Very Weak";
+    const strengthTexts = [
+      t("auth.signup.passwordStrength.veryWeak"),
+      t("auth.signup.passwordStrength.weak"),
+      t("auth.signup.passwordStrength.fair"),
+      t("auth.signup.passwordStrength.good"),
+      t("auth.signup.passwordStrength.strong"),
+    ];
+    return (
+      strengthTexts[passwordStrength] ||
+      t("auth.signup.passwordStrength.veryWeak")
+    );
   };
 
   const getPasswordStrengthColor = () => {
@@ -107,8 +115,8 @@ const SignUp = () => {
         <div className="signup-icon">
           <UserPlus size={32} />
         </div>
-        <h1 className="signup-title">Create Account</h1>
-        <p className="signup-subtitle">Join us and start your journey</p>
+        <h1 className="signup-title">{t("auth.signup.title")}</h1>
+        <p className="signup-subtitle">{t("auth.signup.subtitle")}</p>
       </div>
 
       <form className="signup-form" onSubmit={handleSubmit}>
@@ -126,7 +134,7 @@ const SignUp = () => {
                 placeholder=" "
                 disabled={isLoading}
               />
-              <span className="floating-label">Email Address</span>
+              <span className="floating-label">{t("auth.signup.email")}</span>
             </div>
           </label>
         </div>
@@ -145,7 +153,9 @@ const SignUp = () => {
                 placeholder=" "
                 disabled={isLoading}
               />
-              <span className="floating-label">Password</span>
+              <span className="floating-label">
+                {t("auth.signup.password")}
+              </span>
               <button
                 type="button"
                 className="password-toggle-btn"
@@ -192,7 +202,9 @@ const SignUp = () => {
                 placeholder=" "
                 disabled={isLoading}
               />
-              <span className="floating-label">Confirm Password</span>
+              <span className="floating-label">
+                {t("auth.signup.confirmPassword")}
+              </span>
               <button
                 type="button"
                 className="password-toggle-btn"
@@ -209,10 +221,12 @@ const SignUp = () => {
               {signUpForm.password === signUpForm.confirmPassword ? (
                 <span className="match-success">
                   <CheckCircle size={16} />
-                  Passwords match
+                  {t("auth.signup.passwordMatch")}
                 </span>
               ) : (
-                <span className="match-error">Passwords do not match</span>
+                <span className="match-error">
+                  {t("auth.signup.passwordMismatch")}
+                </span>
               )}
             </div>
           )}
@@ -226,12 +240,12 @@ const SignUp = () => {
           {isLoading ? (
             <>
               <div className="spinner"></div>
-              Creating Account...
+              {t("auth.signup.loading")}
             </>
           ) : (
             <>
               <UserPlus size={20} />
-              Create Account
+              {t("auth.signup.signUpButton")}
             </>
           )}
         </button>

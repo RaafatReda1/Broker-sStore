@@ -1,4 +1,5 @@
 import React, { useState, useContext, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import "./BrokersDataForm.css";
 import supabase from "../../../SupabaseClient";
 import { userContext, sessionContext } from "../../../AppContexts";
@@ -18,6 +19,7 @@ import {
 // id_card_back
 // eslint-disable-next-line react/prop-types
 const BrokersDataForm = ({ setRefresh }) => {
+  const { t } = useTranslation();
   const { user } = useContext(userContext);
   const { session } = useContext(sessionContext);
   const [brokerData, setBrokerData] = useState({
@@ -47,7 +49,9 @@ const BrokersDataForm = ({ setRefresh }) => {
         if (validation.success) {
           setBrokerData((prev) => ({ ...prev, [name]: file }));
           toast.success(
-            `${file.name} selected (${validation.fileInfo.sizeFormatted})`
+            `${file.name} ${t("profile.fileSelected")} (${
+              validation.fileInfo.sizeFormatted
+            })`
           );
         } else {
           toast.error(`${file.name}: ${validation.error}`);
@@ -121,7 +125,7 @@ const BrokersDataForm = ({ setRefresh }) => {
       e.preventDefault();
 
       if (!session || !user.id) {
-        toast.error("User not logged in.");
+        toast.error(t("errors.userNotLoggedIn"));
         return;
       }
 
@@ -130,7 +134,7 @@ const BrokersDataForm = ({ setRefresh }) => {
         !brokerData.idCardBack ||
         !brokerData.selfieWithIdCard
       ) {
-        toast.error("Please upload all required images.");
+        toast.error(t("errors.uploadAllImages"));
         return;
       }
 
@@ -168,7 +172,7 @@ const BrokersDataForm = ({ setRefresh }) => {
           throw error;
         }
 
-        toast.success("✅ Broker data submitted successfully!");
+        toast.success(t("success.brokerDataSubmitted"));
         console.log("✅ Broker data saved with organized storage:", {
           brokerName: brokerData.fullName,
           imageUrls: uploadResult.urls,
@@ -193,7 +197,7 @@ const BrokersDataForm = ({ setRefresh }) => {
         }
       } catch (error) {
         console.error("Error submitting broker data:", error);
-        toast.error("Error submitting broker data.");
+        toast.error(t("errors.brokerDataSubmission"));
       } finally {
         setIsUploading(false);
         setUploadProgress({ front: 0, back: 0, selfie: 0 });
@@ -226,17 +230,15 @@ const BrokersDataForm = ({ setRefresh }) => {
         <div className="broker-icon">
           <UserCheck size={32} />
         </div>
-        <h1 className="broker-title">Broker Registration</h1>
-        <p className="broker-subtitle">
-          Complete your broker profile to get started
-        </p>
+        <h1 className="broker-title">{t("profile.brokerRegistration")}</h1>
+        <p className="broker-subtitle">{t("profile.completeProfile")}</p>
       </div>
 
       <form className="broker-form" onSubmit={handleSubmit}>
         <div className="form-section">
           <h3 className="section-title">
             <User size={20} />
-            Personal Information
+            {t("profile.personalInfo")}
           </h3>
 
           <div className="names">
@@ -254,7 +256,9 @@ const BrokersDataForm = ({ setRefresh }) => {
                     placeholder=" "
                     disabled={isUploading}
                   />
-                  <span className="floating-label">Full Name</span>
+                  <span className="floating-label">
+                    {t("profile.fullName")}
+                  </span>
                 </div>
               </label>
             </div>
@@ -273,7 +277,9 @@ const BrokersDataForm = ({ setRefresh }) => {
                     placeholder=" "
                     disabled={isUploading}
                   />
-                  <span className="floating-label">Nickname</span>
+                  <span className="floating-label">
+                    {t("profile.nickname")}
+                  </span>
                 </div>
               </label>
             </div>
@@ -297,7 +303,9 @@ const BrokersDataForm = ({ setRefresh }) => {
                   maxLength={11}
                   disabled={isUploading}
                 />
-                <span className="floating-label">Phone Number</span>
+                <span className="floating-label">
+                  {t("profile.phoneNumber")}
+                </span>
               </div>
             </label>
           </div>
@@ -306,10 +314,10 @@ const BrokersDataForm = ({ setRefresh }) => {
         <div className="form-section">
           <h3 className="section-title">
             <Camera size={20} />
-            Identity Verification
+            {t("profile.identityVerification")}
           </h3>
           <p className="section-description">
-            Upload clear photos of your ID card and a selfie for verification
+            {t("profile.uploadInstructions")}
           </p>
           <div className="file-validation-info">
             <span className="file-size-limit">
@@ -351,8 +359,12 @@ const BrokersDataForm = ({ setRefresh }) => {
                     ) : (
                       <div className="file-placeholder">
                         <Camera className="upload-icon" size={32} />
-                        <span className="upload-text">ID Card Front Photo</span>
-                        <span className="upload-hint">Click to upload</span>
+                        <span className="upload-text">
+                          {t("profile.idCardFront")}
+                        </span>
+                        <span className="upload-hint">
+                          {t("profile.clickToUpload")}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -403,8 +415,12 @@ const BrokersDataForm = ({ setRefresh }) => {
                     ) : (
                       <div className="file-placeholder">
                         <Camera className="upload-icon" size={32} />
-                        <span className="upload-text">ID Card Back Photo</span>
-                        <span className="upload-hint">Click to upload</span>
+                        <span className="upload-text">
+                          {t("profile.idCardBack")}
+                        </span>
+                        <span className="upload-hint">
+                          {t("profile.clickToUpload")}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -455,8 +471,12 @@ const BrokersDataForm = ({ setRefresh }) => {
                     ) : (
                       <div className="file-placeholder">
                         <Camera className="upload-icon" size={32} />
-                        <span className="upload-text">Selfie with ID Card</span>
-                        <span className="upload-hint">Click to upload</span>
+                        <span className="upload-text">
+                          {t("profile.selfieWithId")}
+                        </span>
+                        <span className="upload-hint">
+                          {t("profile.clickToUpload")}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -487,12 +507,12 @@ const BrokersDataForm = ({ setRefresh }) => {
           {isUploading ? (
             <>
               <div className="spinner"></div>
-              Uploading & Submitting...
+              {t("profile.uploadingSubmitting")}
             </>
           ) : (
             <>
               <Upload size={20} />
-              Submit Broker Data
+              {t("profile.submitBrokerData")}
             </>
           )}
         </button>

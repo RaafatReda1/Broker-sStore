@@ -6,6 +6,7 @@ import React, {
   useRef,
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserTie,
@@ -26,6 +27,7 @@ import {
   sessionContext,
 } from "../../AppContexts";
 import DropMenu from "../DropMenu/DropMenu";
+import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 import "./Header.css";
 import supabase from "../../SupabaseClient";
 
@@ -33,6 +35,7 @@ const SEARCH_RESULTS_LIMIT = 5;
 const SCROLL_THRESHOLD = 20;
 
 const Header = () => {
+  const { t } = useTranslation();
   const { userData } = useContext(userDataContext);
   const { products } = useContext(productsContext);
   const { session } = useContext(sessionContext);
@@ -363,27 +366,31 @@ const Header = () => {
         <nav className="desktop-nav" aria-label="Main navigation">
           <Link to="/about" className="nav-link" aria-label="About Cicada">
             <FontAwesomeIcon icon={faInfoCircle} aria-hidden="true" />
-            <span>About Us</span>
+            <span>{t("navigation.about")}</span>
           </Link>
           {!userData && (
             <Link to="/cart" className="nav-link" aria-label="Shopping cart">
               <FontAwesomeIcon icon={faShoppingCart} aria-hidden="true" />
-              <span>Cart</span>
+              <span>{t("navigation.cart")}</span>
             </Link>
           )}
           {session && (
             <Link
               to="/notifications"
               className="nav-link"
-              aria-label={`Notifications (${unreadCount} unread)`}
+              aria-label={`${t("navigation.notifications")} (${unreadCount} ${t(
+                "notifications.unread"
+              )})`}
               onClick={refreshNotificationCount}
             >
               <FontAwesomeIcon icon={faBell} aria-hidden="true" />
-              <span>Notifications</span>
+              <span>{t("navigation.notifications")}</span>
               {unreadCount > 0 && (
                 <span
                   className={`notification-badge ${badgeAnimation}`}
-                  aria-label={`${unreadCount} unread notifications`}
+                  aria-label={`${unreadCount} ${t("notifications.unread")} ${t(
+                    "navigation.notifications"
+                  )}`}
                 >
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
@@ -395,25 +402,29 @@ const Header = () => {
               <Link
                 to="/withdraw"
                 className="nav-link"
-                aria-label="Withdraw funds"
+                aria-label={t("navigation.withdraw")}
               >
                 <FontAwesomeIcon icon={faMoneyBillWave} aria-hidden="true" />
-                <span>Withdraw</span>
+                <span>{t("navigation.withdraw")}</span>
               </Link>
               <Link
                 to="/balance"
                 className="nav-link"
-                aria-label="Account balance"
+                aria-label={t("navigation.balance")}
               >
                 <FontAwesomeIcon icon={faWallet} aria-hidden="true" />
-                <span>Balance</span>
+                <span>{t("navigation.balance")}</span>
               </Link>
             </>
           )}
 
-          <Link to="/" className="nav-link" aria-label="Browse products">
+          <Link
+            to="/"
+            className="nav-link"
+            aria-label={t("navigation.products")}
+          >
             <FontAwesomeIcon icon={faBoxOpen} aria-hidden="true" />
-            <span>Products</span>
+            <span>{t("navigation.products")}</span>
           </Link>
 
           {/* Search Bar */}
@@ -439,11 +450,11 @@ const Header = () => {
                 >
                   <input
                     type="text"
-                    placeholder="Search products..."
+                    placeholder={t("products.searchPlaceholder")}
                     value={searchQuery}
                     onChange={handleSearchInputChange}
                     autoFocus
-                    aria-label="Search products"
+                    aria-label={t("common.search")}
                     style={{ width: "90%" }}
                   />
                 </form>
@@ -490,12 +501,19 @@ const Header = () => {
                       }}
                     >
                       <FontAwesomeIcon icon={faSearch} aria-hidden="true" />
-                      View all results for &quot;{searchQuery}&quot;
+                      {t("common.view")} {t("common.search")}{" "}
+                      {t("products.searchPlaceholder")} &quot;{searchQuery}
+                      &quot;
                     </div>
                   </div>
                 )}
               </div>
             )}
+          </div>
+
+          {/* Language Switcher */}
+          <div className="header-language-switcher">
+            <LanguageSwitcher />
           </div>
 
           {/* Profile */}
@@ -569,12 +587,17 @@ const Header = () => {
             <FontAwesomeIcon icon={faSearch} aria-hidden="true" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder={t("products.searchPlaceholder")}
               value={searchQuery}
               onChange={handleSearchInputChange}
-              aria-label="Search products"
+              aria-label={t("common.search")}
             />
           </form>
+        </div>
+
+        {/* Mobile Language Switcher */}
+        <div className="mobile-language-switcher">
+          <LanguageSwitcher />
         </div>
 
         {!userData && (
@@ -582,10 +605,10 @@ const Header = () => {
             to="/cart"
             className="mobile-nav-link"
             onClick={closeMobileMenu}
-            aria-label="Shopping cart"
+            aria-label={t("navigation.cart")}
           >
             <FontAwesomeIcon icon={faShoppingCart} aria-hidden="true" />
-            <span>Cart</span>
+            <span>{t("navigation.cart")}</span>
           </Link>
         )}
 
@@ -595,10 +618,10 @@ const Header = () => {
               to="/withdraw"
               className="mobile-nav-link"
               onClick={closeMobileMenu}
-              aria-label="Withdraw funds"
+              aria-label={t("navigation.withdraw")}
             >
               <FontAwesomeIcon icon={faMoneyBillWave} aria-hidden="true" />
-              <span>Withdraw</span>
+              <span>{t("navigation.withdraw")}</span>
             </Link>
 
             <Link
@@ -608,14 +631,18 @@ const Header = () => {
                 closeMobileMenu();
                 refreshNotificationCount();
               }}
-              aria-label={`Notifications (${unreadCount} unread)`}
+              aria-label={`${t("navigation.notifications")} (${unreadCount} ${t(
+                "notifications.unread"
+              )})`}
             >
               <FontAwesomeIcon icon={faBell} aria-hidden="true" />
-              <span>Notifications</span>
+              <span>{t("navigation.notifications")}</span>
               {unreadCount > 0 && (
                 <span
                   className={`notification-badge ${badgeAnimation}`}
-                  aria-label={`${unreadCount} unread notifications`}
+                  aria-label={`${unreadCount} ${t("notifications.unread")} ${t(
+                    "navigation.notifications"
+                  )}`}
                 >
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
@@ -626,10 +653,10 @@ const Header = () => {
               to="/balance"
               className="mobile-nav-link"
               onClick={closeMobileMenu}
-              aria-label="Account balance"
+              aria-label={t("navigation.balance")}
             >
               <FontAwesomeIcon icon={faWallet} aria-hidden="true" />
-              <span>Balance</span>
+              <span>{t("navigation.balance")}</span>
             </Link>
           </>
         )}
@@ -638,20 +665,20 @@ const Header = () => {
           to="/about"
           className="mobile-nav-link"
           onClick={closeMobileMenu}
-          aria-label="About Cicada"
+          aria-label={t("navigation.about")}
         >
           <FontAwesomeIcon icon={faInfoCircle} aria-hidden="true" />
-          <span>About Us</span>
+          <span>{t("navigation.about")}</span>
         </Link>
 
         <Link
           to="/"
           className="mobile-nav-link"
           onClick={closeMobileMenu}
-          aria-label="Browse products"
+          aria-label={t("navigation.products")}
         >
           <FontAwesomeIcon icon={faBoxOpen} aria-hidden="true" />
-          <span>Products</span>
+          <span>{t("navigation.products")}</span>
         </Link>
       </nav>
     </header>

@@ -1,12 +1,14 @@
 /* eslint-disable react/prop-types */
 import { useContext, useMemo } from "react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import "./Balance.css";
 import { userDataContext } from "../../AppContexts";
 import BrokersArrangement from "./BrokersArrangement/BrokersArrangement";
 
 const Balance = () => {
+  const { t } = useTranslation();
   const { userData } = useContext(userDataContext);
 
   const formatters = useMemo(() => {
@@ -232,27 +234,31 @@ const Balance = () => {
   return (
     <div className="balance-container">
       {!stats ? (
-        <div className="loading">Loading...</div>
+        <div className="loading">{t("common.loading")}</div>
       ) : (
         <div className="balance-grid">
           {/* Balance Overview Section */}
           <div className="dashboard-section">
             <h2 className="section-title">
-              <i className="fa-solid fa-wallet" /> Balance Overview
+              <i className="fa-solid fa-wallet" />{" "}
+              {t("balance.balanceOverview")}
             </h2>
             <div className="section-grid">
               <div
                 className="stat-card accent-primary"
-                title="Your available funds ready for withdrawal"
-                aria-label="Available Balance"
+                title={t("balance.availableFundsTooltip")}
+                aria-label={t("balance.availableBalance")}
               >
                 <div className="stat-title">
-                  <i className="fa-solid fa-wallet" /> Available Balance
+                  <i className="fa-solid fa-wallet" />{" "}
+                  {t("balance.availableBalance")}
                 </div>
                 <div className="stat-value">
                   {formatters.currency.format(stats.actualBalance)}
                 </div>
-                <div className="stat-subtitle">Ready to withdraw</div>
+                <div className="stat-subtitle">
+                  {t("balance.readyToWithdraw")}
+                </div>
                 <div className="chart-container">
                   <LinearChart
                     data={generateChartData(stats.actualBalance)}
@@ -263,16 +269,16 @@ const Balance = () => {
 
               <div
                 className="stat-card accent-warning"
-                title="Funds temporarily held for security or compliance"
-                aria-label="Held Balance"
+                title={t("balance.heldFundsTooltip")}
+                aria-label={t("balance.heldBalance")}
               >
                 <div className="stat-title">
-                  <i className="fa-solid fa-hand" /> Held Balance
+                  <i className="fa-solid fa-hand" /> {t("balance.heldBalance")}
                 </div>
                 <div className="stat-value">
                   {formatters.currency.format(stats.suspendedBalance)}
                 </div>
-                <div className="stat-subtitle">Under review</div>
+                <div className="stat-subtitle">{t("balance.underReview")}</div>
                 <div className="chart-container">
                   <LinearChart
                     data={generateChartData(stats.suspendedBalance)}
@@ -286,21 +292,23 @@ const Balance = () => {
           {/* Order Performance Section */}
           <div className="dashboard-section">
             <h2 className="section-title">
-              <i className="fa-solid fa-chart-line" /> Order Performance
+              <i className="fa-solid fa-chart-line" />{" "}
+              {t("balance.orderPerformance")}
             </h2>
             <div className="section-grid">
               <div
                 className="stat-card"
-                title="Total orders you've created"
-                aria-label="Total Orders"
+                title={t("balance.totalOrdersTooltip")}
+                aria-label={t("balance.totalOrders")}
               >
                 <div className="stat-title">
-                  <i className="fa-solid fa-boxes-stacked" /> Total Orders
+                  <i className="fa-solid fa-boxes-stacked" />{" "}
+                  {t("balance.totalOrders")}
                 </div>
                 <div className="stat-value">
                   {formatters.number.format(stats.totalOrders)}
                 </div>
-                <div className="stat-subtitle">All time</div>
+                <div className="stat-subtitle">{t("balance.allTime")}</div>
                 <div className="chart-container">
                   <LinearChart
                     data={generateChartData(stats.totalOrders, 0.2)}
@@ -311,19 +319,22 @@ const Balance = () => {
 
               <div
                 className="stat-card"
-                title="Orders you've successfully completed"
-                aria-label="Completed Orders"
+                title={t("balance.completedOrdersTooltip")}
+                aria-label={t("balance.completed")}
               >
                 <div className="stat-title">
-                  <i className="fa-solid fa-circle-check" /> Completed
+                  <i className="fa-solid fa-circle-check" />{" "}
+                  {t("balance.completed")}
                 </div>
                 <div className="stat-row">
                   <span className="stat-value">
                     {formatters.number.format(stats.completedOrders)}
                   </span>
-                  <span className="stat-chip success">done</span>
+                  <span className="stat-chip success">{t("balance.done")}</span>
                 </div>
-                <div className="stat-subtitle">Successfully finished</div>
+                <div className="stat-subtitle">
+                  {t("balance.successfullyFinished")}
+                </div>
                 <div className="chart-container">
                   <LinearChart
                     data={generateChartData(stats.completedOrders, 0.2)}
@@ -334,19 +345,24 @@ const Balance = () => {
 
               <div
                 className="stat-card"
-                title="Orders waiting for completion"
-                aria-label="Pending Orders"
+                title={t("balance.pendingOrdersTooltip")}
+                aria-label={t("balance.pending")}
               >
                 <div className="stat-title">
-                  <i className="fa-solid fa-hourglass-half" /> Pending
+                  <i className="fa-solid fa-hourglass-half" />{" "}
+                  {t("balance.pending")}
                 </div>
                 <div className="stat-row">
                   <span className="stat-value">
                     {formatters.number.format(stats.pendingOrders)}
                   </span>
-                  <span className="stat-chip warning">pending</span>
+                  <span className="stat-chip warning">
+                    {t("balance.pending")}
+                  </span>
                 </div>
-                <div className="stat-subtitle">Awaiting completion</div>
+                <div className="stat-subtitle">
+                  {t("balance.awaitingCompletion")}
+                </div>
                 <div className="chart-container">
                   <LinearChart
                     data={generateChartData(stats.pendingOrders, 0.2)}
@@ -360,21 +376,23 @@ const Balance = () => {
           {/* Performance Metrics Section */}
           <div className="dashboard-section">
             <h2 className="section-title">
-              <i className="fa-solid fa-gauge-high" /> Performance Metrics
+              <i className="fa-solid fa-gauge-high" />{" "}
+              {t("balance.performanceMetrics")}
             </h2>
             <div className="section-grid">
               <div
                 className="stat-card"
-                title="Your average earnings per order"
-                aria-label="Average Order Value"
+                title={t("balance.avgOrderValueTooltip")}
+                aria-label={t("balance.avgOrderValue")}
               >
                 <div className="stat-title">
-                  <i className="fa-solid fa-receipt" /> Avg Order Value
+                  <i className="fa-solid fa-receipt" />{" "}
+                  {t("balance.avgOrderValue")}
                 </div>
                 <div className="stat-value">
                   {formatters.currency.format(stats.averageOrderValue)}
                 </div>
-                <div className="stat-subtitle">Per order</div>
+                <div className="stat-subtitle">{t("balance.perOrder")}</div>
                 <div className="chart-container">
                   <LinearChart
                     data={generateChartData(stats.averageOrderValue)}
@@ -385,32 +403,38 @@ const Balance = () => {
 
               <div
                 className="stat-card"
-                title="Percentage of orders you complete successfully"
-                aria-label="Success Rate"
+                title={t("balance.successRateTooltip")}
+                aria-label={t("balance.successRate")}
               >
                 <div className="stat-title">
-                  <i className="fa-solid fa-gauge-high" /> Success Rate
+                  <i className="fa-solid fa-gauge-high" />{" "}
+                  {t("balance.successRate")}
                 </div>
                 <div className="stat-visual">
                   <ProgressRing value={derived?.completionRate || 0} />
                 </div>
-                <div className="stat-subtitle">Completed ÷ Total</div>
+                <div className="stat-subtitle">
+                  {t("balance.completedDividedTotal")}
+                </div>
               </div>
 
               <div
                 className="stat-card"
-                title="When you last created an order"
-                aria-label="Last Activity"
+                title={t("balance.lastActivityTooltip")}
+                aria-label={t("balance.lastActivity")}
               >
                 <div className="stat-title">
-                  <i className="fa-regular fa-clock" /> Last Activity
+                  <i className="fa-regular fa-clock" />{" "}
+                  {t("balance.lastActivity")}
                 </div>
                 <div className="stat-value">
                   {stats.lastOrderDate
                     ? formatters.date.format(stats.lastOrderDate)
                     : "—"}
                 </div>
-                <div className="stat-subtitle">Most recent order</div>
+                <div className="stat-subtitle">
+                  {t("balance.mostRecentOrder")}
+                </div>
               </div>
             </div>
           </div>
@@ -418,45 +442,51 @@ const Balance = () => {
           {/* Visual Analytics Section */}
           <div className="dashboard-section">
             <h2 className="section-title">
-              <i className="fa-solid fa-chart-pie" /> Analytics
+              <i className="fa-solid fa-chart-pie" /> {t("balance.analytics")}
             </h2>
             <div className="section-grid">
               <div
                 className="stat-card"
-                title="Visual breakdown of your order completion status"
-                aria-label="Order Status Breakdown"
+                title={t("balance.orderStatusTooltip")}
+                aria-label={t("balance.orderStatus")}
               >
                 <div className="stat-title">
-                  <i className="fa-solid fa-chart-pie" /> Order Status
+                  <i className="fa-solid fa-chart-pie" />{" "}
+                  {t("balance.orderStatus")}
                 </div>
                 <div className="stat-visual">
                   <DonutChart
                     completed={stats.completedOrders}
-                    pending={stats.pendingOrders - stats.completedOrders} 
+                    pending={stats.pendingOrders - stats.completedOrders}
                   />
                 </div>
-                <div className="stat-subtitle">Completed vs Pending</div>
+                <div className="stat-subtitle">
+                  {t("balance.completedVsPending")}
+                </div>
               </div>
 
               <div
                 className="stat-card"
-                title="Visual comparison of your available vs held funds"
-                aria-label="Balance Distribution"
+                title={t("balance.balanceDistributionTooltip")}
+                aria-label={t("balance.balanceSplit")}
               >
                 <div className="stat-title">
-                  <i className="fa-solid fa-chart-column" /> Balance Split
+                  <i className="fa-solid fa-chart-column" />{" "}
+                  {t("balance.balanceSplit")}
                 </div>
                 <BarCompare
                   a={stats.actualBalance}
                   b={stats.suspendedBalance}
-                  aLabel={`Available ${formatters.currency.format(
-                    stats.actualBalance
-                  )}`}
-                  bLabel={`Held ${formatters.currency.format(
+                  aLabel={`${t(
+                    "balance.available"
+                  )} ${formatters.currency.format(stats.actualBalance)}`}
+                  bLabel={`${t("balance.held")} ${formatters.currency.format(
                     stats.suspendedBalance
                   )}`}
                 />
-                <div className="stat-subtitle">Available vs Held</div>
+                <div className="stat-subtitle">
+                  {t("balance.availableVsHeld")}
+                </div>
               </div>
             </div>
           </div>

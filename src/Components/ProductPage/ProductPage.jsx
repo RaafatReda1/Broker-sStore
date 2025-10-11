@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import "./ProductPage.css";
 import {
   userContext,
@@ -21,6 +22,7 @@ import {
 } from "lucide-react";
 
 const ProductPage = () => {
+  const { t } = useTranslation();
   const { products } = useContext(productsContext);
   const { user } = useContext(userContext);
   const { cart, setCart } = useContext(cartContext);
@@ -49,8 +51,8 @@ const ProductPage = () => {
     return (
       <div className="product-page">
         <div className="product-card">
-          {products.length === 0 && <h2>Loading product...</h2>}
-          {products.length > 0 && <p>Product not found</p>}
+          {products.length === 0 && <h2>{t("common.loading")}</h2>}
+          {products.length > 0 && <p>{t("products.productNotFound")}</p>}
         </div>
       </div>
     );
@@ -76,7 +78,7 @@ const ProductPage = () => {
 
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
-    toast.success("Added to cart!");
+    toast.success(t("success.productAdded"));
   };
 
   const handleQuantityChange = (change) => {
@@ -94,11 +96,11 @@ const ProductPage = () => {
         });
       } else {
         await navigator.clipboard.writeText(productUrl);
-        toast.success("Product link copied to clipboard!");
+        toast.success(t("success.linkCopied"));
       }
     } catch (err) {
       console.error("Failed to share:", err);
-      toast.error("Failed to share product. Please try again.");
+      toast.error(t("errors.shareFailed"));
     }
   };
 
@@ -117,7 +119,7 @@ const ProductPage = () => {
         <div className="back-button-container">
           <Link to="/products" className="back-button">
             <ArrowLeft size={20} />
-            <span>Back to Products</span>
+            <span>{t("products.backToProducts")}</span>
           </Link>
         </div>
 
@@ -139,7 +141,7 @@ const ProductPage = () => {
                 onClick={handlePreviewImage}
               >
                 <ZoomIn size={20} />
-                <span>Preview</span>
+                <span>{t("products.previewImage")}</span>
               </button>
             </div>
           </div>
@@ -167,9 +169,13 @@ const ProductPage = () => {
             <h1 className="product-title">{currentProduct.name}</h1>
             <div className="product-badges">
               {userData && (
-                <span className="badge broker-badge">Broker View</span>
+                <span className="badge broker-badge">
+                  {t("products.brokerView")}
+                </span>
               )}
-              <span className="badge available-badge">Available</span>
+              <span className="badge available-badge">
+                {t("products.available")}
+              </span>
             </div>
           </div>
 
@@ -177,12 +183,12 @@ const ProductPage = () => {
 
           <div className="price-section">
             <div className="price-container">
-              <span className="price-label">Price</span>
+              <span className="price-label">{t("products.price")}</span>
               <span className="price-value">${currentProduct.price}</span>
             </div>
             {userData && currentProduct.profit && (
               <div className="profit-container">
-                <span className="profit-label">Your Profit</span>
+                <span className="profit-label">{t("products.yourProfit")}</span>
                 <span className="profit-value">${currentProduct.profit}</span>
               </div>
             )}
@@ -190,7 +196,7 @@ const ProductPage = () => {
 
           {!userData && (
             <div className="quantity-section">
-              <label className="quantity-label">Quantity</label>
+              <label className="quantity-label">{t("products.quantity")}</label>
               <div className="quantity-controls">
                 <button
                   className="quantity-btn minus"
@@ -230,7 +236,7 @@ const ProductPage = () => {
                 >
                   <button className="action-btn pdf-btn">
                     <Download size={20} />
-                    <span>Download PDF</span>
+                    <span>{t("products.downloadPdf")}</span>
                   </button>
                 </PDF>
                 <button
@@ -240,16 +246,16 @@ const ProductPage = () => {
                       await navigator.clipboard.writeText(
                         window.location.href + "?brokerId=" + userData.id
                       );
-                      toast.success("Link copied to clipboard!");
+                      toast.success(t("success.linkCopied"));
                     } catch (err) {
                       console.error("Failed to copy: ", err);
-                      toast.error("Failed to copy link. Please try again.");
+                      toast.error(t("errors.copyFailed"));
                     }
                   }}
                   disabled={userData.isVerified === false}
                 >
                   <Share2 size={20} />
-                  <span>Copy Link</span>
+                  <span>{t("products.copyLink")}</span>
                 </button>
               </>
             ) : (
@@ -259,12 +265,12 @@ const ProductPage = () => {
                   onClick={() => handleAddToCart(currentProduct, quantity)}
                 >
                   <ShoppingCart size={20} />
-                  <span>Add to Cart</span>
+                  <span>{t("products.addToCart")}</span>
                 </button>
                 <Link to="/cart">
                   <button className="action-btn checkout-btn">
                     <Eye size={20} />
-                    <span>View Cart</span>
+                    <span>{t("cart.title")}</span>
                   </button>
                 </Link>
               </>

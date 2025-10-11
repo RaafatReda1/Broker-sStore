@@ -1,5 +1,6 @@
 import { useState, useContext, useCallback, useMemo } from "react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import "./BrokersArrangement.css";
 import { userDataContext, sessionContext } from "../../../AppContexts";
@@ -7,6 +8,7 @@ import supabase from "../../../SupabaseClient";
 import { toast } from "react-toastify";
 
 const BrokersArrangement = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [brokers, setBrokers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,7 +28,7 @@ const BrokersArrangement = () => {
 
       if (error) {
         console.error("Error fetching brokers:", error);
-        toast.error("Failed to load leaderboard. Please try again.");
+        toast.error(t("errors.failedToLoadLeaderboard"));
         return;
       }
 
@@ -35,7 +37,7 @@ const BrokersArrangement = () => {
       }
     } catch (err) {
       console.error("Error:", err);
-      toast.error("Failed to load leaderboard. Please try again.");
+      toast.error(t("errors.failedToLoadLeaderboard"));
     } finally {
       setLoading(false);
     }
@@ -100,7 +102,7 @@ const BrokersArrangement = () => {
       {/* Trigger Button */}
       <button className="leaderboard-btn" onClick={handleOpenPopup}>
         <i className="fa-solid fa-trophy" />
-        View Leaderboard
+        {t("balance.viewLeaderboard")}
       </button>
 
       {/* Popup Overlay */}
@@ -114,7 +116,7 @@ const BrokersArrangement = () => {
             <div className="leaderboard-header">
               <h2>
                 <i className="fa-solid fa-trophy" />
-                Brokers Leaderboard
+                {t("balance.brokersLeaderboard")}
               </h2>
               <button
                 className="brokers-arrangement-close-btn"
@@ -137,7 +139,10 @@ const BrokersArrangement = () => {
                   </div>
                   <div className="current-user-info">
                     <h4>{userData.fullName}</h4>
-                    <p>Your Rank: #{currentUserRank || "Loading..."}</p>
+                    <p>
+                      {t("balance.yourRank")}: #
+                      {currentUserRank || t("common.loading")}
+                    </p>
                     <span className="current-user-revenue">
                       {formatCurrency(userData.totalRevenue)}
                     </span>
@@ -151,7 +156,7 @@ const BrokersArrangement = () => {
               {loading ? (
                 <div className="loading">
                   <i className="fa-solid fa-spinner fa-spin" />
-                  Loading leaderboard...
+                  {t("common.loading")} {t("balance.leaderboard")}...
                 </div>
               ) : (
                 <div className="brokers-list">
@@ -192,7 +197,9 @@ const BrokersArrangement = () => {
                           <span className="revenue-amount">
                             {formatCurrency(broker.totalRevenue)}
                           </span>
-                          <span className="revenue-label">Total Revenue</span>
+                          <span className="revenue-label">
+                            {t("balance.totalRevenue")}
+                          </span>
                         </div>
                       </div>
                     );

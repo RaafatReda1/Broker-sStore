@@ -1,6 +1,6 @@
 /* ===== Header Dark Theme Styles ===== */
-@import url('https://fonts.googleapis.com/css2?family=Playwrite+US+Modern:wght@100..400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single+Ink:wght@100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Playwrite+US+Modern:wght@100..400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single+Ink:wght@100..900&display=swap");
 :root {
   --bg-primary: #0f0f0f;
   --bg-secondary: #1a1a1a;
@@ -33,6 +33,24 @@ header {
   border-bottom: 1px solid var(--border-color);
   z-index: 1000;
   transition: all var(--transition-smooth);
+}
+
+/* ===== Language Switcher in Header ===== */
+.header-language-switcher {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.mobile-language-switcher {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+}
+
+/* RTL Support for Header */
+[dir="rtl"] .header-language-switcher {
+  margin-left: 1rem;
+  margin-right: 0;
 }
 
 header.scrolled {

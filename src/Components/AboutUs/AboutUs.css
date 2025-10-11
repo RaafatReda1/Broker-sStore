@@ -10,6 +10,20 @@
   overflow-x: hidden;
 }
 
+/* Language Switcher Container */
+.language-switcher-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+/* RTL Support */
+[dir="rtl"] .language-switcher-container {
+  right: auto;
+  left: 20px;
+}
+
 .about-us-container::before {
   content: "";
   position: absolute;

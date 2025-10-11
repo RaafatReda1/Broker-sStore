@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import "./Product.css";
 import { cartContext, userDataContext } from "../../AppContexts";
 import { Link } from "react-router-dom";
@@ -16,6 +17,7 @@ const Product = ({
   fullDescription,
   profit,
 }) => {
+  const { t } = useTranslation();
   const { cart, setCart } = useContext(cartContext);
   const { userData } = useContext(userDataContext);
   const handleAddToCart = () => {
@@ -47,7 +49,7 @@ const Product = ({
     setCart(updatedCart);
     // localStorage is now handled in App.jsx
 
-    toast.success("Added to cart!");
+    toast.success(t("success.productAdded"));
   };
 
   const handleShare = async () => {
@@ -61,11 +63,11 @@ const Product = ({
         });
       } else {
         await navigator.clipboard.writeText(productUrl);
-        toast.success("Product link copied to clipboard!");
+        toast.success(t("success.linkCopied"));
       }
     } catch (err) {
       console.error("Failed to share:", err);
-      toast.error("Failed to share product. Please try again.");
+      toast.error(t("errors.shareFailed"));
     }
   };
 
@@ -81,28 +83,30 @@ const Product = ({
             className="overlay-btn view-btn"
           >
             <Eye size={20} />
-            <span>View</span>
+            <span>{t("products.viewProduct")}</span>
           </Link>
           {!userData && (
             <button className="overlay-btn cart-btn" onClick={handleAddToCart}>
               <ShoppingCart size={20} />
-              <span>Add to Cart</span>
+              <span>{t("products.addToCart")}</span>
             </button>
           )}
           <button className="overlay-btn share-btn" onClick={handleShare}>
             <Share2 size={20} />
-            <span>Share</span>
+            <span>{t("products.shareProduct")}</span>
           </button>
         </div>
       </div>
 
-      <div className="card-content" >
+      <div className="card-content">
         <h3 className="product-name">{name}</h3>
         <p className="product-description">{description}</p>
         <div className="price-container">
           <span className="price">${price}</span>
           {userData && profit && (
-            <span className="profit">Profit: ${profit}</span>
+            <span className="profit">
+              {t("products.profit")}: ${profit}
+            </span>
           )}
         </div>
       </div>
@@ -115,7 +119,7 @@ const Product = ({
             onClick={handleAddToCart}
           >
             <ShoppingCart size={16} />
-            Add to cart
+            {t("products.addToCart")}
           </button>
         )}
         {userData && (
@@ -131,16 +135,16 @@ const Product = ({
                     "?brokerId=" +
                     userData.id
                 );
-                toast.success("Link copied to clipboard!");
+                toast.success(t("success.linkCopied"));
               } catch (err) {
                 console.error("Failed to copy: ", err);
-                toast.error("Failed to copy link. Please try again.");
+                toast.error(t("errors.copyFailed"));
               }
             }}
             disabled={userData.isVerified === false}
           >
             <Share2 size={16} />
-            Copy Link
+            {t("products.shareProduct")}
           </button>
         )}
       </div>

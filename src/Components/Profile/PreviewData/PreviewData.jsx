@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import "./PreviewData.css";
 import { sessionContext, userDataContext } from "../../../AppContexts";
 import supabase from "../../../SupabaseClient";
@@ -19,6 +20,7 @@ import {
 import { toast } from "react-toastify";
 
 const PreviewData = () => {
+  const { t } = useTranslation();
   const { userData, setUserData } = useContext(userDataContext);
   const { session } = useContext(sessionContext);
 
@@ -69,7 +71,7 @@ const PreviewData = () => {
   //sending the new form to the DB
   const handleUpdate = async () => {
     if (!userData) {
-      toast.error("No user data found.");
+      toast.error(t("errors.noUserDataFound"));
       return;
     }
 
@@ -95,11 +97,11 @@ const PreviewData = () => {
     if (error) {
       toast.error(error.message);
     } else if (data && data.length > 0) {
-      toast.success("Data updated successfully!");
+      toast.success(t("success.dataUpdated"));
       setRefresh((prev) => !prev);
       setIsEditing(false);
     } else {
-      toast.error("Failed to update data.");
+      toast.error(t("errors.failedToUpdateData"));
     }
   };
   //handling the profile img temporary storage with validation
@@ -113,7 +115,9 @@ const PreviewData = () => {
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
       toast.success(
-        `${file.name} selected (${validation.fileInfo.sizeFormatted})`
+        `${file.name} ${t("profile.fileSelected")} (${
+          validation.fileInfo.sizeFormatted
+        })`
       );
     } else {
       toast.error(`${file.name}: ${validation.error}`);
@@ -146,7 +150,7 @@ const PreviewData = () => {
         .upload(newFileName, selectedFile);
 
       if (uploadError) {
-        toast.error("Error uploading image: " + uploadError.message);
+        toast.error(t("errors.imageUploadError") + uploadError.message);
         return;
       }
 
@@ -156,7 +160,7 @@ const PreviewData = () => {
         .getPublicUrl(newFileName);
 
       if (publicUrlError) {
-        toast.error("Error getting public URL: " + publicUrlError.message);
+        toast.error(t("errors.publicUrlError") + publicUrlError.message);
         return;
       }
 
@@ -170,14 +174,14 @@ const PreviewData = () => {
         .select();
 
       if (updateError) {
-        toast.error("Error updating avatar URL: " + updateError.message);
+        toast.error(t("errors.avatarUpdateError") + updateError.message);
         return;
       }
-      toast.success("Avatar updated successfully!");
+      toast.success(t("success.avatarUpdated"));
       setUserData((prev) => ({ ...prev, avatar_url: avatarUrl })); // تحديث الواجهة فورًا
     } catch (err) {
       console.error("Unexpected error:", err);
-      toast.error("An unexpected error occurred while updating avatar.", {
+      toast.error(t("errors.unexpectedAvatarError"), {
         autoClose: 5000,
       });
     }
@@ -191,16 +195,14 @@ const PreviewData = () => {
         </div>
         <div className="profile-title-section">
           <h1 className="profile-title">
-            Profile
+            {t("profile.profile")}
             {userData?.isVerified && (
               <span className="verified-badge">
                 <CheckCircle size={20} />
               </span>
             )}
           </h1>
-          <p className="profile-subtitle">
-            Manage your broker profile information
-          </p>
+          <p className="profile-subtitle">{t("profile.manageProfileInfo")}</p>
         </div>
       </div>
 
@@ -208,11 +210,8 @@ const PreviewData = () => {
         <div className="verification-warning">
           <AlertTriangle className="warning-icon" size={20} />
           <div className="warning-content">
-            <h4>Account Under Review</h4>
-            <p>
-              Your account is under review. You cannot work until verification
-              is complete.
-            </p>
+            <h4>{t("profile.accountUnderReview")}</h4>
+            <p>{t("profile.accountUnderReviewMessage")}</p>
           </div>
         </div>
       )}
@@ -259,7 +258,7 @@ const PreviewData = () => {
             {isEditing && (
               <div className="avatar-overlay">
                 <Camera size={24} />
-                <span>Change Photo</span>
+                <span>{t("profile.changePhoto")}</span>
               </div>
             )}
 
@@ -288,7 +287,7 @@ const PreviewData = () => {
           <div className="profile-form-section">
             <h3 className="form-section-title">
               <User size={20} />
-              Personal Information
+              {t("profile.personalInfo")}
             </h3>
 
             <form className="profile-form">
@@ -305,7 +304,9 @@ const PreviewData = () => {
                       id="fullName"
                       placeholder=" "
                     />
-                    <span className="floating-label">Full Name</span>
+                    <span className="floating-label">
+                      {t("profile.fullName")}
+                    </span>
                   </div>
                 </label>
               </div>
@@ -323,7 +324,9 @@ const PreviewData = () => {
                       id="nickName"
                       placeholder=" "
                     />
-                    <span className="floating-label">Nickname</span>
+                    <span className="floating-label">
+                      {t("profile.nickname")}
+                    </span>
                   </div>
                 </label>
               </div>
@@ -355,7 +358,9 @@ const PreviewData = () => {
                       id="phone"
                       placeholder=" "
                     />
-                    <span className="floating-label">Phone Number</span>
+                    <span className="floating-label">
+                      {t("profile.phoneNumber")}
+                    </span>
                   </div>
                 </label>
               </div>
@@ -371,7 +376,9 @@ const PreviewData = () => {
                       id="email"
                       placeholder=" "
                     />
-                    <span className="floating-label">Email Address</span>
+                    <span className="floating-label">
+                      {t("profile.emailAddress")}
+                    </span>
                   </div>
                 </label>
               </div>
@@ -398,12 +405,12 @@ const PreviewData = () => {
           {isEditing ? (
             <>
               <Save size={20} />
-              Save Changes
+              {t("profile.saveChanges")}
             </>
           ) : (
             <>
               <Edit3 size={20} />
-              Edit Profile
+              {t("profile.editProfile")}
             </>
           )}
         </button>
@@ -423,7 +430,7 @@ const PreviewData = () => {
             }}
           >
             <X size={20} />
-            Cancel
+            {t("common.cancel")}
           </button>
         )}
       </div>

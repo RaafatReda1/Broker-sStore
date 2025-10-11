@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Shield,
   Users,
@@ -21,9 +22,11 @@ import {
   userDataContext,
   staffContext,
 } from "../../AppContexts";
+import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 import "./AboutUs.css";
 
 const AboutUs = () => {
+  const { t } = useTranslation();
   const { session } = useContext(sessionContext);
   const { userData } = useContext(userDataContext);
   const { isAdmin, isModerator } = useContext(staffContext);
@@ -34,6 +37,11 @@ const AboutUs = () => {
 
   return (
     <div className="about-us-container">
+      {/* Language Switcher */}
+      <div className="language-switcher-container">
+        <LanguageSwitcher />
+      </div>
+
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
@@ -44,14 +52,8 @@ const AboutUs = () => {
               className="cicada-logo"
             />
           </div>
-          <h1 className="hero-title">About <span className="brand-name">Cicada</span>
-          </h1>
-          <p className="hero-subtitle">
-            Cicada isn&apos;t just another e-commerce platform — it&apos;s a
-            bridge between people and opportunity. We believe that trust,
-            transparency, and human connection are the core of every successful
-            deal.
-          </p>
+          <h1 className="hero-title"> {t("about.title")}</h1>
+          <p className="hero-subtitle">{t("about.subtitle")}</p>
         </div>
       </section>
 
@@ -62,39 +64,33 @@ const AboutUs = () => {
             <div className="card-icon">
               <Target size={48} />
             </div>
-            <h2 className="card-title">🌍 Our Mission</h2>
-            <p className="card-description">
-              To redefine online trade by merging technology with human trust —
-              creating a fair ecosystem where brokers, customers, and businesses
-              all grow together.
-            </p>
+            <h2 className="card-title">🌍 {t("about.mission.title")}</h2>
+            <p className="card-description">{t("about.mission.description")}</p>
           </div>
 
           <div className="vision-card">
             <div className="card-icon">
               <Zap size={48} />
             </div>
-            <h2 className="card-title">💡 Our Vision</h2>
-            <p className="card-description">
-              To build the world&apos;s most trusted broker-driven marketplace,
-              where anyone with passion and integrity can become a key player in
-              digital commerce.
-            </p>
+            <h2 className="card-title">💡 {t("about.vision.title")}</h2>
+            <p className="card-description">{t("about.vision.description")}</p>
           </div>
         </div>
       </section>
 
       {/* How We Work */}
       <section className="how-we-work-section">
-        <h2 className="section-title">⚙️ How We Work</h2>
+        <h2 className="section-title">⚙️ {t("about.features.title")}</h2>
         <div className="features-grid">
           <div className="feature-card">
             <div className="feature-icon">
               <Users size={40} />
             </div>
-            <h3 className="feature-title">Verified Brokers</h3>
+            <h3 className="feature-title">
+              {t("about.features.verifiedBrokers.title")}
+            </h3>
             <p className="feature-description">
-              Every broker is identity-verified for full transparency and trust.
+              {t("about.features.verifiedBrokers.description")}
             </p>
           </div>
 
@@ -102,10 +98,11 @@ const AboutUs = () => {
             <div className="feature-icon">
               <TrendingUp size={40} />
             </div>
-            <h3 className="feature-title">Real Commissions</h3>
+            <h3 className="feature-title">
+              {t("about.features.realCommissions.title")}
+            </h3>
             <p className="feature-description">
-              Brokers earn fair profits for every successful order they
-              facilitate.
+              {t("about.features.realCommissions.description")}
             </p>
           </div>
 
@@ -113,10 +110,11 @@ const AboutUs = () => {
             <div className="feature-icon">
               <Shield size={40} />
             </div>
-            <h3 className="feature-title">Smart Management</h3>
+            <h3 className="feature-title">
+              {t("about.features.smartManagement.title")}
+            </h3>
             <p className="feature-description">
-              A powerful admin system ensures smooth operations and quality
-              control.
+              {t("about.features.smartManagement.description")}
             </p>
           </div>
 
@@ -124,10 +122,11 @@ const AboutUs = () => {
             <div className="feature-icon">
               <Lock size={40} />
             </div>
-            <h3 className="feature-title">Secure Infrastructure</h3>
+            <h3 className="feature-title">
+              {t("about.features.secureInfrastructure.title")}
+            </h3>
             <p className="feature-description">
-              Powered by Supabase and React, ensuring reliability and real-time
-              performance.
+              {t("about.features.secureInfrastructure.description")}
             </p>
           </div>
         </div>
@@ -139,49 +138,41 @@ const AboutUs = () => {
           <div className="story-icon">
             <Heart size={60} />
           </div>
-          <h2 className="story-title">🕯️ Our Story</h2>
+          <h2 className="story-title">🕯️ {t("about.story.title")}</h2>
           <div className="story-text">
-            <p>
-              The name <strong>Cicada</strong> is inspired by the mystery and
-              intelligence of Cicada 3301 — a symbol of curiosity, persistence,
-              and problem-solving.
-            </p>
-            <p>
-              Just like the cicada&apos;s hidden emergence after years
-              underground, we believe in quietly building powerful systems that
-              rise when ready — changing how digital trade works forever.
-            </p>
+            <p>{t("about.story.description1")}</p>
+            <p>{t("about.story.description2")}</p>
           </div>
         </div>
       </section>
 
       {/* Value Propositions */}
       <section className="values-section">
-        <h2 className="section-title">Why Choose Cicada?</h2>
+        <h2 className="section-title">{t("about.values.title")}</h2>
         <div className="values-grid">
           <div className="value-item">
             <CheckCircle size={24} className="check-icon" />
-            <span>Human-centered commerce</span>
+            <span>{t("about.values.humanCentered")}</span>
           </div>
           <div className="value-item">
             <CheckCircle size={24} className="check-icon" />
-            <span>Verified broker network</span>
+            <span>{t("about.values.verifiedNetwork")}</span>
           </div>
           <div className="value-item">
             <CheckCircle size={24} className="check-icon" />
-            <span>Real-time commission tracking</span>
+            <span>{t("about.values.realTimeTracking")}</span>
           </div>
           <div className="value-item">
             <CheckCircle size={24} className="check-icon" />
-            <span>Secure and transparent</span>
+            <span>{t("about.values.secureTransparent")}</span>
           </div>
           <div className="value-item">
             <CheckCircle size={24} className="check-icon" />
-            <span>Fair profit sharing</span>
+            <span>{t("about.values.fairProfitSharing")}</span>
           </div>
           <div className="value-item">
             <CheckCircle size={24} className="check-icon" />
-            <span>24/7 support system</span>
+            <span>{t("about.values.supportSystem")}</span>
           </div>
         </div>
       </section>
@@ -189,55 +180,52 @@ const AboutUs = () => {
       {/* Call to Action */}
       <section className="cta-section">
         <div className="cta-content">
-          <h2 className="cta-title">Ready to Join the Future of Commerce?</h2>
-          <p className="cta-subtitle">
-            At Cicada, we don&apos;t just build software. We build connections,
-            trust, and opportunities — one deal at a time.
-          </p>
+          <h2 className="cta-title">{t("about.cta.title")}</h2>
+          <p className="cta-subtitle">{t("about.cta.subtitle")}</p>
 
           <div className="cta-buttons">
             {!isLoggedIn ? (
               <>
                 <Link to="/signup" className="cta-button primary">
                   <UserPlus size={20} />
-                  <span>Sign Up Now</span>
+                  <span>{t("about.cta.signUpNow")}</span>
                   <ArrowRight size={16} />
                 </Link>
                 <Link to="/signin" className="cta-button secondary">
-                  <span>Sign In</span>
+                  <span>{t("about.cta.signIn")}</span>
                 </Link>
               </>
             ) : isBroker ? (
               <>
                 <Link to="/balance" className="cta-button primary">
                   <TrendingUp size={20} />
-                  <span>View My Earnings</span>
+                  <span>{t("about.cta.viewEarnings")}</span>
                   <ArrowRight size={16} />
                 </Link>
                 <Link to="/profile" className="cta-button secondary">
-                  <span>My Profile</span>
+                  <span>{t("about.cta.myProfile")}</span>
                 </Link>
               </>
             ) : isStaff ? (
               <>
                 <Link to="/managebrokers" className="cta-button primary">
                   <Shield size={20} />
-                  <span>Manage Brokers</span>
+                  <span>{t("about.cta.adminDashboard")}</span>
                   <ArrowRight size={16} />
                 </Link>
                 <Link to="/manageorders" className="cta-button secondary">
-                  <span>Manage Orders</span>
+                  <span>{t("about.cta.manageOrders")}</span>
                 </Link>
               </>
             ) : (
               <>
                 <Link to="/products" className="cta-button primary">
                   <ShoppingBag size={20} />
-                  <span>Start Shopping</span>
+                  <span>{t("about.cta.startShopping")}</span>
                   <ArrowRight size={16} />
                 </Link>
                 <Link to="/profile" className="cta-button secondary">
-                  <span>Become a Broker</span>
+                  <span>{t("about.cta.becomeBroker")}</span>
                 </Link>
               </>
             )}
@@ -253,21 +241,23 @@ const AboutUs = () => {
               <Users size={32} />
             </div>
             <div className="stat-number">500+</div>
-            <div className="stat-label">Verified Brokers</div>
+            <div className="stat-label">{t("about.stats.verifiedBrokers")}</div>
           </div>
           <div className="stat-item">
             <div className="stat-icon">
               <ShoppingBag size={32} />
             </div>
             <div className="stat-number">10K+</div>
-            <div className="stat-label">Orders Processed</div>
+            <div className="stat-label">{t("about.stats.ordersProcessed")}</div>
           </div>
           <div className="stat-item">
             <div className="stat-icon">
               <Star size={32} />
             </div>
             <div className="stat-number">98%</div>
-            <div className="stat-label">Customer Satisfaction</div>
+            <div className="stat-label">
+              {t("about.stats.customerSatisfaction")}
+            </div>
           </div>
         </div>
       </section>

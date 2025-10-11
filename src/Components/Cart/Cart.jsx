@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import "./Cart.css";
 import { cartContext } from "../../AppContexts";
 import CheckOut from "../CheckOut/CheckOut";
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 
 export default function Cart() {
+  const { t } = useTranslation();
   const { cart, setCart } = useContext(cartContext);
 
   // حساب الإجمالي
@@ -30,7 +32,7 @@ export default function Cart() {
 
     setCart(updatedCart);
     // localStorage is now handled in App.jsx
-    toast.success("Removed from cart!");
+    toast.success(t("success.itemRemoved"));
   };
 
   const handleIncreaseQuantity = (id) => {
@@ -38,7 +40,7 @@ export default function Cart() {
       item.id === id ? { ...item, quantity: item.quantity + 1 } : item
     );
     setCart(updatedCart);
-    toast.success("Quantity increased!");
+    toast.success(t("success.quantityIncreased"));
   };
 
   const handleDecreaseQuantity = (id) => {
@@ -48,13 +50,13 @@ export default function Cart() {
         : item
     );
     setCart(updatedCart);
-    toast.success("Quantity decreased!");
+    toast.success(t("success.quantityDecreased"));
   };
 
   const handleRemoveItem = (id) => {
     const updatedCart = cart.filter((item) => item.id !== id);
     setCart(updatedCart);
-    toast.success("Item removed from cart!");
+    toast.success(t("success.itemRemoved"));
   };
 
   return (
@@ -63,21 +65,23 @@ export default function Cart() {
         <div className="cart-header">
           <div className="cart-title-section">
             <ShoppingCart className="cart-icon" size={28} />
-            <h2 className="cart-title">Shopping Cart</h2>
+            <h2 className="cart-title">{t("cart.title")}</h2>
           </div>
           <div className="cart-stats">
-            <span className="item-count">{cart.length} items</span>
+            <span className="item-count">
+              {cart.length} {t("cart.items")}
+            </span>
           </div>
         </div>
 
         {cart.length === 0 ? (
           <div className="empty-cart">
             <Package className="empty-icon" size={64} />
-            <h3>Your cart is empty</h3>
-            <p>Add some products to get started!</p>
+            <h3>{t("cart.empty")}</h3>
+            <p>{t("cart.addProducts")}</p>
             <Link to="/" className="continue-shopping-btn">
               <ArrowLeft size={20} />
-              Continue Shopping
+              {t("cart.continueShopping")}
             </Link>
           </div>
         ) : (
@@ -129,7 +133,7 @@ export default function Cart() {
                   <button
                     className="remove-item-btn"
                     onClick={() => handleRemoveItem(item.id)}
-                    title="Remove item"
+                    title={t("cart.removeItem")}
                   >
                     <Trash2 size={18} />
                   </button>
@@ -140,11 +144,11 @@ export default function Cart() {
             <div className="cart-footer">
               <div className="cart-summary">
                 <div className="summary-row">
-                  <span>Subtotal:</span>
+                  <span>{t("cart.subtotal")}:</span>
                   <span>${total.toFixed(2)}</span>
                 </div>
                 <div className="summary-row total-row">
-                  <span>Total:</span>
+                  <span>{t("cart.total")}:</span>
                   <span className="total-amount">${total.toFixed(2)}</span>
                 </div>
               </div>
@@ -154,11 +158,11 @@ export default function Cart() {
                   className="clear-cart-btn"
                   onClick={() => {
                     setCart([]);
-                    toast.success("Your cart is now empty!");
+                    toast.success(t("success.cartCleared"));
                   }}
                 >
                   <Trash2 size={18} />
-                  Clear Cart
+                  {t("cart.clearCart")}
                 </button>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 import "./SignIn.css";
 import supabase from "../../SupabaseClient";
 import { sessionContext } from "../../AppContexts";
@@ -6,6 +7,7 @@ import { toast } from "react-toastify";
 import { Mail, Lock, Eye, EyeOff, LogIn, User } from "lucide-react";
 import { Link } from "react-router-dom";
 const SignIn = () => {
+  const { t } = useTranslation();
   const [signInForm, setSignInForm] = useState({
     email: "",
     password: "",
@@ -36,13 +38,13 @@ const SignIn = () => {
 
       if (error) {
         console.error("Error during sign in:", error);
-        toast.error("Sign in failed. Please check your credentials.");
+        toast.error(t("errors.signInFailed"));
       } else if (data) {
-        toast.success("Welcome back! Sign in successful!");
+        toast.success(t("success.signInSuccess"));
       }
     } catch (err) {
       console.error("Unexpected error:", err);
-      toast.error("An unexpected error occurred. Please try again.");
+      toast.error(t("errors.generic"));
     } finally {
       setIsLoading(false);
     }
@@ -54,8 +56,8 @@ const SignIn = () => {
         <div className="signin-icon">
           <User size={32} />
         </div>
-        <h1 className="signin-title">Welcome Back</h1>
-        <p className="signin-subtitle">Sign in to your account</p>
+        <h1 className="signin-title">{t("auth.signin.title")}</h1>
+        <p className="signin-subtitle">{t("auth.signin.subtitle")}</p>
       </div>
 
       <form className="signin-form" onSubmit={handleSubmit}>
@@ -73,7 +75,7 @@ const SignIn = () => {
                 placeholder=" "
                 disabled={isLoading}
               />
-              <span className="floating-label">Email Address</span>
+              <span className="floating-label">{t("auth.signin.email")}</span>
             </div>
           </label>
         </div>
@@ -92,7 +94,9 @@ const SignIn = () => {
                 placeholder=" "
                 disabled={isLoading}
               />
-              <span className="floating-label">Password</span>
+              <span className="floating-label">
+                {t("auth.signin.password")}
+              </span>
               <button
                 type="button"
                 className="password-toggle-btn"
@@ -113,18 +117,20 @@ const SignIn = () => {
           {isLoading ? (
             <>
               <div className="spinner"></div>
-              Signing In...
+              {t("auth.signin.loading")}
             </>
           ) : (
             <>
               <LogIn size={20} />
-              Sign In
+              {t("auth.signin.signInButton")}
             </>
           )}
         </button>
         <div className="signin-footer">
           <Link to={"/requestreset"} className="forgot-password-link">
-            <span className="forgot-password-text">Forgot Password?</span>
+            <span className="forgot-password-text">
+              {t("auth.signin.forgotPassword")}
+            </span>
             <span className="forgot-password-icon">→</span>
           </Link>
         </div>

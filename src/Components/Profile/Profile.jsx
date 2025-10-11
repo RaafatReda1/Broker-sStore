@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import BrokersDataForm from "./BrokersDataForm/BrokersDataForm";
 import PreviewData from "./PreviewData/PreviewData";
 import supabase from "../../SupabaseClient";
@@ -9,6 +10,7 @@ import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import "./Profile.css";
 
 const Profile = () => {
+  const { t } = useTranslation();
   const [brokerExists, setBrokerExists] = useState(null);
   const [checkDataIsLoading, setCheckDataIsLoading] = useState(true);
   const [responded, setResponded] = useState(false);
@@ -54,8 +56,8 @@ const Profile = () => {
         <div className="loading-state">
           <div className="loading-content">
             <Loader2 className="spinner" size={32} />
-            <h3>Loading Profile...</h3>
-            <p>Please wait while we fetch your data</p>
+            <h3>{t("profile.loading")}</h3>
+            <p>{t("profile.loadingMessage")}</p>
           </div>
         </div>
       )}
@@ -64,14 +66,14 @@ const Profile = () => {
         <div className="error-state">
           <div className="error-content">
             <AlertCircle className="error-icon" size={48} />
-            <h3>Error Loading Profile</h3>
-            <p>There was an issue fetching your profile data</p>
+            <h3>{t("profile.errorTitle")}</h3>
+            <p>{t("profile.errorMessage")}</p>
             <button
               onClick={() => window.location.reload()}
               className="retry-button"
             >
               <RefreshCw size={16} />
-              Retry
+              {t("profile.retry")}
             </button>
           </div>
         </div>
