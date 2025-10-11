@@ -119,7 +119,6 @@ const Header = () => {
           .order("created_at", { ascending: false });
 
         if (error) {
-          console.error("Error fetching notifications:", error);
           return;
         }
 
@@ -127,7 +126,7 @@ const Header = () => {
           setNotifications(data);
         }
       } catch (error) {
-        console.error("Error fetching notifications:", error);
+        // Error fetching notifications handled silently
       }
     };
 
@@ -144,18 +143,18 @@ const Header = () => {
           table: "Notifications",
         },
         (payload) => {
-          console.log("Header: Real-time notification update:", payload);
+          // Real-time notification update
 
           if (payload.eventType === "INSERT") {
-            console.log("Header: New notification inserted");
+            // New notification inserted
             setNotifications((prev) => [payload.new, ...prev]);
           } else if (payload.eventType === "UPDATE") {
-            console.log("Header: Notification updated", payload.new);
+            // Notification updated
             setNotifications((prev) =>
               prev.map((n) => (n.id === payload.new.id ? payload.new : n))
             );
           } else if (payload.eventType === "DELETE") {
-            console.log("Header: Notification deleted");
+            // Notification deleted
             setNotifications((prev) =>
               prev.filter((n) => n.id !== payload.old.id)
             );
@@ -163,7 +162,7 @@ const Header = () => {
         }
       )
       .subscribe((status) => {
-        console.log("Header: Subscription status:", status);
+        // Subscription status handled silently
       });
 
     return () => {
@@ -219,20 +218,13 @@ const Header = () => {
     const newCount = unreadNotifications.length;
     const prevCount = unreadCount;
 
-    console.log("Header: Unread count calculation:", {
-      totalNotifications: notifications.length,
-      filteredNotifications: filteredNotifications.length,
-      unreadNotifications: unreadNotifications.length,
-      prevCount,
-      newCount,
-      userData: userData?.id,
-    });
+    // Unread count calculation handled silently
 
     setUnreadCount(newCount);
 
     // Trigger animation if count changed
     if (prevCount !== newCount) {
-      console.log("Header: Count changed, triggering animation");
+      // Count changed, triggering animation
       triggerBadgeAnimation();
     }
   }, [notifications, userData?.id, userData?.email]);
@@ -256,26 +248,23 @@ const Header = () => {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error refreshing notifications:", error);
+        // Error refreshing notifications handled silently
         return;
       }
 
       if (data) {
-        console.log(
-          "Header: Manual refresh - fetched notifications:",
-          data.length
-        );
+        // Manual refresh - fetched notifications
         setNotifications(data);
       }
     } catch (error) {
-      console.error("Error refreshing notifications:", error);
+      // Error refreshing notifications handled silently
     }
   };
 
   // Listen for custom events from ViewNotifications when messages are read
   useEffect(() => {
     const handleNotificationRead = (event) => {
-      console.log("Header: Received notification read event:", event.detail);
+      // Received notification read event
       // Immediately refresh the notification count
       refreshNotificationCount();
     };
@@ -347,7 +336,7 @@ const Header = () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
-        console.error("Error signing out:", error);
+        // Error signing out handled silently
       } else {
         // Clear any local state if needed
         setIsDropdownOpen(false);
@@ -356,7 +345,7 @@ const Header = () => {
         navigate("/");
       }
     } catch (error) {
-      console.error("Unexpected error during sign out:", error);
+      // Unexpected error during sign out handled silently
     }
   }, [navigate]);
 
@@ -556,10 +545,7 @@ const Header = () => {
                   className="profile-avatar"
                   loading="lazy"
                   onError={(e) => {
-                    console.error(
-                      "❌ Failed to load avatar image:",
-                      userData.avatar_url
-                    );
+                    // Failed to load avatar image
                     e.target.style.display = "none";
                     e.target.nextElementSibling.style.display = "flex";
                   }}
@@ -712,10 +698,7 @@ const Header = () => {
                     className="mobile-profile-image"
                     loading="lazy"
                     onError={(e) => {
-                      console.error(
-                        "❌ Failed to load mobile avatar image:",
-                        userData.avatar_url
-                      );
+                      // Failed to load mobile avatar image
                       e.target.style.display = "none";
                       e.target.nextElementSibling.style.display = "flex";
                     }}

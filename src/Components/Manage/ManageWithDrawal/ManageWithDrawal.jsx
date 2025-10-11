@@ -52,7 +52,6 @@ const ManageWithDrawal = () => {
       if (error) throw error;
       setWithdrawalRequests(data || []);
     } catch (error) {
-      console.error("Error fetching requests:", error);
       toast.error(
         "❌ Couldn't load withdrawal requests. Please refresh the page."
       );
@@ -79,7 +78,7 @@ const ManageWithDrawal = () => {
       if (finishedError) throw finishedError;
       setFinishedCount(finishedCountData || 0);
     } catch (error) {
-      console.error("Error fetching request counts:", error);
+      // Error handled silently
     }
   };
 
@@ -153,7 +152,6 @@ const ManageWithDrawal = () => {
         setBrokerOrders([]);
       }
     } catch (error) {
-      console.error("Error fetching details:", error);
       toast.error("❌ Couldn't load broker details. Please try again.");
     } finally {
       setIsLoading(false);
@@ -183,7 +181,7 @@ const ManageWithDrawal = () => {
       let completedOrders = [];
 
       if (orderIds.length === 0) {
-        console.warn("No orders found in withdrawal request");
+        // No orders to process
       } else {
         // Fetch ONLY the orders that are in the request's order list
         const { data: fetchedOrders, error: fetchError } = await supabase
@@ -251,7 +249,6 @@ const ManageWithDrawal = () => {
       setBrokerData(null);
       setBrokerOrders([]);
     } catch (error) {
-      console.error("Error finishing request:", error);
       toast.error(
         "❌ Oops! Couldn't complete the withdrawal. Please try again."
       );
@@ -283,7 +280,7 @@ const ManageWithDrawal = () => {
       let archivedOrders = [];
 
       if (orderIds.length === 0) {
-        console.warn("No orders found in withdrawal request to restore");
+        // No orders to restore
       } else {
         // Fetch ONLY the archived orders that match the original order IDs from the request
         const { data: fetchedArchivedOrders, error: fetchError } =
@@ -353,7 +350,6 @@ const ManageWithDrawal = () => {
       setBrokerData(null);
       setDeletedOrders([]);
     } catch (error) {
-      console.error("Error resetting request:", error);
       toast.error("❌ Oops! Couldn't restore the request. Please try again.");
     } finally {
       setIsProcessing(false);
@@ -441,10 +437,10 @@ const ManageWithDrawal = () => {
         .insert(notificationData);
 
       if (error) {
-        console.error("Error sending withdrawal notification:", error);
+        // Notification error handled silently
       }
     } catch (error) {
-      console.error("Error in sendWithdrawalNotification:", error);
+      // Notification error handled silently
     }
   };
 
@@ -490,10 +486,10 @@ const ManageWithDrawal = () => {
         .insert(notificationData);
 
       if (error) {
-        console.error("Error sending reset notification:", error);
+        // Notification error handled silently
       }
     } catch (error) {
-      console.error("Error in sendResetNotification:", error);
+      // Notification error handled silently
     }
   };
 

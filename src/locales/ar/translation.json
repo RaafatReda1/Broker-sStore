@@ -650,6 +650,7 @@
     "requestWithdrawal": "طلب السحب",
     "processing": "جاري المعالجة...",
     "success": "تم تقديم طلب السحب بنجاح!",
+    "phoneNumber": "رقم الهاتف",
     "validation": {
       "amountRequired": "المبلغ مطلوب",
       "amountMin": "المبلغ يجب أن يكون أكبر من الحد الأدنى",

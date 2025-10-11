@@ -66,7 +66,7 @@ const Product = ({
         toast.success(t("success.linkCopied"));
       }
     } catch (err) {
-      console.error("Failed to share:", err);
+      // Failed to share handled silently
       toast.error(t("errors.shareFailed"));
     }
   };
@@ -137,7 +137,7 @@ const Product = ({
                 );
                 toast.success(t("success.linkCopied"));
               } catch (err) {
-                console.error("Failed to copy: ", err);
+                // Failed to copy handled silently
                 toast.error(t("errors.copyFailed"));
               }
             }}

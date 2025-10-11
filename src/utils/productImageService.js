@@ -30,7 +30,7 @@ class ProductImageService {
       );
 
       if (bucketIndex === -1) {
-        console.warn("❌ Bucket name not found in URL");
+        // Bucket name not found handled silently
         return null;
       }
 
@@ -43,10 +43,10 @@ class ProductImageService {
         return fileName;
       }
 
-      console.warn("❌ Invalid filename extracted from URL");
+      // Invalid filename extracted handled silently
       return null;
     } catch (error) {
-      console.error("❌ Error extracting filename from URL:", error);
+      // Error extracting filename handled silently
       return null;
     }
   }
@@ -86,7 +86,7 @@ class ProductImageService {
       // Skip non-Supabase URLs (like local placeholders)
       if (!this.isValidSupabaseUrl(imageUrl)) {
         result.error = "Skipped non-Supabase URL";
-        console.log(`ℹ️ Skipping non-Supabase URL: ${imageUrl}`);
+        // Skipping non-Supabase URL handled silently
         return result;
       }
 
@@ -105,14 +105,14 @@ class ProductImageService {
 
       if (error) {
         result.error = error.message;
-        console.error(`❌ Error deleting image ${fileName}:`, error);
+        // Error deleting image handled silently
       } else {
         result.success = true;
-        console.log(`✅ Successfully deleted image: ${fileName}`);
+        // Successfully deleted image handled silently
       }
     } catch (error) {
       result.error = error.message;
-      console.error("❌ Error in deleteProductImage:", error);
+      // Error in deleteProductImage handled silently
     }
 
     return result;
@@ -135,13 +135,11 @@ class ProductImageService {
 
     try {
       if (!product || !product.images || !Array.isArray(product.images)) {
-        console.log("ℹ️ No images to delete for this product");
+        // No images to delete handled silently
         return results;
       }
 
-      console.log(
-        `🗑️ Starting deletion of ${product.images.length} images for product: ${product.name}`
-      );
+      // Starting deletion handled silently
 
       // Try to delete the entire product folder first (more efficient)
       const folderPath = this.getProductFolderPath(product.name);
@@ -155,16 +153,12 @@ class ProductImageService {
             url: `folder:${folderPath}`,
           })
         );
-        console.log(
-          `✅ Successfully deleted entire product folder: ${folderPath}`
-        );
+        // Successfully deleted entire product folder handled silently
         return results;
       }
 
       // Fallback: Delete individual images if folder deletion fails
-      console.log(
-        `⚠️ Folder deletion failed, falling back to individual image deletion`
-      );
+      // Folder deletion failed, falling back to individual image deletion
 
       for (const imageUrl of product.images) {
         // Skip non-Supabase URLs
@@ -174,7 +168,7 @@ class ProductImageService {
             reason: "Non-Supabase URL (local placeholder)",
           });
           results.totalSkipped++;
-          console.log(`ℹ️ Skipping non-Supabase URL: ${imageUrl}`);
+          // Skipping non-Supabase URL handled silently
           continue;
         }
 
@@ -197,13 +191,11 @@ class ProductImageService {
 
       results.success = results.errors.length === 0;
 
-      console.log(
-        `✅ Product image deletion completed: ${results.totalDeleted} deleted, ${results.totalSkipped} skipped, ${results.errors.length} errors`
-      );
+      // Product image deletion completed handled silently
 
       return results;
     } catch (error) {
-      console.error("❌ Error in deleteProductImages:", error);
+      // Error in deleteProductImages handled silently
       results.success = false;
       results.errors.push({
         type: "general",
@@ -234,16 +226,13 @@ class ProductImageService {
 
       if (listError) {
         result.error = listError.message;
-        console.warn(
-          `⚠️ Could not list files in folder ${folderPath}:`,
-          listError
-        );
+        // Could not list files handled silently
         return result;
       }
 
       if (!files || files.length === 0) {
         result.success = true;
-        console.log(`ℹ️ Folder ${folderPath} is empty or doesn't exist`);
+        // Folder is empty or doesn't exist
         return result;
       }
 
@@ -255,20 +244,18 @@ class ProductImageService {
 
       if (deleteError) {
         result.error = deleteError.message;
-        console.error(`❌ Error deleting folder ${folderPath}:`, deleteError);
+        // Error deleting folder handled silently
         return result;
       }
 
       result.success = true;
       result.deletedFiles = filePaths;
 
-      console.log(
-        `✅ Successfully deleted product folder: ${folderPath} (${filePaths.length} files)`
-      );
+      // Successfully deleted product folder handled silently
       return result;
     } catch (error) {
       result.error = error.message;
-      console.error(`❌ Error deleting product folder ${folderPath}:`, error);
+      // Error deleting product folder handled silently
       return result;
     }
   }

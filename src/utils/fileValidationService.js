@@ -136,7 +136,7 @@ class FileValidationService {
             errors.length - 1
           } additional files were rejected. Check console for details.`
         );
-        console.warn("Additional file validation errors:", errors.slice(1));
+        // Additional file validation errors handled silently
       }, 1000);
     }
   }

@@ -60,18 +60,18 @@ const RequestReset = () => {
       });
 
       if (error) {
-        console.error("Reset password error:", error);
+        // Reset password error handled silently
         setEmailError(
           error.message || "Failed to send reset email. Please try again."
         );
         toast.error("Failed to send reset email. Please try again.");
       } else if (data) {
-        console.log("Reset password data:", data);
+        // Reset password data handled silently
         setIsSuccess(true);
         toast.success("Password reset email sent! Check your inbox.");
       }
     } catch (err) {
-      console.error("Unexpected error:", err);
+      // Unexpected error handled silently
       setEmailError("An unexpected error occurred. Please try again.");
       toast.error("An unexpected error occurred. Please try again.");
     } finally {

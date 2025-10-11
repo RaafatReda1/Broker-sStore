@@ -96,7 +96,7 @@ const ViewNotifications = () => {
       .eq("id", notification.id);
 
     if (error) {
-      console.error("Error marking as read:", error);
+      // Error marking as read handled silently
     } else {
       // Update local state
       setNotifications((prev) =>
@@ -114,7 +114,7 @@ const ViewNotifications = () => {
         },
       });
       window.dispatchEvent(event);
-      console.log("ViewNotifications: Dispatched notification read event");
+      // Dispatched notification read event
     }
   };
 
@@ -173,7 +173,7 @@ const ViewNotifications = () => {
         },
       });
       window.dispatchEvent(event);
-      console.log("ViewNotifications: Dispatched mark all read event");
+      // Dispatched mark all read event
     } catch (error) {
       toast.error(t("notifications.failedToMarkAllAsRead"));
     }
@@ -255,7 +255,7 @@ const ViewNotifications = () => {
           table: "Notifications",
         },
         (payload) => {
-          console.log("Real-time notification update:", payload);
+          // Real-time notification update
 
           if (payload.eventType === "INSERT") {
             // New notification added

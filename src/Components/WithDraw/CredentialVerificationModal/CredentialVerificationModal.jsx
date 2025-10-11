@@ -64,7 +64,7 @@ const CredentialVerificationModal = ({
         setPassword("");
       }
     } catch (error) {
-      console.error("Error verifying credentials:", error);
+      // Error verifying credentials handled silently
       toast.error("❌ Verification failed. Please try again.");
       setPassword("");
     } finally {

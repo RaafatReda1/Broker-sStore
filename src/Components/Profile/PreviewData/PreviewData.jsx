@@ -137,9 +137,9 @@ const PreviewData = () => {
           .remove([oldFileName]);
 
         if (deleteError) {
-          console.error("Deleting Old Img Error:", deleteError.message);
+          // Deleting old image error handled silently
         } else {
-          console.log("Previous image deleted successfully:", deleteData);
+          // Previous image deleted successfully
         }
       }
 
@@ -180,7 +180,7 @@ const PreviewData = () => {
       toast.success(t("success.avatarUpdated"));
       setUserData((prev) => ({ ...prev, avatar_url: avatarUrl })); // تحديث الواجهة فورًا
     } catch (err) {
-      console.error("Unexpected error:", err);
+      // Unexpected error handled silently
       toast.error(t("errors.unexpectedAvatarError"), {
         autoClose: 5000,
       });
@@ -217,7 +217,10 @@ const PreviewData = () => {
       )}
 
       <div className="profile-content">
-        <div className="profile-left">
+        <div
+          className="profile-left"
+          style={{ display: "flex", flexDirection: "column" }}
+        >
           <div
             className={`avatar-card ${isEditing ? "editing" : ""}`}
             onClick={() => {
@@ -232,7 +235,7 @@ const PreviewData = () => {
                 alt="Preview"
                 className="avatar-image"
                 onError={(e) => {
-                  console.error("❌ Failed to load preview image");
+                  // Failed to load preview image
                   e.target.style.display = "none";
                 }}
               />
@@ -242,10 +245,7 @@ const PreviewData = () => {
                 alt="Profile"
                 className="avatar-image"
                 onError={(e) => {
-                  console.error(
-                    "❌ Failed to load profile image:",
-                    userData.avatar_url
-                  );
+                  // Failed to load profile image
                   e.target.style.display = "none";
                 }}
               />

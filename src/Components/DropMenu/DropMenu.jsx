@@ -29,11 +29,11 @@ const DropMenu = ({ isOpen, onClose }) => {
   }, [isOpen, onClose]);
 
   const handleLogOut = async () => {
-    console.log("Log Out clicked");
+    // Log Out clicked
     try {
       await supabase.auth.signOut();
     } catch (err) {
-      console.log("LoggingOut Err:   " + err.message);
+      // Logging out error handled silently
     }
     onClose();
   };

@@ -21,16 +21,7 @@ const ProtectedRoute = ({
 
   // Debug logging for user roles
   if (requireAdmin || requireModerator) {
-    console.log("🔍 ProtectedRoute Debug:", {
-      isAdmin,
-      isModerator,
-      requireAdmin,
-      requireModerator,
-      session: session ? "Active" : "None",
-      userData: userData
-        ? { email: userData.email, authority: userData.authority }
-        : null,
-    });
+    // ProtectedRoute Debug handled silently
   }
 
   // CRITICAL: Require session for admin access - check this FIRST

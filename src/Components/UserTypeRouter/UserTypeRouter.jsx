@@ -23,7 +23,7 @@ const UserTypeRouter = () => {
     isAdmin === null &&
     isModerator === null
   ) {
-    console.log("⏳ UserTypeRouter: Waiting for user data to load...");
+    // Waiting for user data to load
     return (
       <div
         style={{
@@ -42,18 +42,18 @@ const UserTypeRouter = () => {
 
   // If user is admin, show admin dashboard
   if (isAdmin) {
-    console.log("🔑 Showing Admin Dashboard");
+    // Showing Admin Dashboard
     return <Admin />;
   }
 
   // If user is moderator, show moderator dashboard
   if (isModerator) {
-    console.log("👮 Showing Moderator Dashboard");
+    // Showing Moderator Dashboard
     return <Moderator />;
   }
 
   // For all other cases (no session, normal users, etc.), show products
-  console.log("🛍️ Showing Products for regular user");
+  // Showing Products for regular user
   return <Products />;
 };
 

@@ -37,7 +37,7 @@ const ManageNotifications = () => {
       if (error) throw error;
       setSentNotifications(data || []);
     } catch (error) {
-      console.error("Error fetching sent notifications:", error);
+      // Error handled silently
     }
   };
 
@@ -53,7 +53,6 @@ const ManageNotifications = () => {
       toast.success(t("manageNotifications.notificationDeleted"));
       fetchSentNotifications();
     } catch (error) {
-      console.error("Error deleting notification:", error);
       toast.error(t("manageNotifications.deleteFailed"));
     }
   };
@@ -158,7 +157,6 @@ const ManageNotifications = () => {
         .insert(insertData);
 
       if (error) {
-        console.error("Error sending notification:", error);
         toast.error("Failed to send notification. Please try again.");
       } else {
         toast.success("Notification sent successfully! ✅");
@@ -175,7 +173,6 @@ const ManageNotifications = () => {
         setBrokerIdTo("");
       }
     } catch (error) {
-      console.error("Error sending notification:", error);
       toast.error("Failed to send notification. Please try again.");
     } finally {
       setIsLoading(false);

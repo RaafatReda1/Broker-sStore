@@ -35,11 +35,11 @@ const Profile = () => {
     if (userData) {
       setBrokerExists(true);
       setResponded(true);
-      console.log("✅ Broker found:", userData);
+      // Broker found
     } else {
       setBrokerExists(false);
       setResponded(true);
-      console.log("⚠️ No broker data found for:", session.user.email);
+      // No broker data found
     }
 
     setCheckDataIsLoading(false);

@@ -116,9 +116,7 @@ const ProductsManager = () => {
     if (!imageFiles.length) return [];
 
     try {
-      console.log(
-        `📁 Uploading ${imageFiles.length} images for product: ${form.name}`
-      );
+      // Uploading images for product
 
       const uploadResult = await StorageOrganizationService.uploadProductImages(
         imageFiles,
@@ -133,14 +131,11 @@ const ProductsManager = () => {
       }
 
       toast.success(`✅ Uploaded ${uploadResult.urls.length} product images`);
-      console.log(
-        "✅ Product images uploaded with organized storage:",
-        uploadResult.urls
-      );
+      // Product images uploaded with organized storage
 
       return uploadResult.urls;
     } catch (error) {
-      console.error("❌ Error uploading product images:", error);
+      // Error uploading product images
       toast.error(`Failed to upload images: ${error.message}`);
       return [];
     }
@@ -209,9 +204,7 @@ const ProductsManager = () => {
 
       // Delete images from storage first
       if (product.images && product.images.length > 0) {
-        console.log(
-          `🗑️ Deleting ${product.images.length} images for product: ${product.name}`
-        );
+        // Deleting images for product
 
         const imageDeletionResult =
           await ProductImageService.deleteProductImages(product);
@@ -227,9 +220,9 @@ const ProductsManager = () => {
               : `⚠️ Deleted ${imageDeletionResult.totalDeleted} images, ${imageDeletionResult.errors.length} failed`;
 
           toast.warning(message);
-          console.warn("Image deletion errors:", imageDeletionResult.errors);
+          // Image deletion errors handled silently
           if (imageDeletionResult.skippedUrls.length > 0) {
-            console.log("Skipped URLs:", imageDeletionResult.skippedUrls);
+            // Skipped URLs handled silently
           }
         }
       }
@@ -248,7 +241,6 @@ const ProductsManager = () => {
       toast.success("🗑️ Product deleted successfully!");
       fetchProducts();
     } catch (error) {
-      console.error("❌ Error deleting product:", error);
       toast.error(`Failed to delete product: ${error.message}`);
     }
   };
@@ -279,7 +271,7 @@ const ProductsManager = () => {
           );
         }
       } catch (error) {
-        console.error("❌ Error deleting image:", error);
+        // Error deleting image
         toast.warning("⚠️ Failed to delete image from storage");
       }
     }

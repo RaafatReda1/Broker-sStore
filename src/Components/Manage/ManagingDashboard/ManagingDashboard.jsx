@@ -27,7 +27,7 @@ const ManagingDashboard = () => {
     try {
       await supabase.auth.signOut();
     } catch (err) {
-      console.log("LoggingOut Err: " + err.message);
+      // Logout error handled silently
     }
   };
 

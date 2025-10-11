@@ -27,10 +27,9 @@ const ManageBrokers = () => {
   const fetchBrokers = async () => {
     const { data, error } = await supabase.from("Brokers").select("*");
     if (error) {
-      console.error("Error fetching brokers:", error);
+      // Error fetching brokers handled silently
     } else if (data) {
       setBrokers(data);
-      console.log("Fetched brokers:", data);
     }
   };
 
@@ -58,9 +57,9 @@ const ManageBrokers = () => {
         await sendVerificationMessage(broker);
       }
 
-      console.log("Verification status updated successfully");
+      // Verification status updated successfully
     } catch (error) {
-      console.error("Error updating verification status:", error);
+      // Error handled silently
     }
   };
 
@@ -117,9 +116,8 @@ The Cicada Team
         }
       );
 
-      console.log("Verification message sent successfully");
+      // Verification message sent successfully
     } catch (error) {
-      console.error("Error sending verification message:", error);
       toast.error(t("manageBrokers.failedToSendVerificationMessage"));
     }
   };
@@ -135,9 +133,8 @@ The Cicada Team
       if (error) throw error;
 
       setTempMessages(data || []);
-      console.log("Fetched temp messages:", data);
     } catch (error) {
-      console.error("Error fetching temp messages:", error);
+      // Error handled silently
     }
   };
 
@@ -152,21 +149,16 @@ The Cicada Team
         return;
       }
 
-      console.log(
-        "🗑️ Starting broker deletion process for:",
-        brokerToDelete.fullName
-      );
+      // Starting broker deletion process
 
       // Step 1: Delete all associated images
-      console.log("📸 Deleting broker images...");
+      // Deleting broker images
       const imageDeletionResult = await BrokerImageService.deleteBrokerImages(
         brokerToDelete
       );
 
       if (imageDeletionResult.success) {
-        console.log(
-          `✅ Successfully deleted ${imageDeletionResult.totalDeleted} images`
-        );
+        // Successfully deleted images
         if (imageDeletionResult.totalDeleted > 0) {
           toast.success(
             `Deleted ${imageDeletionResult.totalDeleted} associated images`,
@@ -177,10 +169,7 @@ The Cicada Team
           );
         }
       } else {
-        console.warn(
-          "⚠️ Some images could not be deleted:",
-          imageDeletionResult.errors
-        );
+        // Some images could not be deleted
         toast.warning(
           `Deleted ${imageDeletionResult.totalDeleted} images, but ${imageDeletionResult.errors.length} failed`,
           {
@@ -191,7 +180,7 @@ The Cicada Team
       }
 
       // Step 2: Create notification with temp message
-      console.log("📧 Creating notification...");
+      // Creating notification
       const { error: notificationError } = await supabase
         .from("Notifications")
         .insert({
@@ -206,7 +195,7 @@ The Cicada Team
       if (notificationError) throw notificationError;
 
       // Step 3: Delete broker from database
-      console.log("🗃️ Deleting broker from database...");
+      // Deleting broker from database
       const { error: deleteError } = await supabase
         .from("Brokers")
         .delete()
@@ -230,7 +219,7 @@ The Cicada Team
       // Step 7: Show undo toast
       showUndoToast(brokerToDelete);
 
-      console.log("✅ Broker deletion completed successfully");
+      // Broker deletion completed successfully
       toast.success(
         `${brokerToDelete.fullName} has been deleted successfully!`,
         {
@@ -239,7 +228,7 @@ The Cicada Team
         }
       );
     } catch (error) {
-      console.error("❌ Error deleting broker:", error);
+      // Error deleting broker
       toast.error("Failed to delete broker. Please try again.", {
         position: "top-right",
         autoClose: 5000,
@@ -352,12 +341,9 @@ The Cicada Team
         autoClose: hasDeletedImages ? 5000 : 3000,
       });
 
-      console.log(
-        "✅ Broker restored successfully",
-        hasDeletedImages ? "(with image warning)" : ""
-      );
+      // Broker restored successfully
     } catch (error) {
-      console.error("❌ Error restoring broker:", error);
+      // Error restoring broker
       toast.error("Failed to restore broker. Please try again.", {
         position: "top-right",
         autoClose: 5000,
@@ -383,21 +369,16 @@ The Cicada Team
         return;
       }
 
-      console.log(
-        "🗑️ Starting broker deletion process for:",
-        brokerToDelete.fullName
-      );
+      // Starting broker deletion process
 
       // Step 1: Delete all associated images
-      console.log("📸 Deleting broker images...");
+      // Deleting broker images
       const imageDeletionResult = await BrokerImageService.deleteBrokerImages(
         brokerToDelete
       );
 
       if (imageDeletionResult.success) {
-        console.log(
-          `✅ Successfully deleted ${imageDeletionResult.totalDeleted} images`
-        );
+        // Successfully deleted images
         if (imageDeletionResult.totalDeleted > 0) {
           toast.success(
             `Deleted ${imageDeletionResult.totalDeleted} associated images`,
@@ -408,10 +389,7 @@ The Cicada Team
           );
         }
       } else {
-        console.warn(
-          "⚠️ Some images could not be deleted:",
-          imageDeletionResult.errors
-        );
+        // Some images could not be deleted
         toast.warning(
           `Deleted ${imageDeletionResult.totalDeleted} images, but ${imageDeletionResult.errors.length} failed`,
           {
@@ -422,7 +400,7 @@ The Cicada Team
       }
 
       // Step 2: Delete broker from database
-      console.log("🗃️ Deleting broker from database...");
+      // Deleting broker from database
       const { error: deleteError } = await supabase
         .from("Brokers")
         .delete()
@@ -455,9 +433,7 @@ The Cicada Team
         },
       });
 
-      console.log(
-        "✅ Broker deletion completed and navigating to notifications"
-      );
+      // Broker deletion completed and navigating to notifications
       toast.success(
         `${brokerToDelete.fullName} has been deleted successfully!`,
         {
@@ -466,7 +442,7 @@ The Cicada Team
         }
       );
     } catch (error) {
-      console.error("❌ Error deleting broker:", error);
+      // Error deleting broker
       toast.error("Failed to delete broker. Please try again.", {
         position: "top-right",
         autoClose: 5000,

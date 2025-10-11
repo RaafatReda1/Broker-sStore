@@ -40,7 +40,7 @@ const WithDraw = () => {
           .single();
 
         if (brokerError) {
-          console.error("Error checking broker verification:", brokerError);
+          // Broker verification check error handled silently
         } else {
           setBrokerVerificationStatus(brokerData?.isVerified || false);
         }
@@ -55,7 +55,7 @@ const WithDraw = () => {
           .limit(1);
 
         if (error) {
-          console.error("Error checking pending requests:", error);
+          // Error handled silently
           return;
         }
 
@@ -67,7 +67,7 @@ const WithDraw = () => {
           setPendingRequestInfo(null);
         }
       } catch (error) {
-        console.error("Error checking broker status:", error);
+        // Error handled silently
       }
     };
 
@@ -85,12 +85,12 @@ const WithDraw = () => {
           filter: `brokerId=eq.${userData?.id}`,
         },
         (payload) => {
-          console.log("Real-time withdrawal request update:", payload);
+          // Real-time withdrawal request update
 
           if (payload.eventType === "UPDATE") {
             // Check if the request status changed to finished (true)
             if (payload.new.Status === true && payload.old.Status === false) {
-              console.log("Withdrawal request completed!");
+              // Withdrawal request completed
               toast.success(t("withdraw.requestProcessed"));
 
               // Update local state to remove pending request
@@ -100,7 +100,7 @@ const WithDraw = () => {
           } else if (payload.eventType === "INSERT") {
             // New withdrawal request added
             if (payload.new.Status === false) {
-              console.log("New pending withdrawal request added");
+              // New pending withdrawal request added
               setHasPendingRequest(true);
               setPendingRequestInfo(payload.new);
             }
@@ -221,7 +221,6 @@ const WithDraw = () => {
         .eq("Status", false); // false means pending
 
       if (checkError) {
-        console.error("Error checking existing requests:", checkError);
         toast.error(t("withdraw.unableToVerifyRequests"));
         return;
       }
@@ -242,7 +241,7 @@ const WithDraw = () => {
         return;
       }
     } catch (error) {
-      console.error("Error checking pending requests:", error);
+      // Error handled silently
       toast.error("Unable to verify existing requests. Please try again.");
       return;
     }
@@ -263,7 +262,7 @@ const WithDraw = () => {
         .eq("status", true);
 
       if (ordersError) {
-        console.error("Error fetching orders:", ordersError);
+        // Error handled silently
         toast.error(t("withdraw.errorFetchingOrders"));
         setIsSubmitting(false);
         return;
@@ -299,7 +298,7 @@ const WithDraw = () => {
         .insert([withdrawalData]);
 
       if (error) {
-        console.error("Error:", error);
+        // Error handled silently
         toast.error(t("withdraw.errorSendingRequest"));
       } else {
         toast.success(t("withdraw.requestSubmittedSuccessfully"));
@@ -313,7 +312,7 @@ const WithDraw = () => {
         });
       }
     } catch (err) {
-      console.error("Unexpected error:", err);
+      // Unexpected error handled silently
       toast.error(t("withdraw.unexpectedError"));
     } finally {
       setIsSubmitting(false);

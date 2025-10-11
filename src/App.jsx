@@ -61,39 +61,33 @@ function App() {
       userData: userDataLoaded,
     } = dataLoadingStates;
 
-    console.log("🔍 Data Loading Check:", {
-      productsLoaded,
-      sessionLoaded,
-      userDataLoaded,
-      hasSession: !!session,
-      userDataValue: userData,
-    });
+    // Data Loading Check handled silently
 
     // Products are always required
     if (!productsLoaded) {
-      console.log("❌ Products not loaded yet");
+      // Products not loaded yet
       return false;
     }
 
     // Session is always required
     if (!sessionLoaded) {
-      console.log("❌ Session not loaded yet");
+      // Session not loaded yet
       return false;
     }
 
     // If there's a session, userData must be loaded
     if (session && !userDataLoaded) {
-      console.log("❌ Session exists but userData not loaded yet");
+      // Session exists but userData not loaded yet
       return false;
     }
 
     // If no session, userData should be null (which means loaded)
     if (!session && userData !== null) {
-      console.log("❌ No session but userData is not null");
+      // No session but userData is not null
       return false;
     }
 
-    console.log("✅ All data loaded successfully!");
+    // All data loaded successfully
     return true;
   }, [dataLoadingStates, session, userData]);
 
@@ -117,7 +111,7 @@ function App() {
       } = await supabase.auth.getSession();
       setSession(session);
     } catch (err) {
-      console.log(err);
+      // Error handled silently
     }
   };
   // Storing brokerId in localStorage if exists in URL
@@ -134,7 +128,7 @@ function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Auth state changed:", _event, "Session:", !!session);
+      // Auth state changed handled silently
 
       // Only update session if it's actually different to prevent unnecessary re-renders
       setSession((prevSession) => {
@@ -143,16 +137,16 @@ function App() {
           prevSession?.user?.id === session?.user?.id &&
           prevSession?.access_token === session?.access_token
         ) {
-          console.log("Session unchanged, skipping update");
+          // Session unchanged, skipping update
           return prevSession;
         }
 
-        console.log("Session changed, updating...");
+        // Session changed, updating
         return session;
       });
 
       if (_event === "SIGNED_OUT") {
-        console.log("User logged out → reloading...");
+        // User logged out, reloading
         window.location.reload(); // ✅ يعمل reload بس عند تسجيل الخروج
         window.location.href = "/";
       }
@@ -167,7 +161,7 @@ function App() {
   // Initialize all app data
   const initializeApp = async () => {
     try {
-      console.log("🚀 Starting app initialization...");
+      // Starting app initialization
 
       // Reset all loading states
       setDataLoadingStates({
@@ -177,30 +171,30 @@ function App() {
       });
 
       // 1. Get session
-      console.log("📡 Loading session...");
+      // Loading session
       await getSession();
       setDataLoadingStates((prev) => ({ ...prev, session: true }));
-      console.log("✅ Session loaded");
+      // Session loaded
 
       // 2. Fetch products data
-      console.log("🛍️ Loading products...");
+      // Loading products
       const { data, error } = await supabase.from("Products").select("*");
       if (error) {
-        console.error("Error fetching products:", error.message);
+        // Error fetching products handled silently
         toast.error("Failed to load products. Please refresh the page.");
       } else {
         setProducts(data);
         setDataLoadingStates((prev) => ({ ...prev, products: true }));
-        console.log("✅ Products loaded:", data.length);
+        // Products loaded
       }
 
       // 3. Wait a bit for smooth UX (optional)
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      console.log("🎉 App initialization complete!");
+      // App initialization complete
       setIsAppInitialized(true);
     } catch (error) {
-      console.error("❌ App initialization failed:", error);
+      // App initialization failed handled silently
       toast.error("Failed to initialize app. Please refresh the page.");
       setIsAppInitialized(true); // Still show app even if there's an error
     }
@@ -229,7 +223,7 @@ function App() {
       return;
     }
 
-    console.log("👤 Fetching user data for:", session.user.email);
+    // Fetching user data handled silently
     setDataLoadingStates((prev) => ({ ...prev, userData: false }));
 
     await fetchUserData(
@@ -240,17 +234,17 @@ function App() {
     );
 
     setDataLoadingStates((prev) => ({ ...prev, userData: true }));
-    console.log("✅ User data loaded");
+    // User data loaded
   };
 
   // Handle user data when session changes (only after app is initialized)
   useEffect(() => {
     if (isAppInitialized) {
       if (session) {
-        console.log("🔄 App: Session detected, fetching user data...");
+        // Session detected, fetching user data
         getUserData();
       } else {
-        console.log("🔄 App: No session, resetting user data...");
+        // No session, resetting user data
         // Reset user data when no session
         setUserData(null);
         setIsAdmin(false);
@@ -283,14 +277,14 @@ function App() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible" && isAppInitialized) {
-        console.log("Tab became visible, checking session validity...");
+        // Tab became visible, checking session validity
         // Only refresh session if needed, don't reinitialize everything
         supabase.auth.getSession().then(({ data: { session } }) => {
           if (session?.access_token !== session?.access_token) {
-            console.log("Session token changed, updating...");
+            // Session token changed, updating
             setSession(session);
           } else {
-            console.log("Session still valid, no update needed");
+            // Session still valid, no update needed
           }
         });
       }
@@ -303,15 +297,7 @@ function App() {
   const componentToShow = getComponentToShow();
   const allDataLoaded = isAllDataLoaded;
 
-  console.log("App State:", {
-    isAppInitialized,
-    allDataLoaded,
-    componentToShow,
-    dataLoadingStates,
-    userData,
-    isAdmin,
-    isModerator,
-  });
+  // App State handled silently
 
   // Show loading screen until app is fully initialized
   if (!isAppInitialized) {

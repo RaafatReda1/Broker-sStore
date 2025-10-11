@@ -115,7 +115,7 @@ class StorageOrganizationService {
 
       return results;
     } catch (error) {
-      console.error("❌ Error uploading broker cards:", error);
+      // Error uploading broker cards handled silently
       results.success = false;
       results.errors.push(error.message);
       return results;
@@ -162,7 +162,7 @@ class StorageOrganizationService {
 
       return results;
     } catch (error) {
-      console.error("❌ Error uploading product images:", error);
+      // Error uploading product images handled silently
       results.success = false;
       results.errors.push(error.message);
       return results;
@@ -195,7 +195,7 @@ class StorageOrganizationService {
 
       if (uploadError) {
         result.error = uploadError.message;
-        console.error(`❌ Error uploading ${key}:`, uploadError);
+        // Error uploading handled silently
         return result;
       }
 
@@ -207,11 +207,11 @@ class StorageOrganizationService {
       result.success = true;
       result.url = publicUrl;
 
-      console.log(`✅ Successfully uploaded ${key}: ${filePath}`);
+      // Successfully uploaded handled silently
       return result;
     } catch (error) {
       result.error = error.message;
-      console.error(`❌ Error uploading ${key}:`, error);
+      // Error uploading handled silently
       return result;
     }
   }
@@ -259,11 +259,11 @@ class StorageOrganizationService {
       result.success = true;
       result.deletedFiles = filePaths;
 
-      console.log(`✅ Successfully deleted folder: ${folderPath}`);
+      // Successfully deleted folder handled silently
       return result;
     } catch (error) {
       result.errors.push(error.message);
-      console.error(`❌ Error deleting folder ${folderPath}:`, error);
+      // Error deleting folder handled silently
       return result;
     }
   }

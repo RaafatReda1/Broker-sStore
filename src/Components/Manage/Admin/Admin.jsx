@@ -9,8 +9,8 @@ import ManageNotifications from "../ManageNotifications/ManageNotifications";
 import ManageWithDrawal from "../ManageWithDrawal/ManageWithDrawal";
 import AboutUs from "../../AboutUs/AboutUs";
 const Admin = () => {
-  console.log("🔑 Admin Component Rendered - User has ADMIN access");
- const navigate = useNavigate();
+  // Admin Component Rendered - User has ADMIN access
+  const navigate = useNavigate();
 
   useEffect(() => {
     navigate("/aboutus");
@@ -24,7 +24,7 @@ const Admin = () => {
         <Route path="/manageProducts" element={<ManageProducts />} />
         <Route path="/manageOrders" element={<ManageOrders />} />
         <Route path="/manageNotifications" element={<ManageNotifications />} />
-        <Route path ="/manageWithdrawals" element={<ManageWithDrawal />} />
+        <Route path="/manageWithdrawals" element={<ManageWithDrawal />} />
         <Route path="/aboutus" element={<AboutUs />} />
       </Routes>
     </div>

@@ -83,7 +83,7 @@ const BrokersDataForm = ({ setRefresh }) => {
 
       return publicUrl;
     } catch (error) {
-      console.error("Error uploading image:", error);
+      // Error uploading image handled silently
       throw error;
     }
   };
@@ -115,7 +115,7 @@ const BrokersDataForm = ({ setRefresh }) => {
 
       return publicUrl;
     } catch (error) {
-      console.error(`Error uploading ${type}:`, error);
+      // Error uploading handled silently
       throw error;
     }
   }, []);
@@ -143,7 +143,7 @@ const BrokersDataForm = ({ setRefresh }) => {
 
       try {
         // Upload broker ID card images with organized folder structure
-        console.log(`📁 Uploading ID cards for broker: ${brokerData.fullName}`);
+        // Uploading ID cards for broker
 
         const uploadResult = await StorageOrganizationService.uploadBrokerCards(
           brokerData,
@@ -173,10 +173,7 @@ const BrokersDataForm = ({ setRefresh }) => {
         }
 
         toast.success(t("success.brokerDataSubmitted"));
-        console.log("✅ Broker data saved with organized storage:", {
-          brokerName: brokerData.fullName,
-          imageUrls: uploadResult.urls,
-        });
+        // Broker data saved with organized storage
 
         // Reset form
         setBrokerData({
@@ -196,7 +193,7 @@ const BrokersDataForm = ({ setRefresh }) => {
           }, 1000);
         }
       } catch (error) {
-        console.error("Error submitting broker data:", error);
+        // Error submitting broker data handled silently
         toast.error(t("errors.brokerDataSubmission"));
       } finally {
         setIsUploading(false);

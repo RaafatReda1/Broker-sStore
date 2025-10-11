@@ -20,7 +20,6 @@ export const fetchUserData = async (
 ) => {
   if (!email) return null;
 
-
   try {
     // First, check if user is in Staff table
     const { data: staffData, error: staffError } = await supabase
@@ -29,7 +28,7 @@ export const fetchUserData = async (
       .eq("email", email);
 
     if (staffError) {
-      console.error("Error fetching staff data:", staffError.message);
+      // Error fetching staff data handled silently
     }
 
     // If user is staff member
@@ -41,11 +40,11 @@ export const fetchUserData = async (
       if (staff.authority === "admin") {
         setIsAdmin(true);
         setIsModerator(false);
-        console.log("🔑 User role: ADMIN");
+        // User role: ADMIN handled silently
       } else if (staff.authority === "moderator") {
         setIsAdmin(false);
         setIsModerator(true);
-        console.log("👮 User role: MODERATOR");
+        // User role: MODERATOR handled silently
       }
 
       return staff;
@@ -58,7 +57,7 @@ export const fetchUserData = async (
       .eq("email", email);
 
     if (brokerError) {
-      console.error("Error fetching broker data:", brokerError.message);
+      // Error fetching broker data handled silently
       if (showToast) {
         toast.error("Failed to load profile data. Please try again.");
       }
@@ -71,7 +70,7 @@ export const fetchUserData = async (
       setUserData(broker);
       setIsAdmin(false);
       setIsModerator(false);
-      console.log("💼 User role: BROKER");
+      // User role: BROKER handled silently
       return broker;
     }
 
@@ -79,10 +78,10 @@ export const fetchUserData = async (
     setUserData(null);
     setIsAdmin(false);
     setIsModerator(false);
-    console.log("❌ No user data found for this email");
+    // No user data found handled silently
     return null;
   } catch (err) {
-    console.error("Unexpected error fetching user data:", err);
+    // Unexpected error fetching user data handled silently
     if (showToast) {
       toast.error("An unexpected error occurred. Please try again.");
     }

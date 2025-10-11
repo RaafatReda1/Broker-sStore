@@ -17,7 +17,7 @@ const DeleteOrderModal = ({ isOpen, onClose, order, onConfirmDelete }) => {
       setStaffComment("");
       onClose();
     } catch (error) {
-      console.error("Error deleting order:", error);
+      // Error handled silently
     } finally {
       setIsDeleting(false);
     }

@@ -68,7 +68,7 @@ const SignUp = () => {
       });
 
       if (error) {
-        console.error("Error during sign up:", error);
+        // Error during sign up handled silently
         toast.error(t("errors.signUpFailed"));
       } else if (data) {
         toast.success(t("success.signUpSuccess"), {
@@ -83,7 +83,7 @@ const SignUp = () => {
         setPasswordStrength(0);
       }
     } catch (error) {
-      console.error("Unexpected error:", error);
+      // Unexpected error handled silently
       toast.error(t("errors.generic"));
     } finally {
       setIsLoading(false);

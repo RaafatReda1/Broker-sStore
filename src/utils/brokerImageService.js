@@ -31,13 +31,11 @@ class BrokerImageService {
       results.totalDeleted = results.deletedImages.length;
       results.success = results.errors.length === 0;
 
-      console.log(
-        `✅ Image deletion completed: ${results.totalDeleted} deleted, ${results.errors.length} errors`
-      );
+      // Image deletion completed handled silently
 
       return results;
     } catch (error) {
-      console.error("❌ Error in deleteBrokerImages:", error);
+      // Error in deleteBrokerImages handled silently
       results.success = false;
       results.errors.push({
         type: "general",
@@ -72,7 +70,7 @@ class BrokerImageService {
               .remove([fileName]);
 
             if (error) {
-              console.error(`❌ Error deleting ${field}:`, error);
+              // Error deleting handled silently
               result.errors.push({
                 type: field,
                 fileName: fileName,
@@ -80,7 +78,7 @@ class BrokerImageService {
                 error: error,
               });
             } else {
-              console.log(`✅ Deleted ${field}:`, fileName);
+              // Deleted handled silently
               result.deletedImages.push({
                 type: field,
                 fileName: fileName,
@@ -88,10 +86,7 @@ class BrokerImageService {
               });
             }
           } else {
-            console.warn(
-              `⚠️ Could not extract filename from ${field} URL:`,
-              broker[field]
-            );
+            // Could not extract filename handled silently
             result.errors.push({
               type: field,
               fileName: null,
@@ -100,7 +95,7 @@ class BrokerImageService {
             });
           }
         } catch (error) {
-          console.error(`❌ Exception deleting ${field}:`, error);
+          // Exception deleting handled silently
           result.errors.push({
             type: field,
             message: error.message,
@@ -134,7 +129,7 @@ class BrokerImageService {
             .remove([fileName]);
 
           if (error) {
-            console.error("❌ Error deleting avatar:", error);
+            // Error deleting avatar handled silently
             result.errors.push({
               type: "avatar",
               fileName: fileName,
@@ -142,7 +137,7 @@ class BrokerImageService {
               error: error,
             });
           } else {
-            console.log("✅ Deleted avatar:", fileName);
+            // Deleted avatar handled silently
             result.deletedImages.push({
               type: "avatar",
               fileName: fileName,
@@ -150,10 +145,7 @@ class BrokerImageService {
             });
           }
         } else {
-          console.warn(
-            "⚠️ Could not extract filename from avatar URL:",
-            broker.avatar_url
-          );
+          // Could not extract filename handled silently
           result.errors.push({
             type: "avatar",
             fileName: null,
@@ -162,7 +154,7 @@ class BrokerImageService {
           });
         }
       } catch (error) {
-        console.error("❌ Exception deleting avatar:", error);
+        // Exception deleting avatar handled silently
         result.errors.push({
           type: "avatar",
           message: error.message,
@@ -199,7 +191,7 @@ class BrokerImageService {
       );
 
       if (bucketIndex === -1) {
-        console.warn("❌ Bucket name not found in URL");
+        // Bucket name not found handled silently
         return null;
       }
 
@@ -212,10 +204,10 @@ class BrokerImageService {
         return fullPath;
       }
 
-      console.warn("❌ Invalid path extracted from URL");
+      // Invalid path extracted handled silently
       return null;
     } catch (error) {
-      console.error("❌ Error extracting filename from URL:", error);
+      // Error extracting filename handled silently
       return null;
     }
   }
@@ -233,7 +225,7 @@ class BrokerImageService {
     };
 
     try {
-      console.log(`🗑️ Deleting all files in broker folder: ${brokerId}`);
+      // Deleting all files in broker folder handled silently
 
       // List all files in the broker's folder
       const { data: files, error: listError } = await supabase.storage
@@ -244,7 +236,7 @@ class BrokerImageService {
         });
 
       if (listError) {
-        console.error("❌ Error listing files:", listError);
+        // Error listing files handled silently
         result.errors.push({
           type: "list",
           message: listError.message,
@@ -263,14 +255,14 @@ class BrokerImageService {
           .remove(filePaths);
 
         if (deleteError) {
-          console.error("❌ Error deleting files:", deleteError);
+          // Error deleting files handled silently
           result.errors.push({
             type: "bulk_delete",
             message: deleteError.message,
             error: deleteError,
           });
         } else {
-          console.log(`✅ Deleted ${files.length} files from broker folder`);
+          // Deleted files handled silently
           result.deletedImages.push(
             ...files.map((file) => ({
               type: "folder_file",
@@ -281,10 +273,10 @@ class BrokerImageService {
           );
         }
       } else {
-        console.log("ℹ️ No files found in broker folder");
+        // No files found in broker folder
       }
     } catch (error) {
-      console.error("❌ Exception in deleteBrokerFolder:", error);
+      // Exception in deleteBrokerFolder handled silently
       result.errors.push({
         type: "folder_delete",
         message: error.message,
@@ -339,16 +331,13 @@ class BrokerImageService {
 
       if (listError) {
         result.error = listError.message;
-        console.warn(
-          `⚠️ Could not list files in broker folder ${folderPath}:`,
-          listError
-        );
+        // Could not list files handled silently
         return result;
       }
 
       if (!files || files.length === 0) {
         result.success = true;
-        console.log(`ℹ️ Broker folder ${folderPath} is empty or doesn't exist`);
+        // Broker folder is empty or doesn't exist
         return result;
       }
 
@@ -360,23 +349,18 @@ class BrokerImageService {
 
       if (deleteError) {
         result.error = deleteError.message;
-        console.error(
-          `❌ Error deleting broker folder ${folderPath}:`,
-          deleteError
-        );
+        // Error deleting broker folder handled silently
         return result;
       }
 
       result.success = true;
       result.deletedFiles = filePaths;
 
-      console.log(
-        `✅ Successfully deleted broker folder: ${folderPath} (${filePaths.length} files)`
-      );
+      // Successfully deleted broker folder handled silently
       return result;
     } catch (error) {
       result.error = error.message;
-      console.error(`❌ Error deleting broker folder ${folderPath}:`, error);
+      // Error deleting broker folder handled silently
       return result;
     }
   }

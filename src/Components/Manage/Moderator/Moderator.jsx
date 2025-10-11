@@ -7,7 +7,7 @@ import "./Moderator.css";
 import ManageNotifications from "../ManageNotifications/ManageNotifications";
 import AboutUs from "../../AboutUs/AboutUs";
 const Moderator = () => {
-  console.log("👮 Moderator Component Rendered - User has MODERATOR access");
+  // Moderator Component Rendered - User has MODERATOR access
   const navigate = useNavigate();
 
   useEffect(() => {

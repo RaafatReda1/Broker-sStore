@@ -29,12 +29,7 @@ const CheckOut = () => {
   const [form, setForm] = useState(() => {
     const storedBrokerId = localStorage.getItem("brokerId");
     const parsedBrokerId = storedBrokerId ? JSON.parse(storedBrokerId) : null;
-    console.log(
-      "🔍 Initial brokerId from localStorage:",
-      storedBrokerId,
-      "Parsed:",
-      parsedBrokerId
-    );
+    // Initial brokerId from localStorage handled silently
 
     return {
       brokerId: parsedBrokerId,
@@ -93,12 +88,7 @@ const CheckOut = () => {
     try {
       // Check if brokerId exists in brokers table
       let validatedBrokerId = form.brokerId;
-      console.log(
-        "🔍 Original brokerId:",
-        form.brokerId,
-        "Type:",
-        typeof form.brokerId
-      );
+      // Original brokerId handled silently
 
       if (form.brokerId && form.brokerId !== null && form.brokerId !== "null") {
         // Convert to number if it's a string
@@ -106,42 +96,30 @@ const CheckOut = () => {
           typeof form.brokerId === "string"
             ? parseInt(form.brokerId, 10)
             : form.brokerId;
-        console.log(
-          "🔍 Checking broker existence for ID:",
-          brokerIdToCheck,
-          "Original:",
-          form.brokerId
-        );
+        // Checking broker existence handled silently
 
         const { data: brokerData, error: brokerError } = await supabase
           .from("Brokers")
           .select("id")
           .eq("id", brokerIdToCheck);
 
-        console.log("🔍 Broker query result:", { brokerData, brokerError });
+        // Broker query result handled silently
 
         if (brokerError) {
-          console.log("⚠️ Broker query error:", brokerError.message);
-          // Database error - keep original brokerId
-          console.log("⚠️ Database error, keeping original brokerId");
+          // Broker query error handled silently
+          // Database error, keeping original brokerId
         } else if (!brokerData || brokerData.length === 0) {
-          console.log(
-            "⚠️ No broker found with ID:",
-            brokerIdToCheck,
-            "setting to null"
-          );
+          // No broker found, setting to null
           validatedBrokerId = null;
         } else {
-          console.log("✅ Broker found:", brokerData[0]);
+          // Broker found
         }
       } else {
-        console.log(
-          "ℹ️ No brokerId or brokerId is null/undefined, keeping as is"
-        );
+        // No brokerId or brokerId is null/undefined, keeping as is
       }
 
       // Create order data with validated brokerId
-      console.log("🔍 Final validated brokerId:", validatedBrokerId);
+      // Final validated brokerId handled silently
       const orderData = {
         ...form,
         brokerId: validatedBrokerId,
@@ -161,28 +139,26 @@ const CheckOut = () => {
 
         // Send notification to broker about new order (only if brokerId is valid)
         const newOrder = data[0];
-        console.log("🛒 Order created successfully:", newOrder);
-        console.log("🛒 BrokerId from order:", newOrder.brokerId);
+        // Order created successfully
+        // BrokerId from order handled silently
 
         if (newOrder.brokerId) {
           try {
             const notificationResult = await NotificationService.notifyNewOrder(
               newOrder
             );
-            console.log("🔔 Notification result:", notificationResult);
+            // Notification result handled silently
             if (notificationResult) {
-              console.log(
-                "✅ New order notification sent to broker successfully"
-              );
+              // New order notification sent to broker successfully
             } else {
-              console.log("❌ Failed to send new order notification");
+              // Failed to send new order notification
             }
           } catch (error) {
-            console.error("❌ Error sending new order notification:", error);
+            // Error sending new order notification handled silently
             // Don't show error to user as order was successful
           }
         } else {
-          console.log("ℹ️ No broker ID, skipping notification");
+          // No broker ID, skipping notification
         }
 
         // Reset form after success
@@ -207,7 +183,7 @@ const CheckOut = () => {
         }, 2000);
       }
     } catch (err) {
-      console.error(err);
+      // Error handled silently
       toast.error(t("errors.generic"));
     } finally {
       setIsSubmitting(false);

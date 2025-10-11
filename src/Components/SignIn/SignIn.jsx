@@ -37,13 +37,13 @@ const SignIn = () => {
       });
 
       if (error) {
-        console.error("Error during sign in:", error);
+        // Error during sign in handled silently
         toast.error(t("errors.signInFailed"));
       } else if (data) {
         toast.success(t("success.signInSuccess"));
       }
     } catch (err) {
-      console.error("Unexpected error:", err);
+      // Unexpected error handled silently
       toast.error(t("errors.generic"));
     } finally {
       setIsLoading(false);

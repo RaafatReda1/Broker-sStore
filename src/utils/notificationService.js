@@ -22,12 +22,7 @@ export class NotificationService {
     isTemp = false,
   }) {
     try {
-      console.log("🔔 sendBrokerNotification called with:", {
-        brokerId,
-        title,
-        message: message.substring(0, 100) + "...",
-        isTemp,
-      });
+      // sendBrokerNotification called handled silently
 
       const notificationData = {
         title,
@@ -39,21 +34,21 @@ export class NotificationService {
         brokerEmail: null,
       };
 
-      console.log("🔔 Inserting notification data:", notificationData);
+      // Inserting notification data handled silently
 
       const { data, error } = await supabase
         .from("Notifications")
         .insert(notificationData);
 
       if (error) {
-        console.error("❌ Error sending broker notification:", error);
+        // Error sending broker notification handled silently
         return false;
       }
 
-      console.log("✅ Broker notification sent successfully:", data);
+      // Broker notification sent successfully handled silently
       return true;
     } catch (error) {
-      console.error("❌ Error in sendBrokerNotification:", error);
+      // Error in sendBrokerNotification handled silently
       return false;
     }
   }
@@ -85,14 +80,14 @@ export class NotificationService {
       });
 
       if (error) {
-        console.error("Error sending email notification:", error);
+        // Error sending email notification handled silently
         return false;
       }
 
-      console.log("Email notification sent successfully:", data);
+      // Email notification sent successfully handled silently
       return true;
     } catch (error) {
-      console.error("Error in sendEmailNotification:", error);
+      // Error in sendEmailNotification handled silently
       return false;
     }
   }
@@ -103,7 +98,7 @@ export class NotificationService {
    * @returns {Promise<boolean>} - Success status
    */
   static async notifyNewOrder(order) {
-    console.log("🔔 notifyNewOrder called with order:", order);
+    // notifyNewOrder called handled silently
 
     const { brokerId, name, total, id, netProfit, status } = order;
 
@@ -111,14 +106,7 @@ export class NotificationService {
     const orderTotal = parseFloat(total) || 0;
     const orderProfit = parseFloat(netProfit) || 0;
 
-    console.log("🔔 Parsed values:", {
-      total: total,
-      orderTotal: orderTotal,
-      netProfit: netProfit,
-      orderProfit: orderProfit,
-      brokerId: brokerId,
-      id: id,
-    });
+    // Parsed values handled silently
 
     // Default status to false (pending) if not provided
     const orderStatus = status !== undefined ? status : false;
@@ -135,8 +123,8 @@ export class NotificationService {
       `📅 **Date:** ${new Date().toLocaleDateString()}\n\n` +
       `🎯 **Order placed with your broker ID: ${brokerId}**\n\n`;
 
-    console.log("🔔 Sending notification to brokerId:", brokerId);
-    console.log("🔔 Notification message:", message);
+    // Sending notification to brokerId handled silently
+    // Notification message handled silently
 
     return await this.sendBrokerNotification({
       brokerId,
@@ -270,13 +258,13 @@ export class NotificationService {
         .single();
 
       if (error) {
-        console.error("Error fetching broker info:", error);
+        // Error fetching broker info handled silently
         return null;
       }
 
       return data;
     } catch (error) {
-      console.error("Error in getBrokerInfo:", error);
+      // Error in getBrokerInfo handled silently
       return null;
     }
   }
@@ -345,10 +333,7 @@ export class NotificationService {
       `⚠️ **Note:** This order has been permanently removed from the system. ` +
       `Any pending profit from this order will not be added to your balance.`;
 
-    console.log(
-      "🗑️ Sending order deletion notification to brokerId:",
-      brokerId
-    );
+    // Sending order deletion notification handled silently
 
     return await this.sendBrokerNotification({
       brokerId,

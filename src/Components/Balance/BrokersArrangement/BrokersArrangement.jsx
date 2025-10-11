@@ -27,7 +27,6 @@ const BrokersArrangement = () => {
         .order("totalRevenue", { ascending: false });
 
       if (error) {
-        console.error("Error fetching brokers:", error);
         toast.error(t("errors.failedToLoadLeaderboard"));
         return;
       }
@@ -36,7 +35,6 @@ const BrokersArrangement = () => {
         setBrokers(data);
       }
     } catch (err) {
-      console.error("Error:", err);
       toast.error(t("errors.failedToLoadLeaderboard"));
     } finally {
       setLoading(false);

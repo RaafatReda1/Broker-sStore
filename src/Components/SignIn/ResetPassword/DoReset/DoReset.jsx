@@ -102,13 +102,13 @@ const DoReset = () => {
       const { data, error } = await supabase.auth.updateUser({ password });
 
       if (error) {
-        console.error("Reset password error:", error);
+        // Reset password error handled silently
         setPasswordError(
           error.message || "Failed to reset password. Please try again."
         );
         toast.error(t("resetPassword.failedToResetPassword"));
       } else if (data) {
-        console.log("Reset password data:", data);
+        // Reset password data handled silently
         setIsSuccess(true);
         toast.success(t("resetPassword.passwordResetSuccessfully"));
 
@@ -118,7 +118,7 @@ const DoReset = () => {
         }, 3000);
       }
     } catch (err) {
-      console.error("Unexpected error:", err);
+      // Unexpected error handled silently
       setPasswordError("An unexpected error occurred. Please try again.");
       toast.error(t("resetPassword.unexpectedError"));
     } finally {

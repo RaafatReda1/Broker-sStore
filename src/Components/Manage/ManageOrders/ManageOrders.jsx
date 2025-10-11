@@ -21,7 +21,7 @@ const ManageOrders = () => {
         Brokers(isVerified)
       `);
     if (error) {
-      console.error("Error fetching orders:", error);
+      // Error fetching orders handled silently
     } else if (data) {
       // Transform the data to include broker verification status
       const ordersWithBrokerStatus = data.map((order) => ({
@@ -29,7 +29,6 @@ const ManageOrders = () => {
         brokerVerified: order.Brokers?.isVerified || false,
       }));
       setOrders(ordersWithBrokerStatus);
-      console.log("Fetched orders with broker status:", ordersWithBrokerStatus);
     }
   };
 
@@ -38,7 +37,6 @@ const ManageOrders = () => {
       // Find the order to get broker information
       const order = orders.find((o) => o.id === orderId);
       if (!order) {
-        console.error("Order not found:", orderId);
         return;
       }
 
@@ -55,21 +53,14 @@ const ManageOrders = () => {
         )
       );
 
-      console.log("Order status updated successfully");
-
       // Send notification to broker about status change
       try {
         await NotificationService.notifyOrderStatusChange(order, newStatus);
-        console.log("Order status change notification sent to broker");
       } catch (notificationError) {
-        console.error(
-          "Failed to send status change notification:",
-          notificationError
-        );
-        // Don't show error to user as order status was updated successfully
+        // Notification error handled silently
       }
     } catch (error) {
-      console.error("Error updating order status:", error);
+      // Error handled silently
     }
   };
 
@@ -90,8 +81,6 @@ const ManageOrders = () => {
         )
       );
 
-      console.log("Bulk order status updated successfully");
-
       // Get orders for notification
       const updatedOrders = orders.filter((order) =>
         orderIds.includes(order.id)
@@ -103,15 +92,11 @@ const ManageOrders = () => {
           updatedOrders,
           newStatus
         );
-        console.log("Bulk order status change notification sent to brokers");
       } catch (notificationError) {
-        console.error(
-          "Failed to send bulk status change notification:",
-          notificationError
-        );
+        // Notification error handled silently
       }
     } catch (error) {
-      console.error("Error updating bulk order status:", error);
+      // Error handled silently
     }
   };
 
@@ -126,7 +111,6 @@ const ManageOrders = () => {
       // Find the order to get broker information
       const order = orders.find((o) => o.id === orderId);
       if (!order) {
-        console.error("Order not found:", orderId);
         toast.error(t("manageOrders.orderNotFound"));
         return;
       }
@@ -147,24 +131,16 @@ const ManageOrders = () => {
         setSelectedOrder(null);
       }
 
-      console.log("Order deleted successfully");
-
       // Send notification to broker about deletion
       try {
         await NotificationService.notifyOrderDeletion(order, staffComment);
-        console.log("Order deletion notification sent to broker");
         toast.success("Order deleted successfully and broker notified!");
       } catch (notificationError) {
-        console.error(
-          "Failed to send deletion notification:",
-          notificationError
-        );
         toast.success(
           "Order deleted successfully, but failed to notify broker."
         );
       }
     } catch (error) {
-      console.error("Error deleting order:", error);
       toast.error("Failed to delete order. Please try again.");
       throw error; // Re-throw to let the modal handle the error state
     }
@@ -437,8 +413,7 @@ const ManageOrders = () => {
             </button>
 
             <h2 className="modal-title">
-              <span className="modal-icon">📦</span>
-              #{selectedOrder.id}{" "}
+              <span className="modal-icon">📦</span>#{selectedOrder.id}{" "}
               {t("manageOrders.details")}
             </h2>
 
