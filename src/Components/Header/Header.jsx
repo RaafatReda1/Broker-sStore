@@ -371,8 +371,7 @@ const Header = () => {
                 src="./CicadaHorizentalWhite.png"
                 style={{
                   width: "fit-content",
-                  height: "110px",
-                  margin: "30px",
+                  height: "90px",
                 }}
               ></img>
             </Link>

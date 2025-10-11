@@ -101,9 +101,7 @@ export default function Cart() {
                     <div className="cart-details">
                       <h3 className="item-name">{item.name}</h3>
                       <p className="item-price">${item.price}</p>
-                      {item.profit && (
-                        <p className="item-profit">Profit: ${item.profit}</p>
-                      )}
+                      
                     </div>
                   </Link>
 

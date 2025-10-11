@@ -286,6 +286,28 @@ const ViewNotifications = () => {
     };
   }, [selectedNotification]);
 
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape" && selectedNotification) {
+        setSelectedNotification(null);
+      }
+    };
+
+    if (selectedNotification) {
+      document.addEventListener("keydown", handleKeyDown);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
+    };
+  }, [selectedNotification]);
+
   const unreadCount = filteredNotifications.filter(
     (n) => !isNotificationRead(n)
   ).length;
@@ -398,55 +420,67 @@ const ViewNotifications = () => {
         </div>
 
         {selectedNotification && (
-          <div className="preview-container">
-            <div className="preview-header">
-              <div>
-                <h3 className="preview-title">{selectedNotification.title}</h3>
-                <p className="preview-date">
-                  {new Date(selectedNotification.created_at).toLocaleString()}
-                </p>
+          <div
+            className="preview-container"
+            onClick={(e) => {
+              // Close modal when clicking on the backdrop (not the content)
+              if (e.target === e.currentTarget) {
+                setSelectedNotification(null);
+              }
+            }}
+          >
+            <div className="preview-content">
+              <div className="preview-header">
+                <div>
+                  <h3 className="preview-title">
+                    {selectedNotification.title}
+                  </h3>
+                  <p className="preview-date">
+                    {new Date(selectedNotification.created_at).toLocaleString()}
+                  </p>
+                </div>
+                <button
+                  className="view-notifications-close-btn"
+                  onClick={() => setSelectedNotification(null)}
+                >
+                  <X size={20} />
+                </button>
               </div>
-              <button
-                className="view-notifications-close-btn"
-                onClick={() => setSelectedNotification(null)}
-              >
-                <X size={20} />
-              </button>
-            </div>
 
-            <div className="preview-meta">
-              <div className="meta-row">
-                <User size={14} />
-                <span className="meta-label">
-                  {t("notifications.recipient")}:
-                </span>
-                <span className="meta-value">
-                  {selectedNotification.isAll
-                    ? t("notifications.allUsers")
-                    : selectedNotification.brokerEmail
-                    ? selectedNotification.brokerEmail
-                    : `${t("notifications.brokers")} ${
-                        selectedNotification.brokerIdFrom
-                      } - ${selectedNotification.brokerIdTo}`}
-                </span>
+              <div className="preview-meta">
+                <div className="meta-row">
+                  <User size={14} />
+                  <span className="meta-label">
+                    {t("notifications.recipient")}:
+                  </span>
+                  <span className="meta-value">
+                    {selectedNotification.isAll
+                      ? t("notifications.allUsers")
+                      : selectedNotification.brokerEmail
+                      ? selectedNotification.brokerEmail
+                      : `${t("notifications.brokers")} ${
+                          selectedNotification.brokerIdFrom
+                        } - ${selectedNotification.brokerIdTo}`}
+                  </span>
+                </div>
               </div>
-            </div>
 
-            <div className="preview-divider" />
+              <div className="preview-divider" />
 
-            <div className="preview-message-container">
-              <h4 className="preview-message-title">
-                📦 {t("notifications.messagePreview")}:
-              </h4>
-              <div className="preview-content">
-                <MDEditor.Markdown
-                  source={selectedNotification.msg}
-                  style={{
-                    whiteSpace: "pre-wrap",
-                    backgroundColor: "transparent",
-                    color: "#e5e7eb",
-                  }}
-                />
+              <div className="preview-message-container">
+                <h4 className="preview-message-title">
+                  📦 {t("notifications.messagePreview")}:
+                </h4>
+                <div className="preview-message-content">
+                  <MDEditor.Markdown
+                    source={selectedNotification.msg}
+                    style={{
+                      whiteSpace: "pre-wrap",
+                      backgroundColor: "transparent",
+                      color: "#e5e7eb",
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>

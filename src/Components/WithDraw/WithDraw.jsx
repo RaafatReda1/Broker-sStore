@@ -350,7 +350,7 @@ const WithDraw = () => {
               </p>
               <div className="alert-actions">
                 <span className="contact-support">
-                  📞 Contact support for more information
+                  📞 {t("withdraw.contactSupport")}
                 </span>
               </div>
             </div>

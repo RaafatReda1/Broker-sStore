@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import supabase from "../../../SupabaseClient";
 import { toast } from "react-toastify";
 import "./ManageModerators.css";
 
 const ManageModerators = () => {
+  const { t } = useTranslation();
   const [moderators, setModerators] = useState([]);
   const [form, setForm] = useState({
     id: null,
@@ -26,7 +28,11 @@ const ManageModerators = () => {
   // Get activity status with color coding
   const getActivityStatus = (lastLogin) => {
     if (!lastLogin) {
-      return { text: "Never Logged In", class: "status-never", icon: "⭕" };
+      return {
+        text: t("manageModerators.neverLoggedIn"),
+        class: "status-never",
+        icon: "⭕",
+      };
     }
 
     const now = new Date();
@@ -35,27 +41,35 @@ const ManageModerators = () => {
     const daysDiff = hoursDiff / 24;
 
     if (hoursDiff < 24) {
-      return { text: "Active Today", class: "status-active-today", icon: "🟢" };
+      return {
+        text: t("manageModerators.activeToday"),
+        class: "status-active-today",
+        icon: "🟢",
+      };
     } else if (daysDiff < 7) {
       return {
-        text: "Active This Week",
+        text: t("manageModerators.activeThisWeek"),
         class: "status-active-week",
         icon: "🟡",
       };
     } else if (daysDiff < 30) {
       return {
-        text: "Active This Month",
+        text: t("manageModerators.activeThisMonth"),
         class: "status-active-month",
         icon: "🟠",
       };
     } else {
-      return { text: "Inactive", class: "status-inactive", icon: "🔴" };
+      return {
+        text: t("manageModerators.inactive"),
+        class: "status-inactive",
+        icon: "🔴",
+      };
     }
   };
 
   // Format relative time
   const getRelativeTime = (date) => {
-    if (!date) return "Never";
+    if (!date) return t("manageModerators.never");
 
     const now = new Date();
     const loginDate = new Date(date);
@@ -64,7 +78,7 @@ const ManageModerators = () => {
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffMins < 1) return "Just now";
+    if (diffMins < 1) return t("manageModerators.justNow");
     if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
     if (diffHours < 24)
       return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
@@ -257,12 +271,9 @@ const ManageModerators = () => {
         <div className="moderators-header">
           <h1>
             <span className="header-icon">👥</span>
-            Manage Moderators
+            {t("manageModerators.title")}
           </h1>
-          <p>
-            Add, edit, and manage moderator accounts with real-time activity
-            tracking
-          </p>
+          <p>{t("manageModerators.subtitle")}</p>
         </div>
 
         <div className="moderators-content">
@@ -271,22 +282,30 @@ const ManageModerators = () => {
             <div className="stat-card stat-card-total">
               <div className="stat-icon">📊</div>
               <div className="stat-value">{stats.total}</div>
-              <div className="stat-label">Total Moderators</div>
+              <div className="stat-label">
+                {t("manageModerators.totalModerators")}
+              </div>
             </div>
             <div className="stat-card stat-card-today">
               <div className="stat-icon">🟢</div>
               <div className="stat-value">{stats.activeToday}</div>
-              <div className="stat-label">Active Today</div>
+              <div className="stat-label">
+                {t("manageModerators.activeToday")}
+              </div>
             </div>
             <div className="stat-card stat-card-week">
               <div className="stat-icon">📅</div>
               <div className="stat-value">{stats.activeThisWeek}</div>
-              <div className="stat-label">Active This Week</div>
+              <div className="stat-label">
+                {t("manageModerators.activeThisWeek")}
+              </div>
             </div>
             <div className="stat-card stat-card-never">
               <div className="stat-icon">⭕</div>
               <div className="stat-value">{stats.neverLoggedIn}</div>
-              <div className="stat-label">Never Logged In</div>
+              <div className="stat-label">
+                {t("manageModerators.neverLoggedIn")}
+              </div>
             </div>
           </div>
 
@@ -294,15 +313,19 @@ const ManageModerators = () => {
           <div className="form-section">
             <div className="form-title">
               <span>{form.id ? "✏️" : "➕"}</span>
-              {form.id ? "Edit Moderator" : "Add New Moderator"}
+              {form.id
+                ? t("manageModerators.editModerator")
+                : t("manageModerators.addNewModerator")}
             </div>
             <div className="form-grid">
               <div className="form-group">
-                <label className="form-label">Full Name *</label>
+                <label className="form-label">
+                  {t("manageModerators.fullName")}
+                </label>
                 <input
                   type="text"
                   name="name"
-                  placeholder="Enter full name"
+                  placeholder={t("manageModerators.enterFullName")}
                   value={form.name}
                   onChange={handleChange}
                   className="form-input"
@@ -310,11 +333,13 @@ const ManageModerators = () => {
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Email Address *</label>
+                <label className="form-label">
+                  {t("manageModerators.emailAddress")}
+                </label>
                 <input
                   type="email"
                   name="email"
-                  placeholder="moderator@example.com"
+                  placeholder={t("manageModerators.emailPlaceholder")}
                   value={form.email}
                   onChange={handleChange}
                   className="form-input"
@@ -329,17 +354,17 @@ const ManageModerators = () => {
                 disabled={loading}
               >
                 {loading
-                  ? "⏳ Processing..."
+                  ? t("common.processing")
                   : form.id
-                  ? "💾 Update Moderator"
-                  : "➕ Add Moderator"}
+                  ? t("manageModerators.updateModerator")
+                  : t("manageModerators.addModerator")}
               </button>
               {form.id && (
                 <button
                   onClick={resetForm}
                   className="manage-moderators-btn manage-moderators-btn-secondary"
                 >
-                  ❌ Cancel
+                  {t("common.cancel")}
                 </button>
               )}
             </div>
@@ -351,7 +376,7 @@ const ManageModerators = () => {
               <span className="search-icon">🔍</span>
               <input
                 type="text"
-                placeholder="Search by name, email, or ID..."
+                placeholder={t("manageModerators.searchPlaceholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
@@ -360,7 +385,7 @@ const ManageModerators = () => {
                 <button
                   className="search-clear"
                   onClick={() => setSearchTerm("")}
-                  title="Clear search"
+                  title={t("manageModerators.clearSearch")}
                 >
                   ✕
                 </button>
@@ -455,14 +480,14 @@ const ManageModerators = () => {
                             <button
                               onClick={() => handleEdit(mod)}
                               className="manage-moderators-btn-edit"
-                              title="Edit moderator"
+                              title={t("manageModerators.editModerator")}
                             >
                               ✏️
                             </button>
                             <button
                               onClick={() => handleDelete(mod.id, mod.name)}
                               className="manage-moderators-btn-delete"
-                              title="Delete moderator"
+                              title={t("manageModerators.deleteModerator")}
                             >
                               🗑️
                             </button>
@@ -480,13 +505,13 @@ const ManageModerators = () => {
                         </div>
                         <div className="empty-state-text">
                           {searchTerm || filterActive !== "all"
-                            ? "No moderators found"
-                            : "No moderators yet"}
+                            ? t("manageModerators.noModeratorsFound")
+                            : t("manageModerators.noModeratorsYet")}
                         </div>
                         <div className="empty-state-subtext">
                           {searchTerm || filterActive !== "all"
-                            ? "Try adjusting your search or filters"
-                            : "Add your first moderator using the form above"}
+                            ? t("manageModerators.tryAdjustingSearch")
+                            : t("manageModerators.addFirstModerator")}
                         </div>
                       </div>
                     </td>

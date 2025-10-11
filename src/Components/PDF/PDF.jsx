@@ -1,8 +1,10 @@
 import jsPDF from "jspdf";
 import amiriFont from "../../../fontBase64";
 import React from "react";
+import { useTranslation } from "react-i18next";
 // eslint-disable-next-line react/prop-types
 const PDF = ({ name, fullDescription, Images, price, profit }) => {
+  const { t } = useTranslation();
   const generatePDF = () => {
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -15,7 +17,7 @@ const PDF = ({ name, fullDescription, Images, price, profit }) => {
 
     // ===== بيانات مثال =====
     const title = name;
-    const description = fullDescription
+    const description = fullDescription;
     const images = Images;
     const pdfPrice = String(price);
     const pdfProfit = String(profit);
@@ -33,11 +35,15 @@ const PDF = ({ name, fullDescription, Images, price, profit }) => {
     const profitX = pageWidth - 60; // على بعد 50mm من اليمين (أو عدّل حسب رغبتك)
 
     doc.setFontSize(18);
-    doc.text("Price: " + pdfPrice, priceX, priceY, { align: "right" });
+    doc.text(t("products.price") + ": " + pdfPrice, priceX, priceY, {
+      align: "right",
+    });
     doc.setTextColor(0, 128, 0); // لو تحب تميز السعر باللون الأخضر
 
     doc.setFontSize(18);
-    doc.text("Profit: " + pdfProfit, profitX, priceY, { align: "right" });
+    doc.text(t("products.profit") + ": " + pdfProfit, profitX, priceY, {
+      align: "right",
+    });
     doc.setTextColor(0, 0, 0); // إعادة اللون الأسود للنص العادي
     // ===== تقسيم النص داخل الصندوق =====
     const splitText = doc.splitTextToSize(description, 300);

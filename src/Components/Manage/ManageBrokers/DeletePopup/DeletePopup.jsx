@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from "react";
+import { useTranslation } from "react-i18next";
 import "./DeletePopup.css";
 
 const DeletePopup = ({
@@ -10,20 +11,23 @@ const DeletePopup = ({
   onDeleteBroker,
   onNavigateToNotifications,
 }) => {
+  const { t } = useTranslation();
   if (!showModal || !selectedBroker) return null;
 
   return (
     <div className="modal-overlay">
       <div className="delete-modal">
         <div className="modal-header">
-          <h3>Delete Broker: {selectedBroker.fullName}</h3>
+          <h3>
+            {t("deletePopup.title")}: {selectedBroker.fullName}
+          </h3>
           <button onClick={onClose} className="delete-popup-close-btn">
             ✕
           </button>
         </div>
 
         <div className="modal-msg-content">
-          <p>Select a message to send to the broker before deletion:</p>
+          <p>{t("deletePopup.selectMessage")}</p>
 
           {/* Send Customizable Message Button */}
           <div className="custom-message-section">
@@ -31,16 +35,15 @@ const DeletePopup = ({
               onClick={() => onNavigateToNotifications(selectedBroker.email)}
               className="custom-message-btn"
             >
-              <span className="btn-icon">✏️ Send Customizable Message</span>
+              <span className="btn-icon">
+                ✏️ {t("deletePopup.sendCustomMessage")}
+              </span>
             </button>
           </div>
 
           {tempMessages.length === 0 ? (
             <div className="no-temp-messages">
-              <p>
-                No temporary messages found. Please create some in the
-                Notifications section first.
-              </p>
+              <p>{t("deletePopup.noTempMessages")}</p>
             </div>
           ) : (
             <div className="temp-messages-list">

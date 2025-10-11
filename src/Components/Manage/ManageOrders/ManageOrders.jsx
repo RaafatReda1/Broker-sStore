@@ -18,7 +18,7 @@ const ManageOrders = () => {
   const fetchOrders = async () => {
     const { data, error } = await supabase.from("Orders").select(`
         *,
-        Brokers!inner(isVerified)
+        Brokers(isVerified)
       `);
     if (error) {
       console.error("Error fetching orders:", error);
@@ -411,7 +411,7 @@ const ManageOrders = () => {
                   <button
                     className="delete-order-btn"
                     onClick={() => handleDeleteOrder(order)}
-                    title="Delete Order"
+                    title={t("manageOrders.deleteOrder")}
                   >
                     🗑️
                   </button>
@@ -438,29 +438,36 @@ const ManageOrders = () => {
 
             <h2 className="modal-title">
               <span className="modal-icon">📦</span>
-              Order #{selectedOrder.id} Details
+              {t("manageOrders.orderId")} #{selectedOrder.id}{" "}
+              {t("manageOrders.details")}
             </h2>
 
             <div className="modal-section">
-              <h3 className="section-title">Customer Information</h3>
+              <h3 className="section-title">
+                {t("manageOrders.customerInformation")}
+              </h3>
               <div className="info-grid">
                 <div className="info-item">
-                  <span className="info-label">Name</span>
+                  <span className="info-label">{t("checkout.fullName")}</span>
                   <span className="info-value">{selectedOrder.name}</span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">Phone</span>
+                  <span className="info-label">
+                    {t("checkout.phoneNumber")}
+                  </span>
                   <span className="info-value">{selectedOrder.phone}</span>
                 </div>
                 <div className="info-item full-width">
-                  <span className="info-label">Address</span>
+                  <span className="info-label">
+                    {t("checkout.deliveryAddress")}
+                  </span>
                   <span className="info-value">{selectedOrder.address}</span>
                 </div>
               </div>
             </div>
 
             <div className="modal-section">
-              <h3 className="section-title">Cart Items</h3>
+              <h3 className="section-title">{t("manageOrders.cartItems")}</h3>
               <div className="cart-items">
                 {selectedOrder.cart?.map((item, index) => (
                   <div key={index} className="cart-item">
@@ -481,28 +488,36 @@ const ManageOrders = () => {
             </div>
 
             <div className="modal-section">
-              <h3 className="section-title">Order Summary</h3>
+              <h3 className="section-title">
+                {t("manageOrders.orderSummary")}
+              </h3>
               <div className="summary-grid">
                 <div className="summary-item">
-                  <span className="summary-label">Total Amount</span>
+                  <span className="summary-label">
+                    {t("manageOrders.totalAmount")}
+                  </span>
                   <span className="summary-value">
                     {formatCurrency(selectedOrder.total)}
                   </span>
                 </div>
                 <div className="summary-item">
-                  <span className="summary-label">Net Profit</span>
+                  <span className="summary-label">
+                    {t("manageOrders.netProfit")}
+                  </span>
                   <span className="summary-value profit">
                     {formatCurrency(selectedOrder.netProfit)}
                   </span>
                 </div>
                 <div className="summary-item">
-                  <span className="summary-label">Broker ID</span>
+                  <span className="summary-label">
+                    {t("manageOrders.brokerId")}
+                  </span>
                   <span className="summary-value">
                     #{selectedOrder.brokerId}
                     {selectedOrder.brokerVerified && (
                       <span className="modal-verification-badge">
                         <span className="modal-verification-icon">✓</span>
-                        Verified
+                        {t("manageBrokers.verified")}
                       </span>
                     )}
                   </span>

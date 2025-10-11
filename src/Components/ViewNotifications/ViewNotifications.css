@@ -743,9 +743,79 @@
 @media (max-width: 1200px) {
   .notifications-content {
     grid-template-columns: 1fr;
+    position: relative;
   }
 
-  .preview-container,
+  .preview-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .preview-container .preview-content {
+    background: rgba(30, 27, 75, 0.95);
+    backdrop-filter: blur(15px);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    position: relative;
+  }
+
+  .preview-container .preview-header {
+    margin-bottom: 16px;
+  }
+
+  .preview-container .preview-title {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .preview-container .preview-date {
+    font-size: 12px;
+  }
+
+  .preview-container .preview-meta {
+    margin-bottom: 16px;
+  }
+
+  .preview-container .preview-divider {
+    margin: 16px 0;
+  }
+
+  .preview-container .preview-message-title {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+
+  .preview-container .preview-message-content {
+    color: #e2e8f0;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 16px;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 8px;
+    border: 1px solid rgba(139, 92, 246, 0.1);
+    min-height: 100px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
   .placeholder-container {
     display: none;
   }
@@ -767,5 +837,34 @@
 
   .notification-item {
     padding: 14px;
+  }
+
+  .preview-container .preview-content {
+    max-width: 95vw;
+    max-height: 85vh;
+    padding: 20px;
+  }
+
+  .preview-container .preview-title {
+    font-size: 18px;
+  }
+
+  .preview-container .preview-date {
+    font-size: 11px;
+  }
+
+  .preview-container .preview-message-content {
+    font-size: 13px;
+    padding: 12px;
+    max-height: 250px;
+  }
+
+  .view-notifications-close-btn {
+    padding: 6px;
+  }
+
+  .view-notifications-close-btn svg {
+    width: 18px;
+    height: 18px;
   }
 }

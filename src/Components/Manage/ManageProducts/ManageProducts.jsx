@@ -149,7 +149,7 @@ const ProductsManager = () => {
   // Create or Update product in Supabase
   const handleSubmit = async () => {
     if (!form.name || !form.price) {
-      toast.error("Please fill in required fields");
+      toast.error(t("manageProducts.fillRequiredFields"));
       return;
     }
 
@@ -203,7 +203,7 @@ const ProductsManager = () => {
       const product = products.find((p) => p.id === productId);
 
       if (!product) {
-        toast.error("Product not found");
+        toast.error(t("manageProducts.productNotFound"));
         return;
       }
 
@@ -322,9 +322,9 @@ const ProductsManager = () => {
               <div className="header-title">
                 <Package size={36} style={{ color: "var(--blue-600)" }} />
                 <div>
-                  <h1>Products Manager</h1>
+                  <h1>{t("manageProducts.title")}</h1>
                   <p className="header-subtitle">
-                    Manage your product inventory efficiently
+                    {t("manageProducts.subtitle")}
                   </p>
                 </div>
               </div>
@@ -338,7 +338,7 @@ const ProductsManager = () => {
                 className="manage-products-btn manage-products-btn-primary"
               >
                 <Plus size={20} />
-                {showForm ? "Cancel" : "Add Product"}
+                {showForm ? t("common.cancel") : t("manageProducts.addProduct")}
               </button>
             </div>
           </div>
@@ -351,7 +351,9 @@ const ProductsManager = () => {
                   <Package size={28} />
                 </div>
                 <div className="stat-info">
-                  <p className="stat-label">Total Products</p>
+                  <p className="stat-label">
+                    {t("manageProducts.totalProducts")}
+                  </p>
                   <p className="stat-value">{products.length}</p>
                 </div>
               </div>
@@ -363,7 +365,7 @@ const ProductsManager = () => {
                   <DollarSign size={28} />
                 </div>
                 <div className="stat-info">
-                  <p className="stat-label">Total Value</p>
+                  <p className="stat-label">{t("manageProducts.totalValue")}</p>
                   <p className="stat-value">{totalValue.toFixed(2)} EGP</p>
                 </div>
               </div>
@@ -375,7 +377,9 @@ const ProductsManager = () => {
                   <TrendingUp size={28} />
                 </div>
                 <div className="stat-info">
-                  <p className="stat-label">Total Profit</p>
+                  <p className="stat-label">
+                    {t("manageProducts.totalProfit")}
+                  </p>
                   <p className="stat-value">{totalProfit.toFixed(2)} EGP</p>
                 </div>
               </div>
@@ -391,7 +395,7 @@ const ProductsManager = () => {
             <div className="sidebar-section">
               <h3 className="sidebar-title">
                 <Search size={16} />
-                Search
+                {t("common.search")}
               </h3>
               <div className="search-box">
                 <Search className="search-icon" size={18} />

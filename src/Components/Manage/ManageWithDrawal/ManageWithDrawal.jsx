@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import "./ManageWithDrawal.css";
 import supabase from "../../../SupabaseClient";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
 
 const ManageWithDrawal = () => {
+  const { t } = useTranslation();
   const [withdrawalRequests, setWithdrawalRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
@@ -160,12 +162,12 @@ const ManageWithDrawal = () => {
 
   const handleFinishRequest = async (request) => {
     showConfirmationModal({
-      title: "Complete Withdrawal Request",
+      title: t("manageWithDrawal.completeWithdrawalRequest"),
       message:
         "✨ Ready to complete this withdrawal?\n\n📋 This will:\n• Mark the request as finished\n• Archive specific orders (only those included in this request)\n• Process the broker's payment\n• Keep other orders available for future withdrawals\n\n💡 Don't worry - archived orders can be restored if needed!",
       type: "success",
-      confirmText: "Complete Withdrawal",
-      cancelText: "Keep Pending",
+      confirmText: t("manageWithDrawal.completeWithdrawal"),
+      cancelText: t("manageWithDrawal.keepPending"),
       onConfirm: async () => {
         await processFinishRequest(request);
       },
@@ -260,12 +262,12 @@ const ManageWithDrawal = () => {
 
   const handleResetToPending = async (request) => {
     showConfirmationModal({
-      title: "Restore Request to Pending",
+      title: t("manageWithDrawal.restoreRequestToPending"),
       message:
         "🔄 Ready to restore this request?\n\n📋 This will:\n• Move the request back to pending\n• Restore specific archived orders (only those from this request)\n• Make orders active again\n• Keep other archived orders untouched\n\n💡 This is reversible - you can finish it again later!",
       type: "info",
-      confirmText: "Restore Request",
-      cancelText: "Keep Finished",
+      confirmText: t("manageWithDrawal.restoreRequest"),
+      cancelText: t("manageWithDrawal.keepFinished"),
       onConfirm: async () => {
         await processResetRequest(request);
       },
@@ -449,7 +451,7 @@ const ManageWithDrawal = () => {
   const sendResetNotification = async (request, ordersCount) => {
     try {
       const notificationData = {
-        title: "🔄 Withdrawal Request Reset to Pending",
+        title: t("manageWithDrawal.withdrawalRequestReset"),
         msg:
           `📋 Your withdrawal request has been reset to pending status.\n\n` +
           `📊 **Details:**\n` +
@@ -498,7 +500,7 @@ const ManageWithDrawal = () => {
   return (
     <div className="manage-withdrawal-container">
       <div className="manage-withdrawal-header">
-        <h1 className="page-title">Manage Withdrawal Requests</h1>
+        <h1 className="page-title">{t("manageWithDrawal.title")}</h1>
 
         <div className="header-controls">
           <div className="tab-switcher">
@@ -506,14 +508,14 @@ const ManageWithDrawal = () => {
               className={`tab-btn ${activeTab === "pending" ? "active" : ""}`}
               onClick={() => setActiveTab("pending")}
             >
-              Pending
+              {t("manageWithDrawal.pending")}
               <span className="tab-badge">{pendingCount}</span>
             </button>
             <button
               className={`tab-btn ${activeTab === "finished" ? "active" : ""}`}
               onClick={() => setActiveTab("finished")}
             >
-              Finished
+              {t("manageWithDrawal.finished")}
               <span className="tab-badge">{finishedCount}</span>
             </button>
           </div>
@@ -521,7 +523,7 @@ const ManageWithDrawal = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="Search by name, email, phone..."
+              placeholder={t("manageWithDrawal.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
@@ -533,16 +535,20 @@ const ManageWithDrawal = () => {
       {isLoading && !selectedRequest ? (
         <div className="loading-state">
           <div className="spinner"></div>
-          <p>Loading requests...</p>
+          <p>{t("common.loading")}</p>
         </div>
       ) : filteredRequests.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon">📭</div>
-          <h3>No {activeTab} requests found</h3>
+          <h3>
+            {t("manageWithDrawal.noRequestsFound", { status: activeTab })}
+          </h3>
           <p>
             {searchQuery
-              ? "Try adjusting your search criteria"
-              : `There are no ${activeTab} withdrawal requests at the moment`}
+              ? t("manageWithDrawal.tryAdjustingSearch")
+              : t("manageWithDrawal.noWithdrawalRequests", {
+                  status: activeTab,
+                })}
           </p>
         </div>
       ) : (
@@ -568,21 +574,25 @@ const ManageWithDrawal = () => {
 
               <div className="card-body">
                 <div className="info-row">
-                  <span className="label">Phone:</span>
+                  <span className="label">{t("manageWithDrawal.phone")}:</span>
                   <span className="value">{request.brokerPhone}</span>
                 </div>
 
                 <div className="info-row">
-                  <span className="label">Withdrawal Phone:</span>
+                  <span className="label">
+                    {t("manageWithDrawal.withdrawalPhone")}:
+                  </span>
                   <span className="value">
                     {request.withDrawalPhone || "N/A"}
                   </span>
                 </div>
 
                 <div className="info-row">
-                  <span className="label">Orders Count:</span>
+                  <span className="label">
+                    {t("manageWithDrawal.ordersCount")}:
+                  </span>
                   <span className="value">
-                    {request.orders?.length || 0} orders
+                    {request.orders?.length || 0} {t("manageWithDrawal.orders")}
                   </span>
                 </div>
 
@@ -590,7 +600,9 @@ const ManageWithDrawal = () => {
                   <div className="payment-method vodafone">
                     <span className="method-icon">📱</span>
                     <div>
-                      <div className="method-name">Vodafone Cash</div>
+                      <div className="method-name">
+                        {t("manageWithDrawal.vodafoneCash")}
+                      </div>
                       <div className="method-detail">
                         {request.vodaCarrierName}
                       </div>
@@ -602,7 +614,9 @@ const ManageWithDrawal = () => {
                   <div className="payment-method instapay">
                     <span className="method-icon">💳</span>
                     <div>
-                      <div className="method-name">InstaPay</div>
+                      <div className="method-name">
+                        {t("manageWithDrawal.instaPay")}
+                      </div>
                       <div className="method-detail">
                         {request.instaEmail || request.instaAccountName}
                       </div>
@@ -630,7 +644,9 @@ const ManageWithDrawal = () => {
                     }}
                     disabled={isProcessing}
                   >
-                    {isProcessing ? "Processing..." : "Finish"}
+                    {isProcessing
+                      ? t("common.processing")
+                      : t("manageWithDrawal.finish")}
                   </button>
                 )}
               </div>
@@ -648,14 +664,16 @@ const ManageWithDrawal = () => {
             </button>
 
             <div className="modal-header">
-              <h2>Request Details</h2>
+              <h2>{t("manageWithDrawal.requestDetails")}</h2>
               {activeTab === "finished" && (
                 <button
                   className="action-btn reset-btn"
                   onClick={() => handleResetToPending(selectedRequest)}
                   disabled={isProcessing}
                 >
-                  {isProcessing ? "Processing..." : "Reset to Pending"}
+                  {isProcessing
+                    ? t("common.processing")
+                    : t("manageWithDrawal.resetToPending")}
                 </button>
               )}
             </div>
@@ -663,37 +681,49 @@ const ManageWithDrawal = () => {
             {isLoading ? (
               <div className="modal-loading">
                 <div className="spinner"></div>
-                <p>Loading details...</p>
+                <p>{t("common.loading")}</p>
               </div>
             ) : (
               <>
                 {/* Broker Information */}
                 {brokerData && (
                   <div className="modal-section">
-                    <h3 className="section-title">Broker Information</h3>
+                    <h3 className="section-title">
+                      {t("manageWithDrawal.brokerInformation")}
+                    </h3>
                     <div className="broker-details">
                       <div className="detail-item">
-                        <span className="detail-label">Full Name:</span>
+                        <span className="detail-label">
+                          {t("manageWithDrawal.fullName")}:
+                        </span>
                         <span className="detail-value">
                           {brokerData.fullName}
                         </span>
                       </div>
                       <div className="detail-item">
-                        <span className="detail-label">Nickname:</span>
+                        <span className="detail-label">
+                          {t("manageWithDrawal.nickname")}:
+                        </span>
                         <span className="detail-value">
                           {brokerData.nickName}
                         </span>
                       </div>
                       <div className="detail-item">
-                        <span className="detail-label">Email:</span>
+                        <span className="detail-label">
+                          {t("manageWithDrawal.email")}:
+                        </span>
                         <span className="detail-value">{brokerData.email}</span>
                       </div>
                       <div className="detail-item">
-                        <span className="detail-label">Phone:</span>
+                        <span className="detail-label">
+                          {t("manageWithDrawal.phone")}:
+                        </span>
                         <span className="detail-value">{brokerData.phone}</span>
                       </div>
                       <div className="detail-item">
-                        <span className="detail-label">Actual Balance:</span>
+                        <span className="detail-label">
+                          {t("manageWithDrawal.actualBalance")}:
+                        </span>
                         <span className="detail-value highlight">
                           {parseFloat(
                             brokerData.actualBalance || 0
@@ -704,13 +734,17 @@ const ManageWithDrawal = () => {
                         </span>
                       </div>
                       <div className="detail-item">
-                        <span className="detail-label">Total Orders:</span>
+                        <span className="detail-label">
+                          {t("manageWithDrawal.totalOrders")}:
+                        </span>
                         <span className="detail-value">
                           {brokerData.totalOrders || 0}
                         </span>
                       </div>
                       <div className="detail-item">
-                        <span className="detail-label">Completed Orders:</span>
+                        <span className="detail-label">
+                          {t("manageWithDrawal.completedOrders")}:
+                        </span>
                         <span className="detail-value">
                           {brokerData.completedOrders || 0}
                         </span>
@@ -723,11 +757,15 @@ const ManageWithDrawal = () => {
                 {activeTab === "pending" && brokerOrders.length > 0 && (
                   <div className="modal-section">
                     <h3 className="section-title">
-                      Orders in this Request ({brokerOrders.length})
+                      {t("manageWithDrawal.ordersInRequest", {
+                        count: brokerOrders.length,
+                      })}
                     </h3>
                     <div className="orders-summary">
                       <div className="summary-item">
-                        <span className="summary-label">Total Revenue:</span>
+                        <span className="summary-label">
+                          {t("manageWithDrawal.totalRevenue")}:
+                        </span>
                         <span className="summary-value">
                           {calculateTotalRevenue(brokerOrders).toLocaleString(
                             "en-US",
@@ -739,7 +777,9 @@ const ManageWithDrawal = () => {
                         </span>
                       </div>
                       <div className="summary-item">
-                        <span className="summary-label">Total Profit:</span>
+                        <span className="summary-label">
+                          {t("manageWithDrawal.totalProfit")}:
+                        </span>
                         <span className="summary-value highlight">
                           {calculateTotalProfit(brokerOrders).toLocaleString(
                             "en-US",
@@ -755,7 +795,9 @@ const ManageWithDrawal = () => {
                       {brokerOrders.map((order) => (
                         <div key={order.id} className="order-item">
                           <div className="order-header">
-                            <span className="order-id">Order #{order.id}</span>
+                            <span className="order-id">
+                              {t("manageOrders.orderId")} #{order.id}
+                            </span>
                             <span className="order-total">
                               {parseFloat(order.total).toLocaleString("en-US", {
                                 style: "currency",
@@ -774,7 +816,7 @@ const ManageWithDrawal = () => {
                               </div>
                             )}
                             <div className="order-profit">
-                              Profit:{" "}
+                              {t("products.profit")}:{" "}
                               {parseFloat(order.netProfit || 0).toLocaleString(
                                 "en-US",
                                 {
@@ -804,7 +846,9 @@ const ManageWithDrawal = () => {
                     </h3>
                     <div className="orders-summary">
                       <div className="summary-item">
-                        <span className="summary-label">Total Revenue:</span>
+                        <span className="summary-label">
+                          {t("manageWithDrawal.totalRevenue")}:
+                        </span>
                         <span className="summary-value">
                           {calculateTotalRevenue(deletedOrders).toLocaleString(
                             "en-US",
@@ -816,7 +860,9 @@ const ManageWithDrawal = () => {
                         </span>
                       </div>
                       <div className="summary-item">
-                        <span className="summary-label">Total Profit:</span>
+                        <span className="summary-label">
+                          {t("manageWithDrawal.totalProfit")}:
+                        </span>
                         <span className="summary-value highlight">
                           {calculateTotalProfit(deletedOrders).toLocaleString(
                             "en-US",
@@ -832,7 +878,9 @@ const ManageWithDrawal = () => {
                       {deletedOrders.map((order) => (
                         <div key={order.id} className="order-item archived">
                           <div className="order-header">
-                            <span className="order-id">Order #{order.orderPrevId}</span>
+                            <span className="order-id">
+                              {t("manageOrders.orderId")} #{order.orderPrevId}
+                            </span>
                             <span className="order-total">
                               {parseFloat(order.total).toLocaleString("en-US", {
                                 style: "currency",
@@ -851,7 +899,7 @@ const ManageWithDrawal = () => {
                               </div>
                             )}
                             <div className="order-profit">
-                              Profit:{" "}
+                              {t("products.profit")}:{" "}
                               {parseFloat(order.netProfit || 0).toLocaleString(
                                 "en-US",
                                 {

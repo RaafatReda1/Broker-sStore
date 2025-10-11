@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import MDEditor from "@uiw/react-md-editor";
@@ -9,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 const ManageNotifications = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const [content, setContent] = useState("");
   const [sendType, setSendType] = useState("single"); // single, range, all
@@ -48,11 +50,11 @@ const ManageNotifications = () => {
         .eq("id", id);
 
       if (error) throw error;
-      toast.success("Notification deleted successfully");
+      toast.success(t("manageNotifications.notificationDeleted"));
       fetchSentNotifications();
     } catch (error) {
       console.error("Error deleting notification:", error);
-      toast.error("Failed to delete notification");
+      toast.error(t("manageNotifications.deleteFailed"));
     }
   };
 
@@ -104,12 +106,12 @@ const ManageNotifications = () => {
 
   const handleSendNotification = async () => {
     if (!content.trim()) {
-      toast.error("Please enter notification content");
+      toast.error(t("manageNotifications.contentRequired"));
       return;
     }
 
     if (!title.trim()) {
-      toast.error("Please enter a title for the message");
+      toast.error(t("manageNotifications.titleRequired"));
       return;
     }
 
@@ -128,7 +130,7 @@ const ManageNotifications = () => {
 
       if (sendType === "single") {
         if (!singleIdentifier.trim()) {
-          toast.error("Please enter user ID or Email");
+          toast.error(t("manageNotifications.identifierRequired"));
           setIsLoading(false);
           return;
         }
@@ -140,7 +142,7 @@ const ManageNotifications = () => {
         }
       } else if (sendType === "range") {
         if (!brokerIdFrom || !brokerIdTo) {
-          toast.error("Please enter both From and To IDs");
+          toast.error(t("manageNotifications.rangeRequired"));
           setIsLoading(false);
           return;
         }
@@ -201,9 +203,9 @@ const ManageNotifications = () => {
                   <line x1="22" y1="2" x2="11" y2="13"></line>
                   <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
-                Admin Notification Center
+                {t("manageNotifications.title")}
               </h1>
-              <p>Send targeted notifications to your users</p>
+              <p>{t("manageNotifications.subtitle")}</p>
             </div>
             <div className="header-actions">
               <button
@@ -218,10 +220,16 @@ const ManageNotifications = () => {
                 className={`toggle-btn ${showHistory ? "active" : ""}`}
               >
                 <span className="btn-icon">
-                  {!showHistory ? "Show History" : "Hide History"}
+                  {!showHistory
+                    ? t("manageNotifications.showHistory")
+                    : t("manageNotifications.hideHistory")}
                 </span>
                 <span className="btn-text">
-                  {showHistory ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
+                  {showHistory ? (
+                    <FontAwesomeIcon icon={faEyeSlash} />
+                  ) : (
+                    <FontAwesomeIcon icon={faEye} />
+                  )}
                 </span>
               </button>
             </div>
@@ -271,8 +279,12 @@ const ManageNotifications = () => {
                     <circle cx="12" cy="7" r="4"></circle>
                   </svg>
                   <div className="send-type-content">
-                    <div className="send-type-title">Single Broker</div>
-                    <div className="send-type-desc">Send to one broker</div>
+                    <div className="send-type-title">
+                      {t("manageNotifications.singleBroker")}
+                    </div>
+                    <div className="send-type-desc">
+                      {t("manageNotifications.sendToOneBroker")}
+                    </div>
                   </div>
                 </button>
 
@@ -298,8 +310,12 @@ const ManageNotifications = () => {
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                   </svg>
                   <div className="send-type-content">
-                    <div className="send-type-title">ID Range</div>
-                    <div className="send-type-desc">Send to Broker range</div>
+                    <div className="send-type-title">
+                      {t("manageNotifications.idRange")}
+                    </div>
+                    <div className="send-type-desc">
+                      {t("manageNotifications.sendToBrokerRange")}
+                    </div>
                   </div>
                 </button>
 
@@ -323,8 +339,12 @@ const ManageNotifications = () => {
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                   </svg>
                   <div className="send-type-content">
-                    <div className="send-type-title">All Brokers</div>
-                    <div className="send-type-desc">Broadcast to everyone</div>
+                    <div className="send-type-title">
+                      {t("manageNotifications.allBrokers")}
+                    </div>
+                    <div className="send-type-desc">
+                      {t("manageNotifications.broadcastToEveryone")}
+                    </div>
                   </div>
                 </button>
               </div>
@@ -333,7 +353,9 @@ const ManageNotifications = () => {
               {sendType === "single" && (
                 <div>
                   <div className="input-group">
-                    <label className="input-label">Identify by</label>
+                    <label className="input-label">
+                      {t("manageNotifications.identifyBy")}
+                    </label>
                     <div className="identifier-toggle">
                       <button
                         onClick={() => setIdentifierType("id")}
@@ -356,7 +378,9 @@ const ManageNotifications = () => {
 
                   <div className="input-group">
                     <label className="input-label">
-                      {identifierType === "id" ? "User ID" : "User Email"}
+                      {identifierType === "id"
+                        ? t("manageNotifications.userID")
+                        : t("manageNotifications.userEmail")}
                     </label>
                     <input
                       type={identifierType === "id" ? "number" : "email"}
@@ -364,8 +388,8 @@ const ManageNotifications = () => {
                       onChange={(e) => setSingleIdentifier(e.target.value)}
                       placeholder={
                         identifierType === "id"
-                          ? "Enter user ID"
-                          : "Enter user email"
+                          ? t("manageNotifications.enterUserID")
+                          : t("manageNotifications.enterUserEmail")
                       }
                       className="input-field"
                     />
@@ -381,7 +405,7 @@ const ManageNotifications = () => {
                       type="number"
                       value={brokerIdFrom}
                       onChange={(e) => setBrokerIdFrom(e.target.value)}
-                      placeholder="Start ID"
+                      placeholder={t("manageNotifications.startID")}
                       className="input-field"
                     />
                   </div>
@@ -392,7 +416,7 @@ const ManageNotifications = () => {
                       type="number"
                       value={brokerIdTo}
                       onChange={(e) => setBrokerIdTo(e.target.value)}
-                      placeholder="End ID"
+                      placeholder={t("manageNotifications.endID")}
                       className="input-field"
                     />
                   </div>
@@ -411,16 +435,20 @@ const ManageNotifications = () => {
 
             {/* Right Panel - Editor */}
             <div className="notification-card">
-              <div className="card-header">📝 Notification Content</div>
+              <div className="card-header">
+                📝 {t("manageNotifications.notificationContent")}
+              </div>
 
               {/* Message Title */}
               <div className="title-section">
-                <label className="input-label">Message Title</label>
+                <label className="input-label">
+                  {t("manageNotifications.messageTitle")}
+                </label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter message title..."
+                  placeholder={t("manageNotifications.enterMessageTitle")}
                   className="title-input"
                 />
               </div>
@@ -435,7 +463,7 @@ const ManageNotifications = () => {
                       onChange={(e) => setIsTemp(e.target.checked)}
                     />
                     <span className="checkmark"></span>
-                    Save as Template Message
+                    {t("manageNotifications.saveAsTemplate")}
                   </label>
                 </div>
               </div>
@@ -451,7 +479,9 @@ const ManageNotifications = () => {
                     hideToolbar={false}
                     visibleDragBar={false}
                     textareaProps={{
-                      placeholder: "Write your notification message here...",
+                      placeholder: t(
+                        "manageNotifications.writeNotificationMessage"
+                      ),
                       style: {
                         fontSize: 14,
                         fontFamily: "Arial, sans-serif",
@@ -504,7 +534,7 @@ const ManageNotifications = () => {
                       <line x1="22" y1="2" x2="11" y2="13"></line>
                       <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                     </svg>
-                    Send Notification
+                    {t("manageNotifications.sendNotification")}
                   </>
                 )}
               </button>
@@ -515,15 +545,15 @@ const ManageNotifications = () => {
           {showHistory && (
             <div className="notification-history">
               <div className="history-header">
-                <h2>📋 Sent Notifications History</h2>
-                <p>View and manage your sent notifications</p>
+                <h2>📋 {t("manageNotifications.sentNotificationsHistory")}</h2>
+                <p>{t("manageNotifications.viewAndManage")}</p>
               </div>
 
               <div className="history-content">
                 {sentNotifications.length === 0 ? (
                   <div className="no-history">
                     <span className="no-history-icon">📭</span>
-                    <p>No notifications sent yet</p>
+                    <p>{t("manageNotifications.noNotificationsSent")}</p>
                   </div>
                 ) : (
                   <div className="notifications-list">
@@ -544,12 +574,12 @@ const ManageNotifications = () => {
                             </span>
                             <span className="notification-type">
                               {notification.isAll
-                                ? "All Brokers"
+                                ? t("manageNotifications.allBrokers")
                                 : notification.brokerEmail
                                 ? `To: ${notification.brokerEmail}`
                                 : notification.brokerIdTo
                                 ? `To ID: ${notification.brokerIdTo}`
-                                : "Range"}
+                                : t("manageNotifications.range")}
                             </span>
                             <button
                               onClick={() =>
@@ -577,7 +607,6 @@ const ManageNotifications = () => {
           )}
         </div>
       </div>
-
     </>
   );
 };

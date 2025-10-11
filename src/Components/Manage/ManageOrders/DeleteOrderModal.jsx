@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { X, Trash2, AlertTriangle, MessageSquare } from "lucide-react";
 import "./DeleteOrderModal.css";
 
 const DeleteOrderModal = ({ isOpen, onClose, order, onConfirmDelete }) => {
+  const { t } = useTranslation();
   const [staffComment, setStaffComment] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -39,7 +41,7 @@ const DeleteOrderModal = ({ isOpen, onClose, order, onConfirmDelete }) => {
         <div className="delete-modal-header">
           <div className="delete-modal-title">
             <AlertTriangle className="warning-icon" size={24} />
-            <h3>Delete Order</h3>
+            <h3>{t("manageOrders.deleteOrder")}</h3>
           </div>
           <button
             className="close-btn"
@@ -53,27 +55,35 @@ const DeleteOrderModal = ({ isOpen, onClose, order, onConfirmDelete }) => {
         <div className="delete-modal-body">
           <div className="order-info">
             <div className="order-detail">
-              <span className="detail-label">Order ID:</span>
+              <span className="detail-label">{t("manageOrders.orderId")}:</span>
               <span className="detail-value">#{order.id}</span>
             </div>
             <div className="order-detail">
-              <span className="detail-label">Customer:</span>
+              <span className="detail-label">
+                {t("manageOrders.customerName")}:
+              </span>
               <span className="detail-value">{order.name}</span>
             </div>
             <div className="order-detail">
-              <span className="detail-label">Total:</span>
+              <span className="detail-label">
+                {t("manageOrders.orderTotal")}:
+              </span>
               <span className="detail-value">
                 ${parseFloat(order.total || 0).toFixed(2)}
               </span>
             </div>
             <div className="order-detail">
-              <span className="detail-label">Broker Profit:</span>
+              <span className="detail-label">
+                {t("manageOrders.brokerProfit")}:
+              </span>
               <span className="detail-value">
                 ${parseFloat(order.netProfit || 0).toFixed(2)}
               </span>
             </div>
             <div className="order-detail">
-              <span className="detail-label">Broker ID:</span>
+              <span className="detail-label">
+                {t("manageOrders.brokerId")}:
+              </span>
               <span className="detail-value">{order.brokerId}</span>
             </div>
           </div>
@@ -81,27 +91,26 @@ const DeleteOrderModal = ({ isOpen, onClose, order, onConfirmDelete }) => {
           <div className="warning-message">
             <AlertTriangle className="warning-icon-small" size={16} />
             <p>
-              <strong>Warning:</strong> This action cannot be undone. The order
-              will be permanently deleted and the broker will be notified.
+              <strong>{t("common.warning")}:</strong>{" "}
+              {t("manageOrders.deleteWarning")}
             </p>
           </div>
 
           <div className="comment-section">
             <label className="comment-label">
               <MessageSquare size={16} />
-              Staff Comment (Optional)
+              {t("manageOrders.staffComment")}
             </label>
             <textarea
               className="comment-textarea"
               value={staffComment}
               onChange={(e) => setStaffComment(e.target.value)}
-              placeholder="Add a comment explaining why this order is being deleted..."
+              placeholder={t("manageOrders.deleteCommentPlaceholder")}
               disabled={isDeleting}
               rows={3}
             />
             <small className="comment-help">
-              This comment will be included in the notification sent to the
-              broker.
+              {t("manageOrders.deleteCommentHelp")}
             </small>
           </div>
         </div>
@@ -112,7 +121,7 @@ const DeleteOrderModal = ({ isOpen, onClose, order, onConfirmDelete }) => {
             onClick={handleClose}
             disabled={isDeleting}
           >
-            Cancel
+            {t("common.cancel")}
           </button>
           <button
             className="delete-btn"
@@ -122,12 +131,12 @@ const DeleteOrderModal = ({ isOpen, onClose, order, onConfirmDelete }) => {
             {isDeleting ? (
               <>
                 <div className="spinner"></div>
-                Deleting...
+                {t("common.deleting")}
               </>
             ) : (
               <>
                 <Trash2 size={16} />
-                Delete Order
+                {t("manageOrders.deleteOrder")}
               </>
             )}
           </button>

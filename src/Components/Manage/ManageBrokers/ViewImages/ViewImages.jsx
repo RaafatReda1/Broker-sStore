@@ -1,8 +1,10 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import "./ViewImages.css";
 
 const ViewImages = ({ broker, show, onClose }) => {
+  const { t } = useTranslation();
   const { showImages, setShowImages } = show;
   const [selectedImg, setSelectedImg] = useState(null);
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
@@ -10,9 +12,9 @@ const ViewImages = ({ broker, show, onClose }) => {
   if (!showImages) return null;
 
   const images = [
-    { src: broker.idCardFront, alt: "Front ID" },
-    { src: broker.idCardBack, alt: "Back ID" },
-    { src: broker.selfieWithIdCard, alt: "Selfie with ID" },
+    { src: broker.idCardFront, alt: t("viewImages.frontID") },
+    { src: broker.idCardBack, alt: t("viewImages.backID") },
+    { src: broker.selfieWithIdCard, alt: t("viewImages.selfieWithID") },
   ];
 
   const handleClose = () => {
@@ -35,7 +37,9 @@ const ViewImages = ({ broker, show, onClose }) => {
           <button className="view-images-close-btn-x" onClick={handleClose}>
             X
           </button>
-          <h2>ID Card Images - {broker.fullName}</h2>
+          <h2>
+            {t("viewImages.title")} - {broker.fullName}
+          </h2>
           <div className="images-grid">
             {images.map((img, idx) => (
               <div

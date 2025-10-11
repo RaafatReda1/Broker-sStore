@@ -74,25 +74,23 @@ const DoReset = () => {
 
     // Validation
     if (!password.trim()) {
-      setPasswordError("Password is required");
+      setPasswordError(t("auth.resetPassword.passwordRequired"));
       return;
     }
 
     if (!confirmPassword.trim()) {
-      setConfirmPasswordError("Please confirm your password");
+      setConfirmPasswordError(t("auth.resetPassword.confirmPasswordRequired"));
       return;
     }
 
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
-      setPasswordError(
-        "Password must be at least 8 characters with uppercase, lowercase, numbers, and special characters"
-      );
+      setPasswordError(t("auth.resetPassword.passwordValidation"));
       return;
     }
 
     if (password !== confirmPassword) {
-      setConfirmPasswordError("Passwords do not match");
+      setConfirmPasswordError(t("auth.resetPassword.passwordMismatch"));
       return;
     }
 

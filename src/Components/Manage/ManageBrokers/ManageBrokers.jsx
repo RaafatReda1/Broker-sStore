@@ -98,7 +98,7 @@ The Cicada Team
         .from("Notifications")
         .insert({
           msg: verificationMessage,
-          title: "Account Verification Successful",
+          title: t("manageBrokers.accountVerificationSuccessful"),
           brokerEmail: broker.email,
           isAll: false,
           brokerIdFrom: null,
@@ -307,9 +307,11 @@ The Cicada Team
       // Show warning if images were deleted
       if (hasDeletedImages) {
         const confirmed = window.confirm(
-          `⚠️ Warning: ${imageDeletionResult.totalDeleted} associated images were deleted and cannot be restored.\n\n` +
-            `The broker will be restored to the database, but the images (ID cards, avatar) will remain deleted.\n\n` +
-            `Do you want to continue with the restoration?`
+          `⚠️ ${t("common.warning")}: ${imageDeletionResult.totalDeleted} ${t(
+            "manageBrokers.imagesDeletedWarning"
+          )}\n\n` +
+            `${t("manageBrokers.restoreWarning")}\n\n` +
+            `${t("manageBrokers.continueRestoration")}`
         );
 
         if (!confirmed) {
