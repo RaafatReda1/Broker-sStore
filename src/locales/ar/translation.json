@@ -454,7 +454,8 @@
     "customerName": "اسم العميل",
     "orderTotal": "إجمالي الطلب",
     "deleteCommentPlaceholder": "أضف تعليقاً يوضح سبب حذف هذا الطلب...",
-    "deleteCommentHelp": "سيتم تضمين هذا التعليق في الإشعار المرسل إلى الوسيط."
+    "deleteCommentHelp": "سيتم تضمين هذا التعليق في الإشعار المرسل إلى الوسيط.",
+    "orderId ": "معرف الطلب"
   },
   "viewStatistics": {
     "title": "إحصائيات لـ",
@@ -571,7 +572,8 @@
     "totalOrders": "إجمالي الطلبات",
     "completedOrders": "الطلبات المكتملة",
     "ordersInRequest": "الطلبات في هذا الطلب ({{count}})",
-    "totalRevenue": "إجمالي الإيرادات"
+    "totalRevenue": "إجمالي الإيرادات",
+    "resetToPending": "استرداد الطلب إلى المعلق"
   },
   "manageBrokers": {
     "title": "ادارة الوساطاء",

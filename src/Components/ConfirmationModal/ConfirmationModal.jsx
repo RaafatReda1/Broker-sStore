@@ -49,7 +49,7 @@ const ConfirmationModal = ({
 
   return (
     <div className="confirmation-modal-overlay" onClick={handleBackdropClick}>
-      <div className="confirmation-modal">
+      <div className="confirmation-modal" style={{ overflow: "auto" }}>
         <div className="modal-header">
           <div className="modal-icon">{getIcon()}</div>
           <h3 className="modal-title">{title}</h3>

@@ -438,7 +438,7 @@ const ManageOrders = () => {
 
             <h2 className="modal-title">
               <span className="modal-icon">📦</span>
-              {t("manageOrders.orderId")} #{selectedOrder.id}{" "}
+              #{selectedOrder.id}{" "}
               {t("manageOrders.details")}
             </h2>
 
