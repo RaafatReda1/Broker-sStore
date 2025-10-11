@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import supabase from "../../../../SupabaseClient";
 import { toast } from "react-toastify";
 import {
@@ -14,6 +15,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./DoReset.css";
 
 const DoReset = () => {
+  const { t } = useTranslation();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -106,11 +108,11 @@ const DoReset = () => {
         setPasswordError(
           error.message || "Failed to reset password. Please try again."
         );
-        toast.error("Failed to reset password. Please try again.");
+        toast.error(t("resetPassword.failedToResetPassword"));
       } else if (data) {
         console.log("Reset password data:", data);
         setIsSuccess(true);
-        toast.success("Password reset successfully!");
+        toast.success(t("resetPassword.passwordResetSuccessfully"));
 
         // Redirect to sign in after 3 seconds
         setTimeout(() => {
@@ -120,7 +122,7 @@ const DoReset = () => {
     } catch (err) {
       console.error("Unexpected error:", err);
       setPasswordError("An unexpected error occurred. Please try again.");
-      toast.error("An unexpected error occurred. Please try again.");
+      toast.error(t("resetPassword.unexpectedError"));
     } finally {
       setIsLoading(false);
     }
@@ -136,10 +138,9 @@ const DoReset = () => {
             <div className="reset-icon">
               <Lock size={32} />
             </div>
-            <h1 className="reset-title">Set New Password</h1>
+            <h1 className="reset-title">{t("resetPassword.setNewPassword")}</h1>
             <p className="reset-subtitle">
-              Enter your new password below. Make sure it&apos;s strong and
-              secure.
+              {t("resetPassword.setNewPasswordSubtitle")}
             </p>
           </div>
 
@@ -156,7 +157,9 @@ const DoReset = () => {
                     placeholder=" "
                     disabled={isLoading}
                   />
-                  <span className="floating-label">New Password</span>
+                  <span className="floating-label">
+                    {t("resetPassword.newPassword")}
+                  </span>
                   <button
                     type="button"
                     className="password-toggle"
@@ -197,7 +200,7 @@ const DoReset = () => {
                         }`}
                       >
                         <CheckCircle size={14} />
-                        At least 8 characters
+                        {t("resetPassword.atLeast8Characters")}
                       </div>
                       <div
                         className={`requirement ${
@@ -205,7 +208,7 @@ const DoReset = () => {
                         }`}
                       >
                         <CheckCircle size={14} />
-                        Uppercase letter
+                        {t("resetPassword.uppercaseLetter")}
                       </div>
                       <div
                         className={`requirement ${
@@ -213,7 +216,7 @@ const DoReset = () => {
                         }`}
                       >
                         <CheckCircle size={14} />
-                        Lowercase letter
+                        {t("resetPassword.lowercaseLetter")}
                       </div>
                       <div
                         className={`requirement ${
@@ -221,7 +224,7 @@ const DoReset = () => {
                         }`}
                       >
                         <CheckCircle size={14} />
-                        Number
+                        {t("resetPassword.number")}
                       </div>
                       <div
                         className={`requirement ${
@@ -229,7 +232,7 @@ const DoReset = () => {
                         }`}
                       >
                         <CheckCircle size={14} />
-                        Special character
+                        {t("resetPassword.specialCharacter")}
                       </div>
                     </div>
                   </div>
@@ -251,7 +254,9 @@ const DoReset = () => {
                     placeholder=" "
                     disabled={isLoading}
                   />
-                  <span className="floating-label">Confirm Password</span>
+                  <span className="floating-label">
+                    {t("resetPassword.confirmPassword")}
+                  </span>
                   <button
                     type="button"
                     className="password-toggle"
@@ -276,7 +281,7 @@ const DoReset = () => {
                   password === confirmPassword && (
                     <div className="password-match">
                       <CheckCircle size={16} />
-                      Passwords match
+                      {t("resetPassword.passwordsMatch")}
                     </div>
                   )}
               </label>
@@ -290,12 +295,12 @@ const DoReset = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="spinner" size={20} />
-                  Resetting Password...
+                  {t("resetPassword.resettingPassword")}
                 </>
               ) : (
                 <>
                   <CheckCircle size={20} />
-                  Reset Password
+                  {t("resetPassword.resetPassword")}
                 </>
               )}
             </button>
@@ -304,7 +309,7 @@ const DoReset = () => {
           <div className="reset-footer">
             <Link to="/signin" className="back-to-signin">
               <ArrowLeft size={16} />
-              Back to Sign In
+              {t("resetPassword.backToSignIn")}
             </Link>
           </div>
         </>
@@ -313,14 +318,15 @@ const DoReset = () => {
           <div className="success-icon">
             <CheckCircle size={48} />
           </div>
-          <h2 className="success-title">Password Reset Successfully!</h2>
+          <h2 className="success-title">
+            {t("resetPassword.passwordResetSuccessfully")}
+          </h2>
           <p className="success-message">
-            Your password has been updated successfully. You can now sign in
-            with your new password.
+            {t("resetPassword.passwordUpdatedSuccessfully")}
           </p>
           <div className="success-instructions">
-            <p>You will be redirected to the sign-in page automatically.</p>
-            <p>If you&apos;re not redirected, click the button below.</p>
+            <p>{t("resetPassword.redirectedAutomatically")}</p>
+            <p>{t("resetPassword.clickButtonIfNotRedirected")}</p>
           </div>
           <div className="success-actions">
             <button
@@ -328,7 +334,7 @@ const DoReset = () => {
               onClick={() => navigate("/signin")}
             >
               <ArrowLeft size={16} />
-              Go to Sign In
+              {t("resetPassword.goToSignIn")}
             </button>
           </div>
         </div>

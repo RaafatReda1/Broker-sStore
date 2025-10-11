@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import supabase from "../../../SupabaseClient";
@@ -9,6 +10,7 @@ import DeletePopup from "./DeletePopup/DeletePopup";
 import "./ManageBrokers.css";
 
 const ManageBrokers = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [brokers, setBrokers] = useState([]);
   const [selectedBroker, setSelectedBroker] = useState(null);
@@ -107,15 +109,18 @@ The Cicada Team
       if (notificationError) throw notificationError;
 
       // Show success toast
-      toast.success(`Verification message sent to ${broker.fullName}`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.success(
+        t("manageBrokers.verificationMessageSent", { name: broker.fullName }),
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
 
       console.log("Verification message sent successfully");
     } catch (error) {
       console.error("Error sending verification message:", error);
-      toast.error("Failed to send verification message");
+      toast.error(t("manageBrokers.failedToSendVerificationMessage"));
     }
   };
 
@@ -143,7 +148,7 @@ The Cicada Team
       const brokerToDelete = brokers.find((b) => b.id === brokerId);
 
       if (!brokerToDelete) {
-        toast.error("Broker not found");
+        toast.error(t("manageBrokers.brokerNotFound"));
         return;
       }
 
@@ -372,7 +377,7 @@ The Cicada Team
       const brokerToDelete = selectedBroker;
 
       if (!brokerToDelete) {
-        toast.error("Broker not found");
+        toast.error(t("manageBrokers.brokerNotFound"));
         return;
       }
 
@@ -500,21 +505,21 @@ The Cicada Team
       <div className="header-section">
         <h1 className="page-title">
           <span className="title-icon">👥</span>
-          Manage Brokers
+          {t("manageBrokers.title")}
         </h1>
         <div className="broker-stats">
           <div className="stat-badge">
-            <span className="stat-label">Total</span>
+            <span className="stat-label">{t("manageBrokers.total")}</span>
             <span className="stat-value">{brokers.length}</span>
           </div>
           <div className="stat-badge verified">
-            <span className="stat-label">Verified</span>
+            <span className="stat-label">{t("manageBrokers.verified")}</span>
             <span className="stat-value">
               {brokers.filter((b) => b.isVerified).length}
             </span>
           </div>
           <div className="stat-badge unverified">
-            <span className="stat-label">Pending</span>
+            <span className="stat-label">{t("manageBrokers.pending")}</span>
             <span className="stat-value">
               {brokers.filter((b) => !b.isVerified).length}
             </span>
@@ -527,7 +532,7 @@ The Cicada Team
           <span className="search-icon">🔍</span>
           <input
             type="text"
-            placeholder="Search by name, email, or phone..."
+            placeholder={t("manageBrokers.searchPlaceholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -541,7 +546,7 @@ The Cicada Team
             }
             onClick={() => setFilterStatus("all")}
           >
-            All
+            {t("manageBrokers.all")}
           </button>
           <button
             className={
@@ -549,7 +554,7 @@ The Cicada Team
             }
             onClick={() => setFilterStatus("verified")}
           >
-            Verified
+            {t("manageBrokers.verified")}
           </button>
           <button
             className={
@@ -557,7 +562,7 @@ The Cicada Team
             }
             onClick={() => setFilterStatus("unverified")}
           >
-            Pending
+            {t("manageBrokers.pending")}
           </button>
         </div>
       </div>
@@ -566,11 +571,11 @@ The Cicada Team
         <table className="brokers-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Broker</th>
-              <th>Contact</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{t("manageBrokers.id")}</th>
+              <th>{t("manageBrokers.broker")}</th>
+              <th>{t("manageBrokers.contact")}</th>
+              <th>{t("manageBrokers.status")}</th>
+              <th>{t("manageBrokers.actions")}</th>
             </tr>
           </thead>
 
@@ -579,7 +584,7 @@ The Cicada Team
               <tr>
                 <td colSpan="5" className="no-results">
                   <span className="no-results-icon">🔍</span>
-                  <p>No brokers found</p>
+                  <p>{t("manageBrokers.noBrokersFound")}</p>
                 </td>
               </tr>
             ) : (
@@ -633,7 +638,9 @@ The Cicada Team
                       <span className="status-icon">
                         {broker.isVerified ? "✓" : "⏳"}
                       </span>
-                      {broker.isVerified ? "Verified" : "Pending"}
+                      {broker.isVerified
+                        ? t("manageBrokers.verified")
+                        : t("manageBrokers.pending")}
                     </button>
                   </td>
 
@@ -645,10 +652,12 @@ The Cicada Team
                           setShowImages(true);
                         }}
                         className="action-btn images-btn"
-                        title="View ID Images"
+                        title={t("manageBrokers.viewImages")}
                       >
                         <span className="btn-icon">🖼️</span>
-                        <span className="btn-text">Images</span>
+                        <span className="btn-text">
+                          {t("manageBrokers.images")}
+                        </span>
                       </button>
 
                       <button
@@ -657,19 +666,23 @@ The Cicada Team
                           setShowStatistics(true);
                         }}
                         className="action-btn stats-btn"
-                        title="View Statistics"
+                        title={t("manageBrokers.viewStatistics")}
                       >
                         <span className="btn-icon">📊</span>
-                        <span className="btn-text">Stats</span>
+                        <span className="btn-text">
+                          {t("manageBrokers.stats")}
+                        </span>
                       </button>
 
                       <button
                         onClick={() => openDeleteModal(broker)}
                         className="action-btn brokers-delete-btn"
-                        title="Delete Broker"
+                        title={t("manageBrokers.deleteBroker")}
                       >
                         <span className="btn-icon">🗑️</span>
-                        <span className="btn-text">Delete</span>
+                        <span className="btn-text">
+                          {t("manageBrokers.delete")}
+                        </span>
                       </button>
                     </div>
                   </td>

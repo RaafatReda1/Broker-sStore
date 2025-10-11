@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import supabase from "../../../SupabaseClient";
 import { toast } from "react-toastify";
 import FileValidationService from "../../../utils/fileValidationService";
@@ -20,6 +21,7 @@ import "./ManageProducts.css";
 const BUCKET_NAME = "Products";
 
 const ProductsManager = () => {
+  const { t } = useTranslation();
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState({
     id: null,
@@ -395,7 +397,7 @@ const ProductsManager = () => {
                 <Search className="search-icon" size={18} />
                 <input
                   type="text"
-                  placeholder="Search products..."
+                  placeholder={t("manageProducts.searchPlaceholder")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="search-input"
@@ -407,7 +409,7 @@ const ProductsManager = () => {
             <div className="sidebar-section">
               <h3 className="sidebar-title">
                 <SortAsc size={16} />
-                Sort By
+                {t("manageProducts.sortBy")}
               </h3>
               <div className="filter-group">
                 <select
@@ -415,14 +417,30 @@ const ProductsManager = () => {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="sort-select"
                 >
-                  <option value="name-asc">Name (A-Z)</option>
-                  <option value="name-desc">Name (Z-A)</option>
-                  <option value="price-asc">Price (Low to High)</option>
-                  <option value="price-desc">Price (High to Low)</option>
-                  <option value="profit-asc">Profit (Low to High)</option>
-                  <option value="profit-desc">Profit (High to Low)</option>
-                  <option value="date-newest">Date (Newest First)</option>
-                  <option value="date-oldest">Date (Oldest First)</option>
+                  <option value="name-asc">
+                    {t("manageProducts.nameAsc")}
+                  </option>
+                  <option value="name-desc">
+                    {t("manageProducts.nameDesc")}
+                  </option>
+                  <option value="price-asc">
+                    {t("manageProducts.priceAsc")}
+                  </option>
+                  <option value="price-desc">
+                    {t("manageProducts.priceDesc")}
+                  </option>
+                  <option value="profit-asc">
+                    {t("manageProducts.profitAsc")}
+                  </option>
+                  <option value="profit-desc">
+                    {t("manageProducts.profitDesc")}
+                  </option>
+                  <option value="date-newest">
+                    {t("manageProducts.dateNewest")}
+                  </option>
+                  <option value="date-oldest">
+                    {t("manageProducts.dateOldest")}
+                  </option>
                 </select>
               </div>
             </div>
@@ -435,7 +453,9 @@ const ProductsManager = () => {
               <div className="form-card">
                 <div className="form-header">
                   <h2 className="form-title">
-                    {form.id ? "Edit Product" : "Add New Product"}
+                    {form.id
+                      ? t("manageProducts.editProduct")
+                      : t("manageProducts.addNewProduct")}
                   </h2>
                   <button
                     onClick={() => setShowForm(false)}
@@ -447,19 +467,23 @@ const ProductsManager = () => {
 
                 <div className="form-grid">
                   <div className="form-group">
-                    <label className="form-label">Product Name *</label>
+                    <label className="form-label">
+                      {t("manageProducts.productName")} *
+                    </label>
                     <input
                       name="name"
                       value={form.name}
                       onChange={handleChange}
-                      placeholder="Enter product name"
+                      placeholder={t("manageProducts.enterProductName")}
                       className="form-input"
                       required
                     />
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Price (EGP) *</label>
+                    <label className="form-label">
+                      {t("manageProducts.price")} (EGP) *
+                    </label>
                     <input
                       name="price"
                       value={form.price}
@@ -473,7 +497,9 @@ const ProductsManager = () => {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Profit (EGP)</label>
+                    <label className="form-label">
+                      {t("manageProducts.profit")} (EGP)
+                    </label>
                     <input
                       name="profit"
                       value={form.profit}
@@ -486,31 +512,37 @@ const ProductsManager = () => {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Short Description</label>
+                    <label className="form-label">
+                      {t("manageProducts.shortDescription")}
+                    </label>
                     <input
                       name="description"
                       value={form.description}
                       onChange={handleChange}
-                      placeholder="Brief description"
+                      placeholder={t("manageProducts.briefDescription")}
                       className="form-input"
                     />
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Full Description</label>
+                  <label className="form-label">
+                    {t("manageProducts.fullDescription")}
+                  </label>
                   <textarea
                     name="fullDescription"
                     value={form.fullDescription}
                     onChange={handleChange}
-                    placeholder="Detailed product description..."
+                    placeholder={t("manageProducts.detailedDescription")}
                     className="form-textarea"
                     rows="4"
                   />
                 </div>
 
                 <div className="file-input-wrapper">
-                  <label className="form-label">Product Images</label>
+                  <label className="form-label">
+                    {t("manageProducts.productImages")}
+                  </label>
                   <div className="file-input-info">
                     <span className="file-size-limit">
                       {FileValidationService.getSizeLimitMessage()}
@@ -556,17 +588,17 @@ const ProductsManager = () => {
                     }`}
                   >
                     {loading
-                      ? "Processing..."
+                      ? t("manageProducts.processing")
                       : form.id
-                      ? "Update Product"
-                      : "Add Product"}
+                      ? t("manageProducts.updateProduct")
+                      : t("manageProducts.addProduct")}
                   </button>
                   <button
                     type="button"
                     onClick={resetForm}
                     className="manage-products-btn manage-products-btn-secondary"
                   >
-                    Clear Form
+                    {t("manageProducts.clearForm")}
                   </button>
                 </div>
               </div>
@@ -586,18 +618,23 @@ const ProductsManager = () => {
                     <div className="product-content">
                       <h3 className="product-title">{product.name}</h3>
                       <p className="product-description">
-                        {product.description || "No description available"}
+                        {product.description ||
+                          t("manageProducts.noDescriptionAvailable")}
                       </p>
 
                       <div className="product-details">
                         <div className="product-detail-row">
-                          <span className="product-detail-label">Price:</span>
+                          <span className="product-detail-label">
+                            {t("manageProducts.price")}:
+                          </span>
                           <span className="product-price">
                             {Number(product.price).toFixed(2)} EGP
                           </span>
                         </div>
                         <div className="product-detail-row">
-                          <span className="product-detail-label">Profit:</span>
+                          <span className="product-detail-label">
+                            {t("manageProducts.profit")}:
+                          </span>
                           <span className="product-profit">
                             {Number(product.profit || 0).toFixed(2)} EGP
                           </span>

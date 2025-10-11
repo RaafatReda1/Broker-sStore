@@ -116,14 +116,12 @@ const CheckOut = () => {
         const { data: brokerData, error: brokerError } = await supabase
           .from("Brokers")
           .select("id")
-          .eq("id", brokerIdToCheck)
-          .limit(1);
+          .eq("id", brokerIdToCheck);
 
         console.log("🔍 Broker query result:", { brokerData, brokerError });
 
         if (brokerError) {
           console.log("⚠️ Broker query error:", brokerError.message);
-          console.log("⚠️ Full error object:", brokerError);
           // Database error - keep original brokerId
           console.log("⚠️ Database error, keeping original brokerId");
         } else if (!brokerData || brokerData.length === 0) {

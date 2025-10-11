@@ -343,6 +343,23 @@ const Header = () => {
     setIsDropdownOpen(false);
   }, []);
 
+  const handleSignOut = useCallback(async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error signing out:", error);
+      } else {
+        // Clear any local state if needed
+        setIsDropdownOpen(false);
+        setIsMobileMenuOpen(false);
+        // Navigate to home page
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Unexpected error during sign out:", error);
+    }
+  }, [navigate]);
+
   return (
     <header className={scrolled ? "scrolled" : ""}>
       <div className="header-container">
@@ -680,6 +697,97 @@ const Header = () => {
           <FontAwesomeIcon icon={faBoxOpen} aria-hidden="true" />
           <span>{t("navigation.products")}</span>
         </Link>
+
+        {/* Mobile Profile Section */}
+        <div className="mobile-profile-section">
+          {session ? (
+            // User is logged in
+            <div className="mobile-profile-info">
+              <div className="mobile-profile-avatar">
+                {userData?.avatar_url ? (
+                  <img
+                    src={userData.avatar_url}
+                    alt={`${
+                      userData.fullName || userData.nickName || "User"
+                    }'s avatar`}
+                    className="mobile-profile-image"
+                    loading="lazy"
+                    onError={(e) => {
+                      console.error(
+                        "❌ Failed to load mobile avatar image:",
+                        userData.avatar_url
+                      );
+                      e.target.style.display = "none";
+                      e.target.nextElementSibling.style.display = "flex";
+                    }}
+                  />
+                ) : (
+                  <div className="mobile-profile-icon">
+                    <FontAwesomeIcon icon={faUserTie} aria-hidden="true" />
+                  </div>
+                )}
+              </div>
+              <div className="mobile-profile-details">
+                <span className="mobile-user-name">
+                  {userData?.fullName ||
+                    userData?.nickName ||
+                    session.user?.email ||
+                    "User"}
+                </span>
+                <span className="mobile-user-email">{session.user?.email}</span>
+              </div>
+            </div>
+          ) : (
+            // User is not logged in
+            <div className="mobile-auth-section">
+              <Link
+                to="/signin"
+                className="mobile-nav-link mobile-signin-link"
+                onClick={closeMobileMenu}
+                aria-label={t("auth.signin.signInButton")}
+              >
+                <FontAwesomeIcon icon={faUserTie} aria-hidden="true" />
+                <span>{t("auth.signin.signInButton")}</span>
+              </Link>
+              <Link
+                to="/signup"
+                className="mobile-nav-link mobile-signup-link"
+                onClick={closeMobileMenu}
+                aria-label={t("auth.signup.signUpButton")}
+              >
+                <FontAwesomeIcon icon={faUserTie} aria-hidden="true" />
+                <span>{t("auth.signup.signUpButton")}</span>
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Profile Actions */}
+        {session && (
+          <div className="mobile-profile-actions">
+            <Link
+              to="/profile"
+              className="mobile-nav-link"
+              onClick={closeMobileMenu}
+              aria-label={t("navigation.profile")}
+            >
+              <FontAwesomeIcon icon={faUserTie} aria-hidden="true" />
+              <span>{t("navigation.profile")}</span>
+            </Link>
+
+            <button
+              className="mobile-nav-link mobile-logout-btn"
+              onClick={() => {
+                closeMobileMenu();
+                handleSignOut();
+              }}
+              aria-label={t("navigation.logout")}
+            >
+              <FontAwesomeIcon icon={faUserTie} aria-hidden="true" />
+              <span>{t("navigation.logout")}</span>
+            </button>
+          </div>
+        )}
       </nav>
     </header>
   );

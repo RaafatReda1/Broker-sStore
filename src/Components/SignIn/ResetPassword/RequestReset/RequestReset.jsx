@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import supabase from "../../../../SupabaseClient";
 import { toast } from "react-toastify";
 import {
@@ -13,6 +14,7 @@ import { Link } from "react-router-dom";
 import "./RequestReset.css";
 
 const RequestReset = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -39,12 +41,12 @@ const RequestReset = () => {
 
     // Validation
     if (!email.trim()) {
-      setEmailError("Email is required");
+      setEmailError(t("resetPassword.emailRequired"));
       return;
     }
 
     if (!validateEmail(email)) {
-      setEmailError("Please enter a valid email address");
+      setEmailError(t("resetPassword.emailInvalid"));
       return;
     }
 
@@ -85,11 +87,10 @@ const RequestReset = () => {
             <div className="reset-icon">
               <Mail size={32} />
             </div>
-            <h1 className="reset-title">Reset Your Password</h1>
-            <p className="reset-subtitle">
-              Enter your email address and we&apos;ll send you a link to reset
-              your password
-            </p>
+            <h1 className="reset-title">
+              {t("resetPassword.resetYourPassword")}
+            </h1>
+            <p className="reset-subtitle">{t("resetPassword.resetSubtitle")}</p>
           </div>
 
           <form className="reset-form" onSubmit={sendResetRequest}>
@@ -105,7 +106,9 @@ const RequestReset = () => {
                     placeholder=" "
                     disabled={isLoading}
                   />
-                  <span className="floating-label">Email Address</span>
+                  <span className="floating-label">
+                    {t("resetPassword.emailAddress")}
+                  </span>
                 </div>
                 {emailError && (
                   <div className="error-message">
@@ -124,12 +127,12 @@ const RequestReset = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="spinner" size={20} />
-                  Sending Reset Link...
+                  {t("resetPassword.sendingResetLink")}
                 </>
               ) : (
                 <>
                   <Send size={20} />
-                  Send Reset Link
+                  {t("resetPassword.sendResetLink")}
                 </>
               )}
             </button>
@@ -138,7 +141,7 @@ const RequestReset = () => {
           <div className="reset-footer">
             <Link to="/signin" className="back-to-signin">
               <ArrowLeft size={16} />
-              Back to Sign In
+              {t("resetPassword.backToSignIn")}
             </Link>
           </div>
         </>
@@ -147,16 +150,13 @@ const RequestReset = () => {
           <div className="success-icon">
             <CheckCircle size={48} />
           </div>
-          <h2 className="success-title">Check Your Email</h2>
+          <h2 className="success-title">{t("resetPassword.checkYourEmail")}</h2>
           <p className="success-message">
-            We&apos;ve sent a password reset link to <strong>{email}</strong>
+            {t("resetPassword.emailSentTo", { email })}
           </p>
           <div className="success-instructions">
-            <p>
-              Please check your email and follow the instructions to reset your
-              password.
-            </p>
-            <p>If you don&apos;t see the email, check your spam folder.</p>
+            <p>{t("resetPassword.checkEmailInstructions")}</p>
+            <p>{t("resetPassword.checkSpamFolder")}</p>
           </div>
           <div className="success-actions">
             <button
@@ -167,11 +167,11 @@ const RequestReset = () => {
               }}
             >
               <Send size={16} />
-              Send Another Email
+              {t("resetPassword.sendAnotherEmail")}
             </button>
             <Link to="/signin" className="back-to-signin">
               <ArrowLeft size={16} />
-              Back to Sign In
+              {t("resetPassword.backToSignIn")}
             </Link>
           </div>
         </div>

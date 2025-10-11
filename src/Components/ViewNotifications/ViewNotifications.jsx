@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import supabase from "../../SupabaseClient";
-import { userDataContext } from "../../AppContexts";
+import { userDataContext, sessionContext } from "../../AppContexts";
 import { toast } from "react-toastify";
 import { Bell, X, CheckCheck, Trash2, Calendar, User } from "lucide-react";
 import MDEditor from "@uiw/react-md-editor";
@@ -13,6 +13,7 @@ const ViewNotifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const { userData } = useContext(userDataContext);
+  const { session } = useContext(sessionContext);
   const fetchNotifications = async () => {
     const { data, error } = await supabase
       .from("Notifications")
@@ -28,23 +29,28 @@ const ViewNotifications = () => {
 
   // Filter notifications based on user eligibility
   const filteredNotifications = notifications.filter((notification) => {
+    // If no session, don't show any notifications
+    if (!session) {
+      return false;
+    }
+
     // If it's a broadcast to all users
     if (notification.isAll) {
       return true;
     }
 
-    // If it's a direct email notification
-    if (notification.brokerEmail && userData.email) {
-      return notification.brokerEmail === userData.email;
+    // If it's a direct email notification - check against session user email
+    if (notification.brokerEmail && session.user?.email) {
+      return notification.brokerEmail === session.user.email;
     }
 
-    // If it's a direct ID notification
-    if (notification.brokerIdTo && userData.id) {
+    // If it's a direct ID notification - check against userData if available
+    if (notification.brokerIdTo && userData?.id) {
       return notification.brokerIdTo === userData.id;
     }
 
-    // If it's a range notification
-    if (notification.brokerIdFrom && notification.brokerIdTo && userData.id) {
+    // If it's a range notification - check against userData if available
+    if (notification.brokerIdFrom && notification.brokerIdTo && userData?.id) {
       return (
         userData.id >= notification.brokerIdFrom &&
         userData.id <= notification.brokerIdTo
@@ -58,12 +64,26 @@ const ViewNotifications = () => {
   // Check if notification is read by current user
   const isNotificationRead = (notification) => {
     if (!notification.read_by) return false;
-    return notification.read_by[userData.id] === true;
+
+    // If we have userData, use the broker ID
+    if (userData?.id) {
+      return notification.read_by[userData.id] === true;
+    }
+
+    // If we only have session, we can't track read status by ID
+    // For now, we'll consider all notifications as unread for non-broker users
+    return false;
   };
 
   // Mark notification as read in database
   const markAsRead = async (notification) => {
     if (isNotificationRead(notification)) return;
+
+    // Only brokers can mark notifications as read (they have userData.id)
+    if (!userData?.id) {
+      // For non-broker users, we can't track read status
+      return;
+    }
 
     const updatedReadBy = {
       ...(notification.read_by || {}),
@@ -100,6 +120,12 @@ const ViewNotifications = () => {
 
   // Mark all notifications as read
   const markAllAsRead = async () => {
+    // Only brokers can mark notifications as read (they have userData.id)
+    if (!userData?.id) {
+      // For non-broker users, we can't track read status
+      return;
+    }
+
     const unreadNotifications = filteredNotifications.filter(
       (n) => !isNotificationRead(n)
     );
@@ -155,6 +181,9 @@ const ViewNotifications = () => {
 
   // Check if notification can be deleted (only for single user notifications)
   const canDeleteNotification = (notification) => {
+    // Only brokers can delete notifications (they have userData)
+    if (!userData) return false;
+
     return (
       (notification.brokerEmail === userData.email ||
         notification.brokerIdTo === userData.id) &&
@@ -261,6 +290,26 @@ const ViewNotifications = () => {
     (n) => !isNotificationRead(n)
   ).length;
 
+  // Show loading state if session is not loaded yet
+  if (!session) {
+    return (
+      <div className="notifications-container">
+        <div className="notifications-header">
+          <div className="header-left">
+            <Bell size={24} className="bell-icon" />
+            <h2 className="notifications-title">{t("notifications.title")}</h2>
+          </div>
+        </div>
+        <div className="notifications-content">
+          <div className="empty-state">
+            <Bell size={48} className="empty-icon" />
+            <p className="empty-text">{t("common.loading")}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="notifications-container">
       <div className="notifications-header">
@@ -271,7 +320,7 @@ const ViewNotifications = () => {
             <span className="unread-badge">{unreadCount}</span>
           )}
         </div>
-        {filteredNotifications.length > 0 && (
+        {filteredNotifications.length > 0 && userData?.id && (
           <button className="mark-all-btn" onClick={markAllAsRead}>
             <CheckCheck size={16} />
             {t("notifications.markAllRead")}

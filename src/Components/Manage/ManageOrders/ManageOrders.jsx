@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import supabase from "../../../SupabaseClient";
 import "./ManageOrders.css";
 import NotificationService from "../../../utils/notificationService";
@@ -6,6 +7,7 @@ import DeleteOrderModal from "./DeleteOrderModal";
 import { toast } from "react-toastify";
 
 const ManageOrders = () => {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -125,7 +127,7 @@ const ManageOrders = () => {
       const order = orders.find((o) => o.id === orderId);
       if (!order) {
         console.error("Order not found:", orderId);
-        toast.error("Order not found!");
+        toast.error(t("manageOrders.orderNotFound"));
         return;
       }
 
@@ -223,27 +225,27 @@ const ManageOrders = () => {
       <div className="header-section">
         <h1 className="page-title">
           <span className="title-icon">📦</span>
-          Manage Orders
+          {t("manageOrders.title")}
         </h1>
         <div className="order-stats">
           <div className="stat-badge">
-            <span className="stat-label">Total Orders</span>
+            <span className="stat-label">{t("manageOrders.totalOrders")}</span>
             <span className="stat-value">{orders.length}</span>
           </div>
           <div className="stat-badge completed">
-            <span className="stat-label">Completed</span>
+            <span className="stat-label">{t("manageOrders.completed")}</span>
             <span className="stat-value">
               {orders.filter((o) => o.status).length}
             </span>
           </div>
           <div className="stat-badge pending">
-            <span className="stat-label">Pending</span>
+            <span className="stat-label">{t("manageOrders.pending")}</span>
             <span className="stat-value">
               {orders.filter((o) => !o.status).length}
             </span>
           </div>
           <div className="stat-badge revenue">
-            <span className="stat-label">Revenue</span>
+            <span className="stat-label">{t("manageOrders.revenue")}</span>
             <span className="stat-value">{formatCurrency(totalRevenue)}</span>
           </div>
         </div>
@@ -253,7 +255,7 @@ const ManageOrders = () => {
         <div className="search-box">
           <input
             type="text"
-            placeholder="Search by order ID, name, phone, or address..."
+            placeholder={t("manageOrders.searchPlaceholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -267,7 +269,7 @@ const ManageOrders = () => {
             }
             onClick={() => setFilterStatus("all")}
           >
-            All
+            {t("manageOrders.all")}
           </button>
           <button
             className={
@@ -275,7 +277,7 @@ const ManageOrders = () => {
             }
             onClick={() => setFilterStatus("completed")}
           >
-            Completed
+            {t("manageOrders.completed")}
           </button>
           <button
             className={
@@ -283,7 +285,7 @@ const ManageOrders = () => {
             }
             onClick={() => setFilterStatus("pending")}
           >
-            Pending
+            {t("manageOrders.pending")}
           </button>
         </div>
       </div>
@@ -292,14 +294,14 @@ const ManageOrders = () => {
         {filteredOrders.length === 0 ? (
           <div className="no-results-card">
             <span className="no-results-icon">📭</span>
-            <p>No orders found</p>
+            <p>{t("manageOrders.noOrdersFound")}</p>
           </div>
         ) : (
           filteredOrders.map((order) => (
             <div key={order.id} className="order-card">
               <div className="order-header">
                 <div className="order-id">
-                  <span className="id-label">Order</span>
+                  <span className="id-label">{t("manageOrders.order")}</span>
                   <span className="id-value">#{order.id}</span>
                 </div>
                 <div className="order-badges">
@@ -314,13 +316,17 @@ const ManageOrders = () => {
                     <span className="status-icon">
                       {order.status ? "✓" : "⏳"}
                     </span>
-                    {order.status ? "Completed" : "Pending"}
+                    {order.status
+                      ? t("manageOrders.completed")
+                      : t("manageOrders.pending")}
                   </button>
 
                   {order.brokerVerified && (
                     <div className="verification-badge verified">
                       <span className="verification-icon">✓</span>
-                      <span className="verification-text">Verified Broker</span>
+                      <span className="verification-text">
+                        {t("manageOrders.verifiedBroker")}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -340,7 +346,9 @@ const ManageOrders = () => {
                 <div className="detail-item">
                   <span className="detail-icon">📍</span>
                   <div className="detail-content">
-                    <span className="detail-label">Delivery Address</span>
+                    <span className="detail-label">
+                      {t("manageOrders.deliveryAddress")}
+                    </span>
                     <span className="detail-value">{order.address}</span>
                   </div>
                 </div>
@@ -348,7 +356,9 @@ const ManageOrders = () => {
                 <div className="detail-item">
                   <span className="detail-icon">🛒</span>
                   <div className="detail-content">
-                    <span className="detail-label">Items</span>
+                    <span className="detail-label">
+                      {t("manageOrders.items")}
+                    </span>
                     <span className="detail-value">
                       {order.cart?.length || 0} item(s)
                     </span>
@@ -359,7 +369,9 @@ const ManageOrders = () => {
                   <div className="detail-item">
                     <span className="detail-icon">📝</span>
                     <div className="detail-content">
-                      <span className="detail-label">Notes</span>
+                      <span className="detail-label">
+                        {t("manageOrders.notes")}
+                      </span>
                       <span className="detail-value">{order.notes}</span>
                     </div>
                   </div>
@@ -368,13 +380,17 @@ const ManageOrders = () => {
 
               <div className="order-financial">
                 <div className="financial-item">
-                  <span className="financial-label">Total</span>
+                  <span className="financial-label">
+                    {t("manageOrders.total")}
+                  </span>
                   <span className="financial-value total">
                     {formatCurrency(order.total)}
                   </span>
                 </div>
                 <div className="financial-item">
-                  <span className="financial-label">Net Profit</span>
+                  <span className="financial-label">
+                    {t("manageOrders.netProfit")}
+                  </span>
                   <span className="financial-value profit">
                     {formatCurrency(order.netProfit)}
                   </span>
@@ -390,7 +406,7 @@ const ManageOrders = () => {
                     className="view-details-btn"
                     onClick={() => setSelectedOrder(order)}
                   >
-                    View Details
+                    {t("manageOrders.viewDetails")}
                   </button>
                   <button
                     className="delete-order-btn"

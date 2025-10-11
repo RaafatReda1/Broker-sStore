@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import {
   sessionContext,
   staffContext,
@@ -9,13 +10,19 @@ import Moderator from "../Manage/Moderator/Moderator";
 import Products from "../Products/Products";
 
 const UserTypeRouter = () => {
+  const { t } = useTranslation();
   const { session } = useContext(sessionContext);
   const { isAdmin, isModerator } = useContext(staffContext);
   const { userData } = useContext(userDataContext);
 
   // This should not happen anymore since we check data loading in App.jsx
   // But keeping as fallback
-  if (session && userData === null && isAdmin === null && isModerator === null) {
+  if (
+    session &&
+    userData === null &&
+    isAdmin === null &&
+    isModerator === null
+  ) {
     console.log("⏳ UserTypeRouter: Waiting for user data to load...");
     return (
       <div
@@ -28,7 +35,7 @@ const UserTypeRouter = () => {
           color: "#666",
         }}
       >
-        🔄 Loading user permissions...
+        🔄 {t("userTypeRouter.loadingPermissions")}
       </div>
     );
   }
