@@ -450,9 +450,9 @@
 @media (max-width: 480px) {
   .checkout-form {
     padding: 20px;
-  }
+}
 
-  .checkout-title {
+.checkout-title {
     font-size: 20px;
   }
 

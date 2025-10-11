@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { useTranslation } from "react-i18next";
 import "./CheckOut.css";
 import { cartContext } from "../../AppContexts";
 import supabase from "../../SupabaseClient";
@@ -16,6 +17,7 @@ import {
 import NotificationService from "../../utils/notificationService";
 //test
 const CheckOut = () => {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -24,19 +26,30 @@ const CheckOut = () => {
   const { cart } = useContext(cartContext);
 
   // ✅ form state
-  const [form, setForm] = useState({
-    brokerId: JSON.parse(localStorage.getItem("brokerId") || "null") || 45,
-    name: "",
-    address: "",
-    phone: "",
-    notes: "",
-    // date: "", this feild is deleted at the DB for now
-    cart: cart,
-    total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-    //adding the net profit logic
-    netProfit: cart.reduce((sum, product) => {
-      return sum + product.profit * product.quantity;
-    }, 0),
+  const [form, setForm] = useState(() => {
+    const storedBrokerId = localStorage.getItem("brokerId");
+    const parsedBrokerId = storedBrokerId ? JSON.parse(storedBrokerId) : null;
+    console.log(
+      "🔍 Initial brokerId from localStorage:",
+      storedBrokerId,
+      "Parsed:",
+      parsedBrokerId
+    );
+
+    return {
+      brokerId: parsedBrokerId,
+      name: "",
+      address: "",
+      phone: "",
+      notes: "",
+      // date: "", this feild is deleted at the DB for now
+      cart: cart,
+      total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+      //adding the net profit logic
+      netProfit: cart.reduce((sum, product) => {
+        return sum + product.profit * product.quantity;
+      }, 0),
+    };
   });
 
   // ✅ Update form when cart changes from context
@@ -72,44 +85,106 @@ const CheckOut = () => {
   // ✅ handle form submit
   const handleSubmit = async () => {
     if (!form.name || !form.address || !form.phone) {
-      toast.error("Please fill in all required fields!");
+      toast.error(t("errors.fillRequiredFields"));
       return;
     }
 
     setIsSubmitting(true);
     try {
+      // Check if brokerId exists in brokers table
+      let validatedBrokerId = form.brokerId;
+      console.log(
+        "🔍 Original brokerId:",
+        form.brokerId,
+        "Type:",
+        typeof form.brokerId
+      );
+
+      if (form.brokerId && form.brokerId !== null && form.brokerId !== "null") {
+        // Convert to number if it's a string
+        const brokerIdToCheck =
+          typeof form.brokerId === "string"
+            ? parseInt(form.brokerId, 10)
+            : form.brokerId;
+        console.log(
+          "🔍 Checking broker existence for ID:",
+          brokerIdToCheck,
+          "Original:",
+          form.brokerId
+        );
+
+        const { data: brokerData, error: brokerError } = await supabase
+          .from("Brokers")
+          .select("id")
+          .eq("id", brokerIdToCheck)
+          .limit(1);
+
+        console.log("🔍 Broker query result:", { brokerData, brokerError });
+
+        if (brokerError) {
+          console.log("⚠️ Broker query error:", brokerError.message);
+          console.log("⚠️ Full error object:", brokerError);
+          // Database error - keep original brokerId
+          console.log("⚠️ Database error, keeping original brokerId");
+        } else if (!brokerData || brokerData.length === 0) {
+          console.log(
+            "⚠️ No broker found with ID:",
+            brokerIdToCheck,
+            "setting to null"
+          );
+          validatedBrokerId = null;
+        } else {
+          console.log("✅ Broker found:", brokerData[0]);
+        }
+      } else {
+        console.log(
+          "ℹ️ No brokerId or brokerId is null/undefined, keeping as is"
+        );
+      }
+
+      // Create order data with validated brokerId
+      console.log("🔍 Final validated brokerId:", validatedBrokerId);
+      const orderData = {
+        ...form,
+        brokerId: validatedBrokerId,
+      };
+
       const { data, error } = await supabase
         .from("Orders")
-        .insert([form])
+        .insert([orderData])
         .select(); // ✅ علشان يرجعلك الـ data المدخلة
 
       if (error) {
-        toast.error(`Error: ${error.message}`);
+        toast.error(t("errors.generic"));
         return;
       } else if (data && data.length > 0) {
         setOrderSuccess(true);
-        toast.success("Order placed successfully!");
+        toast.success(t("success.orderPlaced"));
 
-        // Send notification to broker about new order
+        // Send notification to broker about new order (only if brokerId is valid)
         const newOrder = data[0];
         console.log("🛒 Order created successfully:", newOrder);
         console.log("🛒 BrokerId from order:", newOrder.brokerId);
 
-        try {
-          const notificationResult = await NotificationService.notifyNewOrder(
-            newOrder
-          );
-          console.log("🔔 Notification result:", notificationResult);
-          if (notificationResult) {
-            console.log(
-              "✅ New order notification sent to broker successfully"
+        if (newOrder.brokerId) {
+          try {
+            const notificationResult = await NotificationService.notifyNewOrder(
+              newOrder
             );
-          } else {
-            console.log("❌ Failed to send new order notification");
+            console.log("🔔 Notification result:", notificationResult);
+            if (notificationResult) {
+              console.log(
+                "✅ New order notification sent to broker successfully"
+              );
+            } else {
+              console.log("❌ Failed to send new order notification");
+            }
+          } catch (error) {
+            console.error("❌ Error sending new order notification:", error);
+            // Don't show error to user as order was successful
           }
-        } catch (error) {
-          console.error("❌ Error sending new order notification:", error);
-          // Don't show error to user as order was successful
+        } else {
+          console.log("ℹ️ No broker ID, skipping notification");
         }
 
         // Reset form after success
@@ -135,7 +210,7 @@ const CheckOut = () => {
       }
     } catch (err) {
       console.error(err);
-      toast.error("Unexpected error occurred! " + err.message);
+      toast.error(t("errors.generic"));
     } finally {
       setIsSubmitting(false);
     }
@@ -160,7 +235,9 @@ const CheckOut = () => {
             }}
           >
             <ShoppingBag size={20} />
-            {visible ? "Still shopping?" : "Proceed to Checkout"}
+            {visible
+              ? t("checkout.stillShopping")
+              : t("checkout.proceedToCheckout")}
             <ArrowRight size={16} />
           </button>
 
@@ -169,15 +246,15 @@ const CheckOut = () => {
               <div className="checkout-header">
                 <h2 className="checkout-title">
                   <CreditCard size={28} />
-                  Checkout
+                  {t("checkout.title")}
                 </h2>
                 <div className="order-summary">
                   <div className="summary-item">
-                    <span>Items:</span>
+                    <span>{t("checkout.items")}:</span>
                     <span>{cart.length}</span>
                   </div>
                   <div className="summary-item">
-                    <span>Total:</span>
+                    <span>{t("checkout.total")}:</span>
                     <span className="total-price">
                       ${form.total.toFixed(2)}
                     </span>
@@ -188,17 +265,15 @@ const CheckOut = () => {
               {orderSuccess ? (
                 <div className="success-state">
                   <CheckCircle className="success-icon" size={64} />
-                  <h3>Order Placed Successfully!</h3>
-                  <p>
-                    Thank you for your order. We&apos;ll process it shortly.
-                  </p>
+                  <h3>{t("checkout.orderSuccess")}</h3>
+                  <p>{t("checkout.thankYou")}</p>
                 </div>
               ) : (
                 <form onSubmit={(e) => e.preventDefault()}>
                   <div className="form-section">
                     <h3 className="section-title">
                       <User size={20} />
-                      Personal Information
+                      {t("checkout.personalInfo")}
                     </h3>
 
                     <label className="checkout-label">
@@ -212,7 +287,9 @@ const CheckOut = () => {
                         placeholder=" "
                         disabled={isSubmitting}
                       />
-                      <span className="floating-label">Full Name *</span>
+                      <span className="floating-label">
+                        {t("checkout.fullName")}
+                      </span>
                     </label>
 
                     <label className="checkout-label">
@@ -227,14 +304,16 @@ const CheckOut = () => {
                         pattern="[0-9]{10,15}"
                         disabled={isSubmitting}
                       />
-                      <span className="floating-label">Phone Number *</span>
+                      <span className="floating-label">
+                        {t("checkout.phoneNumber")}
+                      </span>
                     </label>
                   </div>
 
                   <div className="form-section">
                     <h3 className="section-title">
                       <MapPin size={20} />
-                      Delivery Information
+                      {t("checkout.deliveryInfo")}
                     </h3>
 
                     <label className="checkout-label">
@@ -248,14 +327,16 @@ const CheckOut = () => {
                         placeholder=" "
                         disabled={isSubmitting}
                       />
-                      <span className="floating-label">Delivery Address *</span>
+                      <span className="floating-label">
+                        {t("checkout.deliveryAddress")}
+                      </span>
                     </label>
                   </div>
 
                   <div className="form-section">
                     <h3 className="section-title">
                       <FileText size={20} />
-                      Additional Information
+                      {t("checkout.additionalInfo")}
                     </h3>
 
                     <label className="checkout-label">
@@ -268,7 +349,7 @@ const CheckOut = () => {
                         disabled={isSubmitting}
                       />
                       <span className="floating-label">
-                        Order Notes (Optional)
+                        {t("checkout.orderNotes")}
                       </span>
                     </label>
                   </div>
@@ -282,12 +363,12 @@ const CheckOut = () => {
                     <span className="button-content">
                       {isSubmitting ? (
                         <span className="loading-content">
-                          Processing Order...
+                          {t("checkout.processingOrder")}
                         </span>
                       ) : (
                         <span className="normal-content">
                           <CreditCard size={20} />
-                          Place Order
+                          {t("checkout.placeOrder")}
                         </span>
                       )}
                     </span>

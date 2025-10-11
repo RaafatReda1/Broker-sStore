@@ -1,8 +1,8 @@
 /* Professional Product Page Styles */
 .product-page {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
   align-items: flex-start;
   padding: 40px 20px;
   background: linear-gradient(
@@ -51,7 +51,7 @@
 
 .back-button {
   display: flex;
-  align-items: center;
+    align-items: center;
   gap: 8px;
   padding: 12px 20px;
   background: rgba(255, 255, 255, 0.9);
@@ -74,9 +74,9 @@
 }
 
 /* Product Card */
-.product-card {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  .product-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   gap: 40px;
   background: linear-gradient(
     145deg,
@@ -86,7 +86,7 @@
   border-radius: 25px;
   padding: 40px;
   max-width: 1200px;
-  width: 100%;
+    width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(8px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -94,15 +94,15 @@
   position: relative;
   z-index: 1;
   will-change: transform, box-shadow;
-}
-
-.product-card:hover {
+  }
+  
+  .product-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
+  }
+  
 /* Product Images */
-.product-images {
+  .product-images {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -119,10 +119,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.main-image {
-  width: 100%;
+  }
+  
+  .main-image {
+    width: 100%;
   height: 100%;
   object-fit: contain;
   object-position: center;
@@ -130,9 +130,9 @@
   filter: brightness(1.05) contrast(1.1);
   max-width: 100%;
   max-height: 100%;
-}
-
-.main-image:hover {
+  }
+  
+  .main-image:hover {
   transform: scale(1.02);
   filter: brightness(1.1) contrast(1.15);
 }
@@ -235,34 +235,34 @@
 }
 
 /* Thumbnails */
-.thumbnails {
-  display: flex;
-  justify-content: center;
+  .thumbnails {
+    display: flex;
+    justify-content: center;
   gap: 15px;
   flex-wrap: wrap;
-}
-
-.thumbnail {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
+  }
+  
+  .thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
   object-position: center;
   border-radius: 15px;
-  cursor: pointer;
+    cursor: pointer;
   border: 2px solid rgba(255, 255, 255, 0.3);
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
-}
-
-.thumbnail:hover {
+  }
+  
+  .thumbnail:hover {
   transform: scale(1.1) translateY(-2px);
   border-color: #3b82f6;
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-}
-
-.thumbnail.active {
-  border: 3px solid #2563eb;
+  }
+  
+  .thumbnail.active {
+    border: 3px solid #2563eb;
   transform: scale(1.05);
   box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
@@ -283,7 +283,7 @@
 
 .product-title {
   font-size: 2.5rem;
-  font-weight: 800;
+    font-weight: 800;
   color: #1f2937;
   margin: 0;
   line-height: 1.2;
@@ -321,7 +321,7 @@
 .product-description {
   font-size: 1.1rem;
   color: #6b7280;
-  line-height: 1.6;
+    line-height: 1.6;
   margin: 0;
   font-weight: 400;
 }
@@ -365,9 +365,9 @@
 }
 
 .profit-container {
-  display: flex;
+    display: flex;
   justify-content: space-between;
-  align-items: center;
+    align-items: center;
   padding: 15px;
   background: linear-gradient(
     135deg,
@@ -405,9 +405,9 @@
 }
 
 .quantity-controls {
-  display: flex;
+    display: flex;
   align-items: center;
-  gap: 15px;
+    gap: 15px;
   justify-content: center;
 }
 
@@ -445,15 +445,15 @@
   height: 45px;
   padding: 0 15px;
   border: 2px solid rgba(59, 130, 246, 0.3);
-  border-radius: 12px;
+    border-radius: 12px;
   font-size: 1.1rem;
-  font-weight: 600;
+    font-weight: 600;
   text-align: center;
   background: rgba(255, 255, 255, 0.9);
   color: #374151;
-  transition: all 0.3s ease;
-}
-
+    transition: all 0.3s ease;
+  }
+  
 .quantity-input:focus {
   outline: none;
   border-color: #3b82f6;
@@ -550,7 +550,7 @@
 
 .product-page .copy-link-btn {
   background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: white;
+    color: white;
   box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
@@ -718,7 +718,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+    color: white;
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
@@ -875,4 +875,5 @@
     color: #f9fafb;
     border-color: rgba(59, 130, 246, 0.5);
   }
-}
+  }
+  
