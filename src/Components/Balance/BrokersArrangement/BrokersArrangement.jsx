@@ -87,11 +87,27 @@ const BrokersArrangement = () => {
     return `#${rank}`;
   }, []);
 
-  // Memoized current user rank
-  const currentUserRank = useMemo(
-    () => getCurrentUserRank(),
-    [getCurrentUserRank]
-  );
+  // Get top 10 brokers
+  const top10Brokers = useMemo(() => {
+    return brokers.slice(0, 10);
+  }, [brokers]);
+
+  // Check if current user is in top 10
+  const isCurrentUserInTop10 = useMemo(() => {
+    if (!userData) return false;
+    return top10Brokers.some((broker) => broker.id === userData.id);
+  }, [top10Brokers, userData]);
+
+  // Get current user's detailed rank info
+  const currentUserRankInfo = useMemo(() => {
+    if (!userData) return null;
+    const userIndex = brokers.findIndex((broker) => broker.id === userData.id);
+    return {
+      rank: userIndex + 1,
+      broker: brokers[userIndex],
+      isInTop10: userIndex < 10,
+    };
+  }, [brokers, userData]);
 
   if (!session || !userData) {
     return null; // Don't show for non-authenticated users
@@ -127,7 +143,7 @@ const BrokersArrangement = () => {
             </div>
 
             {/* Current User Status */}
-            {userData && (
+            {userData && currentUserRankInfo && (
               <div className="current-user-status">
                 <div className="current-user-card">
                   <div className="current-user-avatar">
@@ -139,13 +155,32 @@ const BrokersArrangement = () => {
                   </div>
                   <div className="current-user-info">
                     <h4>{userData.fullName}</h4>
-                    <p>
-                      {t("balance.yourRank")}: #
-                      {currentUserRank || t("common.loading")}
-                    </p>
-                    <span className="current-user-revenue">
-                      {formatCurrency(userData.totalRevenue)}
-                    </span>
+                    <div className="rank-display">
+                      <span
+                        className={`rank-badge ${getRankBadgeClass(
+                          currentUserRankInfo.rank
+                        )}`}
+                      >
+                        {getRankIcon(currentUserRankInfo.rank)}
+                      </span>
+                      <span className="rank-text">
+                        {t("balance.yourRank")}: #{currentUserRankInfo.rank}
+                      </span>
+                    </div>
+                    <div className="revenue-display">
+                      <span className="current-user-revenue">
+                        {formatCurrency(userData.totalRevenue)}
+                      </span>
+                      <span className="revenue-label">
+                        {t("balance.totalRevenue")}
+                      </span>
+                    </div>
+                    {!currentUserRankInfo.isInTop10 && (
+                      <div className="motivation-text">
+                        <i className="fa-solid fa-rocket" />
+                        {t("balance.climbLeaderboard")}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -160,7 +195,13 @@ const BrokersArrangement = () => {
                 </div>
               ) : (
                 <div className="brokers-list">
-                  {brokers.map((broker, index) => {
+                  <div className="top10-header">
+                    <h3>
+                      <i className="fa-solid fa-crown" />
+                      {t("balance.top10Brokers")}
+                    </h3>
+                  </div>
+                  {top10Brokers.map((broker, index) => {
                     const rank = index + 1;
                     const isCurrentUser = userData && broker.id === userData.id;
 
@@ -212,8 +253,14 @@ const BrokersArrangement = () => {
             <div className="leaderboard-footer">
               <p>
                 <i className="fa-solid fa-info-circle" />
-                Rankings are based on total revenue earned
+                {t("balance.leaderboardInfo")}
               </p>
+              {currentUserRankInfo && !currentUserRankInfo.isInTop10 && (
+                <p className="motivation-footer">
+                  <i className="fa-solid fa-chart-line" />
+                  {t("balance.keepClimbing")}
+                </p>
+              )}
             </div>
           </div>
         </div>
